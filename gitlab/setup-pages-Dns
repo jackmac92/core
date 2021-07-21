@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+domain=${2:-"jackm.works"}
+subdomain=$1
+GITLAB_CODE=$(s gitlab this-project-request POST pages/domains domain=$subdomain.$domain | jq '.verification_code')
+doctl compute domain records create $domain --record-type TXT --record-name _gitlab-pages-verification-code.$subdomain --record-data gitlab-pages-verification-code=$GITLAB_CODE --record-ttl 3600
+doctl compute domain records create $domain --record-type CNAME --record-name $subdomain --record-data jackmac92.gitlab.io. --record-ttl 43200

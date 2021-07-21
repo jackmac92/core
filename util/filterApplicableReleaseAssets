@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+python -c '
+import sys
+import json
+ostype=sys.platform
+def seems_to_reference_osx(name):
+    if "macos" in name:
+        return True
+    if "apple" in name:
+        return True
+    if "darwin" in name:
+        return True
+    if name.endswith(".dmg"):
+        return True
+    return False
+def seems_to_reference_windows(name):
+    if "win64" in name:
+        return True
+    if "win32" in name:
+        return True
+    if "windows" in name:
+        return True
+    if name.endswith(".exe"):
+        return True
+    return False
+# for obj in map(lambda x: json.loads(x), sys.stdin.readlines()):
+for jsonstr in sys.stdin.readlines():
+    obj = json.loads(jsonstr)
+    url = obj["browser_download_url"]
+    name = obj["name"]
+    size = obj["size"]
+    # too small
+    if size < 500:
+        continue
+    if ostype == "linux" and (seems_to_reference_osx(name) or seems_to_reference_windows(name)):
+        continue
+    print(jsonstr)
+'

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+  fd ".help$" -t f "$scriptdir" -x bash -c "(test -e {.} && [ -x {.} ]) || echo {}"
+done

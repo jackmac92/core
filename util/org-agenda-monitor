@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+realpath "$1" >>~/org/.external-todo-feeds
+bat ~/org/.external-todo-feeds | sort -u | sponge ~/org/.external-todo-feeds
+echo >>~/org/.external-todo-feeds

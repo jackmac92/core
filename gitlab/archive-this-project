@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "WARNING THIS WILL ARCHIVE THE PROJECT... ^C if you wanna bail!"
+read
+s gitlab this-project-request "POST" "archive"

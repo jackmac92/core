@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sed --expression 's/\([A-Z]\)/-\L\1/g' --expression 's/^-//'

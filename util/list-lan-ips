@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+active_interface=$(nmcli device status | rg -e "\sconnected\s\s+" | choose 0)
+sudo arp-scan --localnet --interface $active_interface

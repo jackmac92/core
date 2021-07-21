@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+chk=${1#[+-]};
+[ "$chk" ] && [ -z "${chk//[0-9]}" ]

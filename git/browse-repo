@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+open "$(s git remote-to-http-url)"

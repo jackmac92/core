@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ACTIVE_TICKET_FILE="$HOME/cbinsights/active-jira-ticket"
+
+while ! [ -s "$ACTIVE_TICKET_FILE" ] || [ -z $(cat "$ACTIVE_TICKET_FILE") ]; do
+   s jira change-active-ticket
+done
+
+cat "$ACTIVE_TICKET_FILE"

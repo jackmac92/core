@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+proto_path=${1:-"$(s cbi svc-name-to-proto-path "$(s cbi svc-select-dwim)")"}
+
+cat "$proto_path" | rg --color=never --no-filename --no-line-number --only-matching '^message\s(\w+)\s' --replace '$1'

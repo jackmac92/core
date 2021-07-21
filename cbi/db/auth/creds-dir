@@ -1,0 +1,8 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+cbienv=$1
+targetDb=$2
+result="$CBI_DEV_DIRECTORY/vault-creds/$cbienv-db_$targetDb"
+mkdir -p "$result" || true
+echo "$result"

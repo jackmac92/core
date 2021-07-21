@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+yq m <(s gitlab this-project-request "pipelines" status==pending) <(s gitlab this-project-request "pipelines" status==running)

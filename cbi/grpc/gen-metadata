@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+metadatatype=${1:-"user"}
+
+currenv=$(s cbi env-select-dwim)
+metadatadir="$HOME/.local/cbinsights/grpc-metadata/$currenv"
+mkdir -p "$metadatadir"
+
+export CBI_OVERRIDE_METADATA_WITH_BASIC=1
+
+if [[ $metadatatype = "admin" ]]; then
+  if ! [ -s "$metadatadir/admin" ]; then
+    # s cbi grpccall admin-frontend-service GetUserInfo "{}" > "$metadatadir/admin"
+    jo idUser=$CBI_USER_ID email="$CBI_USER_EMAIL" firstName=$(git config user.name | awk '{ print $1 }') lastName=$(git config user.name | awk '{ print $2 }') pagePermissions=\{\} > "$metadatadir/admin"
+  fi
+  cat "$metadatadir/admin" | jq -c
+else
+  if ! [ -s "$metadatadir/user" ]; then
+    # s cbi grpccall user-v2-service GetUserInfoAndTrialInfo "{}" > "$metadatadir/user"
+    jo idUser=$CBI_USER_ID email="$CBI_USER_EMAIL" features=\[\] package=\{\} userInfo=$(jo idUser=$CBI_USER_ID) > "$metadatadir/user"
+  fi
+  cat "$metadatadir/user" | jq -c '{ features: [] } + .' # ensure there is a features array
+fi
+
+unset CBI_OVERRIDE_METADATA_WITH_BASIC
+

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+currval=${1:-$PWD}
+
+while [ $currval != "/" ]; do
+    echo $currval
+    currval="$(dirname $currval)"
+done | tac

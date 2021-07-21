@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+notDone=1
+reattempt=0
+while [[ "$notDone" -eq 1 ]]; do
+    if [[ "$reattempt" -eq 1 ]]; then
+        echo; echo; echo; echo
+        echo "Let's try again"
+    fi
+	echo "At what time?"
+	read userin
+	echo "$userin" | python -c '
+from dateparser import parse
+import sys
+result = parse(sys.stdin.read())
+if result is None:
+    raise Exception("Could not determine date")
+print(result)' && notDone=0
+    reattempt=1
+done

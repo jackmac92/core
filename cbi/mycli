@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+cbienv=$1
+shift
+targetDb=$1
+shift
+
+mycli --login-path "$cbienv-$targetDb" $*

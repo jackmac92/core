@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+project_name=$1
+shift
+if [[ $1 = "POST" ]] || [[ $1 = "GET" ]] || [[ $1 = "PUT" ]] || [[ $1 = "DELETE" ]]; then
+	req_method=$1
+	shift
+else
+	req_method="GET"
+fi
+api_path=$1
+shift
+req_path="projects/$(urlencode $project_name)/$api_path"
+s gitlab request "$req_method" "$req_path" $*

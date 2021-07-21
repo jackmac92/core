@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for ii in $(s meta list-all); do
+
+    if ! [ -e "$HOME/.local/scripts-dir-metrics/$ii" ]; then
+        echo "$ii"
+    fi
+done

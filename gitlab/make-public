@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+gitleaks  $(git remote get-url origin)
+
+# review commit history
+tmux split-window 'git log --oneline'
+echo "Press enter when done reviewing previous commits"
+read waitr
+if [ $(git branch | wc -l) -gt 1 ]; then
+    tmux split-window 'git branch && $SHELL'
+    echo "Press enter when done reviewing other branches"
+    read waitr
+fi
+
+s Yn "Confirm making repo public?"
+
+s util gitlabphorm
+
+# NOTE it would be nice to automatically make CI private even while repo is public, but can't figure that out with API or gitlabform
+# gitlabThisProjectRequest PUT "/" public_builds=false
+
+s gitlab mirror-on-github

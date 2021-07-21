@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+reqflags=()
+
+while [[ $1 = --* ]]; do
+	reqflags+=( "$1" )
+	shift
+done
+
+if [[ $1 = "POST" ]] || [[ $1 = "GET" ]] || [[ $1 = "PUT" ]] || [[ $1 = "DELETE" ]] || [[ $1 = "HEAD" ]]; then
+	req_method=$1
+	shift
+else
+	req_method="GET"
+fi
+api_path=$1
+shift
+req_path="projects/$(s gitlab get-url-encoded-project-name-from-remote)/$api_path"
+s gitlab request ${reqflags[@]} "$req_method" "$req_path" $*

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export S_INNER_CALL=1
+
+script=$(echo "$@" | tr ' ' '/')
+
+# Look for exact file match
+for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    if [[ -f "$root/$script" ]]; then
+        echo "$root/$script"
+    fi
+done
+
+# Look for parent dir match
+for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    if [[ -d $(dirname "$root/$script") ]]; then
+        echo "$root/$script"
+    fi
+done
+
+# If all else fails echo first possible location
+for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    echo "$root/$script"
+done
+

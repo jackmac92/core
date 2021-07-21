@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+tmpcsvfile=$(mktemp --suffix .csv)
+tmpjsonfile=$(mktemp --suffix .json)
+tgt_env=${2:-$(s cbi env-select-dwim)}
+mycli --csv $(s cbi db auth conn-string "$tgt_env") -e "
+		SELECT u.email, u.id_user
+		FROM cbi_user.cbi_user u
+		WHERE
+			u.email LIKE '$1%@cbinsights.com'
+			AND u.email NOT LIKE '%+%@cbinsights.com'
+		" | s util convert-csv-to-json | s fzf select-by-json-key "email" | jq -r '.id_user'

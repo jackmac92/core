@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python -c 'import sys, json, configparser; config = configparser.ConfigParser(); config.read_file(sys.stdin); print(json.dumps(config._sections))'

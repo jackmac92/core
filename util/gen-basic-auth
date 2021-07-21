@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+USER=$1
+PASS=$2
+
+htpasswd -nbB $USER "$PASS"

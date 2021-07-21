@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $PWD = $HOME/cbinsights* ]]; then
+  echo "https://gitlab.cbinsights.com"
+else
+  echo "https://gitlab.com"
+fi

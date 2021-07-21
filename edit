@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+argument=${@:-"$(s meta last-invoked "(edit|cat|whicha?)")"}
+
+tgt_file="$(s which "$argument")"
+
+$EDITOR "$tgt_file"

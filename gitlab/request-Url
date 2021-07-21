@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+path=${1:-""}
+
+glabhost=$(s gitlab host-Url)
+
+echo "$glabhost/api/v4/$path"

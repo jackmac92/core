@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+relativeFilePath=$1
+filePath="$(basename -- "$relativeFilePath")"
+fileContents="$(cat $relativeFilePath)"
+httpVerb="POST"
+if s gitlab this-project-request "HEAD" "repository/files/$filePath" ref==master >/dev/null; then
+	httpVerb="PUT"
+fi
+api_path="repository/files/$filePath"
+req_path="projects/$(s gitlab get-url-encoded-project-name-from-remote)/$api_path"
+jo branch=master author_email="$(git config user.email)" author_name="$(git config user.name)" commit_message="api update $filePath" content="$fileContents" | http --check-status --body "$httpVerb" $(s gitlab request-Url "$req_path") Private-Token:"$LAB_CORE_TOKEN"

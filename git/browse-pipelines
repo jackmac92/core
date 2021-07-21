@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# what is browse-repo doing to get url?
+# get that url and add /-/pipelines for gitlab project
+
+url=$(s git remote-to-http-url)
+
+if [[ $url = *gitlab* ]]; then
+    open "$url/-/pipelines"
+    exit 0
+elif [[ $url = *github* ]]; then
+    open "$url/actions"
+    exit 0
+fi
+
+echo "Unknown repo hosting"
+exit 1

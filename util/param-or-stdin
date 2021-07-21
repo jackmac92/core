@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+param=${1:-""}
+
+if [[ -z $param ]]; then
+  cat /dev/stdin
+else
+  echo "$param"
+fi

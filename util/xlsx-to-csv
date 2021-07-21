@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+output=$(mktemp -u --suffix .csv)
+ssconvert "$1" "$output"
+cat "$output"

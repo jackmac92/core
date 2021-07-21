@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+cbienv=$1
+targetDb=$2
+cat "$(s cbi db auth latest-creds-path "$cbienv" "$targetDb")" | head -n 3

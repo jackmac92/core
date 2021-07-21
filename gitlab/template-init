@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repoName=${PWD##*/}
+git status >/dev/null 2>&1 || git init
+git remote add origin "git@gitlab.com:quickstart-templates/$repoName.git"
+s gitlab request POST projects name="$repoName" namespace_id=5776495 visibility=private

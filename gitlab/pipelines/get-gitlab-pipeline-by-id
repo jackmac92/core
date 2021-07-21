@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo_name="$1"
+pipeline_id="$2"
+http --print=b "$GITLAB_INSTANCE_URL/api/v4/projects/$(urlencode "$repo_name")/pipelines/$pipeline_id" private_token=="$LAB_CORE_TOKEN"

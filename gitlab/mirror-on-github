@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repoName=$(basename $(git rev-parse --show-toplevel))
+http --auth "jackmac92:$GITHUB_TOKEN" POST https://api.github.com/user/repos name=$repoName description="Gitlab repo mirror" has_wiki=false
+git remote add github "git@github.com:jackmac92/$repoName.git"
+s gitlab this-project-request "POST" "remote_mirrors" url="https://jackmac92:$GITHUB_TOKEN@github.com/jackmac92/$repoName.git" enabled=true only_protected_branches=false

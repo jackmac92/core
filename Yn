@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+msg="${1:-"Double checking... [Yn]"}"
+
+>&2 echo "$msg"
+>&2 echo
+
+read gogo
+if [[ $gogo = Y* ]] || [[ $gogo = y* ]]; then
+  exit 0
+fi
+
+exit 1

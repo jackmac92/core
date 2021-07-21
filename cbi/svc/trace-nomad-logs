@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+tgt_svc="${1:-$(s cbi svc select-dwim)}"
+
+s cbi svc get-nomad-alloc-ids "$tgt_svc" | xpanes -t -c "SCRIPTS_PATH=$SCRIPTS_PATH s cbi nomad alloc logs -tail -f {} $tgt_svc"

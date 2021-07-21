@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jira available-tickets | jq '.issues | map({key: .key, description: .fields.summary, reporter: .fields.reporter.displayName })' | s fzf select-by-json-key "key" "description"

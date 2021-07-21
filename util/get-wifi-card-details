@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+iw phy phy0 info
+

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmdname="$1"
+
+tee ~/.local/share/zsh/completions/_$cmdname
+
+zsh -c 'source $HOME/.zinit/bin/zinit.zsh; zinit creinstall ~/.local/share/zsh/completions'

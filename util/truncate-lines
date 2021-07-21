@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+N_TRIM=${1-1}
+
+if ! s shell is-num $N_TRIM ; then
+    echo "must pass an integer parameter, got $N_TRIM"
+    exit 1
+fi
+
+python -c '
+import sys
+res = [l for l in sys.stdin.readlines()]
+print("".join(res[:-'$N_TRIM']), end="")
+'

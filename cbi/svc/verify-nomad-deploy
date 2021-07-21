@@ -1,0 +1,20 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+CI_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
+job_name=$(s cbi get-cbi-job-name-from-git-remote)
+deployed_version="$(s cbi svc get-deployed-version "$job_name")"
+
+attempts=0
+
+while [[ "$deployed_version" != "$CI_COMMIT_SHORT_SHA" ]]; do
+    sleep 2s
+    attempts=$(($attempts + 1))
+    deployed_version="$(s cbi svc get-deployed-version "$job_name")"
+    if [[ $attempts -gt 50 ]]; then
+        echo "timeout waiting to confirm deploy in nomad"
+        exit 1
+    fi
+done
+
+echo "Success! $deployed_version is deployed"

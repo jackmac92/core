@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+if [[ -n ${1:-""} ]] && [[ -s "$1" ]]; then
+    cat "$1" | rg ^package | choose 1 | tr -d ';'
+else
+    timeout 1 rg ^package | choose 1 | tr -d ';'
+fi

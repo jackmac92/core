@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s util dir-ancestors "$1" | rg '__proto_dont_modify__$' | head -n 1

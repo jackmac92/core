@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+tgt_file=${1:-".envrc"}
+existing_variables=$(s gitlab this-project-request "variables" | jq -r '.[].key')
+bat "$tgt_file" | rg '^export' | awk '{ print $2 }' | while IFS= read -r; do
+	key=$(echo "$REPLY" | cut -d= -f1 || echo "")
+	if echo "$existing_variables" | rg -q "$key"; then
+		s gitlab this-project-request PUT "variables/$key" value=$(eval echo '$'"$key")
+	else
+		s gitlab this-project-request POST variables key=$key value=$(eval echo '$'"$key") masked=true || s gitlab this-project-request POST variables key=$key value=$(eval echo '$'"$key")
+	fi
+	echo
+done

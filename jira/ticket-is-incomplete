@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jira my-incomplete-tickets | jq -e '.issues | map(select(.key | contains("'"${1:-""}"'"))) | map(select(.fields.status.name | contains("Code Review") | not)) | first' > /dev/null

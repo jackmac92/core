@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+proto_path=${1:-"$(s cbi svc-name-to-proto-path "$(s cbi svc-select-dwim)")"}
+msgnamefilter=${2:-""}
+
+pkgname=$(cat "$proto_path" | s proto get-pkg-name-from-file)
+import_path=$(s cbi proto walkup-for-import-path "$proto_path")
+msgname=$(s proto list-messages | rg "$msgnamefilter" | fzf --header "Select grpc message")
+
+grpcurl -import-path "$import_path" -proto "$proto_path" describe "$pkgname.$msgname"

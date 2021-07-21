@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+echo pre-commit
+echo commit-msg
+echo post-checkout
+echo post-commit
+echo pre-push
+echo prepare-commit-msg

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ACTIVE_TICKET_FILE="$HOME/cbinsights/active-jira-ticket"
+s jira select-ticket "${1:-""}" | jq -r '.key | select(. != null)' | xargs > "$ACTIVE_TICKET_FILE"

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab unprotect-master-branch && git push --force && s gitlab protect-master-branch

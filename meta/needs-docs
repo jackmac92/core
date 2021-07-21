@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+  fd --exclude="*.help" --exclude="*.inproc" -t f . "$scriptdir" -x sh -c "(test -e {}.help && [ -s {}.help ]) || echo {}"
+done

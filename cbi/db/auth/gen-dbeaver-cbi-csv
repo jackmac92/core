@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo '
+name,host,port,server,database,url,user,password,type
+CBI dev main,mysql-dev.cbinsights.com,3306,,mysql,jdbc:mysql://mysql-dev.cbinsights.com:3306/cbi_data,USER,PASSWORD,dev
+CBI stg main,mysql-staging.cbinsights.com,3306,,mysql,jdbc:mysql://mysql-staging.cbinsights.com:3306/cbi_data,USER,PASSWORD,stg
+CBI prd main,mysql.cbinsights.com,3306,,mysql,jdbc:mysql://mysql.cbinsights.com:3306/cbi_data,USER,PASSWORD,prd
+'

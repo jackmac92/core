@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+checkScriptDir() {
+    scriptDir=$(realpath $1)
+
+    LAST_CHECK_FILE="$scriptDir/.last-news-check"
+
+    LCL_SVC_ROOT=$(dirname "$scriptDir")
+
+    last_news_check=""
+    if [ -f "$LAST_CHECK_FILE" ]; then
+        last_news_check=$(cat "$LAST_CHECK_FILE" || echo "")
+    else
+        # First commit of repo
+        last_news_check=$(git -C $scriptDir rev-list --max-parents=0 HEAD)
+    fi
+
+    git -C $scriptDir diff --name-status "$last_news_check"..HEAD | grep -v '.help$' | while IFS= read c; do
+        changetype=$(echo "$c" | awk '{ print $1 }')
+        changefile=$(echo "$c" | awk '{ print $2 }')
+        changecopy=""
+        if [ "$changetype" = "M" ]; then changecopy="Modified"; fi
+        if [ "$changetype" = "D" ]; then changecopy="Deleted"; fi
+        if [ "$changetype" = "A" ]; then changecopy="Added"; fi
+        echo "$changecopy $changefile"
+        if [ -f "$scriptDir/$changefile.help" ]; then
+            cat "$scriptDir/$changefile.help"
+        fi
+        echo "----"
+    done
+
+    git -C $scriptDir rev-parse HEAD >"$LAST_CHECK_FILE"
+
+}
+
+for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+  checkScriptDir "$scriptdir" "${orig_args[@]}"
+done

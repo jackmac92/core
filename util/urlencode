@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+set -eo pipefail
+
+python -c 'import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], ""))' "$1"

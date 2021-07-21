@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+oldGossServePid=$(lsof -i :7321 | tail -n 1 | awk '{ print $2 }')
+if [ -n "$oldGossServePid" ]; then kill -9 "$oldGossServePid"; fi
+
+goss serve --gossfile ~/cbinsights/local-service/goss.yaml --listen-addr ":7321" >/dev/null 2>&1 &
+
+while true; do
+    echo "Checking connections: $(date)"
+    curl --silent -H "Accept: application/json" 127.0.0.1:7321/healthz | jq '.results | map(select(.successful | not)) | map(.meta)'
+    sleep 30s
+done

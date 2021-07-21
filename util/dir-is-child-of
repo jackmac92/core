@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtdir=${2:-$PWD}
+
+s util dir-ancestors "$tgtdir" | rg --quiet "$1"

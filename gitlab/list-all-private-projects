@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+VERBOSE_OUTPUT="${1:-0}"
+PROJECT_LIST=()
+collecting_prjs=1
+most_recent_id=0
+while [[ $collecting_prjs -eq 1 ]]; do
+	if [ $VERBOSE_OUTPUT -ne 0 ]; then
+		printf "."
+	fi
+	collecting_prjs=0
+	for prj_info in $(s gitlab request "projects" sort==asc order_by==id owned==true visibility==private id_after==$most_recent_id | jq --arg keys_to_keep '["path_with_namespace", "id"]' '.[] | with_entries(select(.key as $k | any($keys_to_keep | fromjson[]; . == $k)))' -c); do
+		collecting_prjs=1
+		PROJECT_LIST+=("$prj_info")
+	done
+	most_recent_prj="${PROJECT_LIST[-1]}"
+	most_recent_id=$(echo "$most_recent_prj" | jq -r '.id')
+done
+printf '%s\n' "${PROJECT_LIST[@]}"

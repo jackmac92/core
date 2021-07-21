@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+targetField=$1
+cbienv=$2
+targetDb=$3
+s cbi db auth latest-creds "$cbienv" "$targetDb" | yq - r "$targetField"

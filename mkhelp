@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_name="$1"
+
+script_path=$(s which "$script_name")
+
+echo "Enter help info"
+read helpinfo
+echo "$helpinfo" >> "$script_path.help"

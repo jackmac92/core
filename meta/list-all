@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    fd . "$scriptdir" -t x -x bash -c '[[ "{}" =~ ^'"$scriptdir"'/(.*) ]] && echo "${BASH_REMATCH[1]}"'
+done | rg --color=never "${1:-""}"

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+msg="$1"
+
+answer=""
+while true; do
+  >&2 echo "$msg"
+  >&2 echo -n ">> "
+  read answer
+  >&2 echo "roger that"
+  >&2 echo "$answer"
+  if s Yn "happy with the above answer?"; then
+    break;
+  fi
+done
+
+echo "$answer"

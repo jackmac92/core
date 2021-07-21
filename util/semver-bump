@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+bump_type=${1:-"minor"}
+bump_from=${2:-$(git tag --list | tail -n 1)}
+
+python -c "
+import sys
+import semver
+
+base = '$bump_from'
+while len(base) > 1 and not base[0].isdigit():
+    base = base[1:]
+
+ver = semver.VersionInfo.parse(base)
+print({
+  'patch': ver.bump_patch,
+  'minor': ver.bump_minor,
+  'major': ver.bump_major,
+}['$bump_type']())
+"

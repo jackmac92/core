@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+exclude=${1:-"____unmatchable____"}
+LIMIT=${2-1}
+
+fd 'invocations' ~/.local/scripts-dir-metrics -x bash -c 'echo {}/* | tr " " "\n"' |
+    choose -f / 4: |
+    choose -- -1 :-2 |
+    sed -e 's/ invocations$//g' |
+    rg -v "$exclude" |
+    rg -v 'meta last-(executed|invoked)$' |
+    sort -n |
+    tail -n $LIMIT |
+    while read -r; do
+        echo "$REPLY" | choose 1:
+    done

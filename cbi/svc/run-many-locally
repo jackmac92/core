@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+for r in $(s cbi svc select-many); do
+    s cbi start-service $r
+done

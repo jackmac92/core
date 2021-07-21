@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+gitRoot=$(git root-directory)
+
+hooktype=$(s git hook-types | fzf)
+
+hookfile="$gitRoot/githooks/$hooktype/$(date +%s).sh"
+
+s touch "$hookfile"
+
+echo '#!/usr/bin/env bash
+set -euo pipefail' > "$hookfile"
+
+chmod +x "$hookfile"
+
+s util edit-file "$hookfile"

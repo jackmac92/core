@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+proto_path=${1:-"$(s cbi svc-name-to-proto-path "$(s cbi svc-select-dwim)")"}
+proto_path=$(realpath "$proto_path")
+pkg_name=$(cat "$proto_path" | s proto get-pkg-name-from-file)
+import_path=$(s cbi proto walkup-for-import-path "$proto_path")
+
+protoExpandMessage() {
+    # NOTE was using describe-message, but the repeat fzfs were annoying
+    grpcurl -import-path "$import_path" -proto "$proto_path" describe "$1" | rg '=' | choose -f = 0 | awk '{$1=$1}1' | while read line; do
+        fieldname=$(choose -1 <<< "$line")
+        fieldtype=$(choose -2 <<< "$line")
+
+        fieldtypeout=$(python -c 'import sys; ftype = sys.argv[-1]; mapping = {"string": "str", "int32": "-10", "uint32": "10", "bool": "false"}; print(mapping.get(ftype, "{}"))' "$fieldtype")
+        if [[ $fieldtype = .$pkg_name* ]]; then
+            fieldtypeout=$(protoExpandMessage "$fieldtype")
+        fi
+		if [[ -n $(choose 2 <<< "$line") ]]; then
+			fieldtypeout='['"$fieldtypeout"']'
+		fi
+        echo "$fieldname=$fieldtypeout"
+    done | jo
+}
+
+protoExpandMessage "$pkg_name.$(s proto list-messages "$proto_path" | rg "${2:-""}" | fzf --header="initial pick")" | jq

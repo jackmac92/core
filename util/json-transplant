@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+jsonKey="$1"
+sourceFile="$2"
+targetFile="$2"
+jq --arg k "$jsonKey" -s '.[0]."$k" = .[1]."$k" | .[0]' $targetFile $sourceFile | sponge $targetFile

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+_CMD=cat
+
+if [ -z "${S_NO_BAT_CAT:-""}" ] && command -v bat >/dev/null 2>&1; then
+    _CMD=bat
+fi
+
+argument=""
+if [[ -z ${@:-""} ]]; then
+    argument="$(s meta last-invoked '(cat)')"
+else
+    argument="$@"
+fi
+
+$_CMD "$(s which "$argument")"

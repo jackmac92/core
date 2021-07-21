@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REGISTRY_FILE="$HOME/cbinsights/ticket-branch-name-registry.json"
+
+
+jiraticket=${1:-"$(s jira select-active-ticket-dwim)"}
+
+# NOTE this should be a string JSON array
+knownBranchName=$(cat "$REGISTRY_FILE" | jq -r --arg ticket $jiraticket '.[$ticket] | select(. != null)')
+
+if [[ -z "$knownBranchName" ]]; then
+    branchForTicket=$(s cbi make-branchname "$jiraticket")
+    cat "$REGISTRY_FILE" | jq --arg ticket $jiraticket --arg branchName "$branchForTicket" '.[($ticket)] = $branchName' | sponge "$REGISTRY_FILE"
+else
+    branchForTicket=$(echo "$knownBranchName")
+fi
+
+echo "$branchForTicket" | xargs

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt=${1:-"$PWD"}
+
+var=${tgt//[!\/]}
+echo ${#var}
+

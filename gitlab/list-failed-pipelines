@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+s gitlab list-all-projects | jq -s '.[].path_with_namespace' -r | while read prjid ; do
+    lastPipelineInfo="$(s gitlab project-request "$prjid" pipelines | jq -c '.[0]')"
+    if [[ $(echo "$lastPipelineInfo" | jq -r '.status') = "failed" ]]; then
+        echo "$(echo "$lastPipelineInfo" | jq -r '.updated_at') $prjid"
+    fi
+done | sort -r

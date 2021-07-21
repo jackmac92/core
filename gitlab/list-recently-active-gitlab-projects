@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+for prj_id in $(s gitlab request "projects" order_by==updated_at | jq '.[].id'); do
+	s gitlab pipelines get-running-and-queued $prj_id
+done

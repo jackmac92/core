@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s cbi get-cbi-job-name-from-git-remote 2> /dev/null || s cbi svc select --sync

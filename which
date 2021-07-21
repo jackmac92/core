@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+export S_INNER_CALL=1
+
+s whicha "$@" | head -n 1
+
