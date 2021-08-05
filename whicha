@@ -8,6 +8,7 @@ script=$(echo "$@" | tr ' ' '/')
 # Look for exact file match
 for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
     if [[ -f "$root/$script" ]]; then
+        >&2 echo "which matched on exact file"
         echo "$root/$script"
     fi
 done
@@ -15,12 +16,14 @@ done
 # Look for parent dir match
 for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
     if [[ -d $(dirname "$root/$script") ]]; then
+        >&2 echo "which matched on parent dir"
         echo "$root/$script"
     fi
 done
 
 # If all else fails echo first possible location
 for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    >&2 echo "which matched fallback"
     echo "$root/$script"
 done
 
