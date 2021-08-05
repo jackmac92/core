@@ -16,8 +16,13 @@ while test $# -gt 0; do
     esac
     shift
 done
+
+script_name=$(echo "$script_name" | sd '\s*$' '')
+
 script_name="$(echo "$script_name")"
 script_path="$(s which $script_name)"
+>&2 echo "Script name is: $script_name"
+>&2 echo "Script path is: $script_path"
 
 # dest_dir=$(dirname "$script_path")
 # scriptgit() {
