@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s meta list-all-full-paths | xargs rg $*

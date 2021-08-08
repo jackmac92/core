@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    fd . "$scriptdir" -t x
+done | rg --color=never "${1:-""}"
