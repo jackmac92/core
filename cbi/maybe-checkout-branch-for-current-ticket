@@ -23,3 +23,5 @@ else
 fi
 
 git switch "$ticketbranch"
+
+emacsclient -e "(setq current-prefix-arg '(13))" -e '(counsel-projectile-switch-project-by-name "'"$PWD"'")'
