@@ -2,7 +2,7 @@
 set -euo pipefail
 jobsWithArtifacts=$(s gitlab this-project-request jobs | jq 'map(select((.artifacts | length) > 0 and (.artifacts[].filename | index("artifacts.zip")))) | del(.[].commit.message)' -c)
 jobInfo=$(echo "$jobsWithArtifacts" | tr '\r\n' ' ' | s fzf select-by-json-key "name")
-targetJobName=$(echo "$jobInfo" | jq '.name' | sort -u | xargs)
+targetJobName=$(echo "$jobInfo" | jq -r '.name' | sort -u | xargs)
 currentbranch=$(urlencode $(git current-branch))
-s gitlab this-project-request --download "jobs/artifacts/$currentbranch/download" job=="$targetJobName"
-mv --backup=t download.bin "artifacts-$targetJobName.zip"
+s gitlab this-project-request --download "jobs/artifacts/$currentbranch/download" "job==${targetJobName}"
+mv --backup=t download.bin "artifacts-${targetJobName}.zip"

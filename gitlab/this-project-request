@@ -18,3 +18,4 @@ api_path=$1
 shift
 req_path="projects/$(s gitlab get-url-encoded-project-name-from-remote)/$api_path"
 s gitlab request ${reqflags[@]} "$req_method" "$req_path" $*
+

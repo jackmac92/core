@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s meta list-all | fzf | choose -f / 4:
+
+
+selection=$(s meta list-all | sd / " " | fzf --preview 's cat {}' )
+
+if [[ -n ${1:-""} ]]; then
+  s $selection
+fi
 
