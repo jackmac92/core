@@ -24,11 +24,13 @@ script_path="$(s which $script_name)"
 >&2 echo "Script name is: $script_name"
 >&2 echo "Script path is: $script_path"
 
-# dest_dir=$(dirname "$script_path")
-# scriptgit() {
-#     git -C "$dest_dir" $*
-# }
-# scriptgit stash --all
+dest_dir=$(dirname "$script_path")
+scriptgit() {
+    git -C "$dest_dir" $*
+}
+scriptgit switch master
+
+scriptgit stash --all
 
 mkdir -p "$(dirname "$script_path")"
 cat > "$script_path" <<EOF
@@ -50,7 +52,7 @@ fi
 s mkhelp "$script_name"
 
 
-# scriptgit add "$script_path*"
-# scriptgit -- commit --message 'added new s script'
+scriptgit add "$script_path*"
+scriptgit -- commit --message 'added new s script'
 # 
-# scriptgit stash pop
+scriptgit stash pop
