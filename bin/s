@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# dir=$SCRIPTS_DIR_ROOT
+
+execution_tracker="$HOME/.local/scripts-dir-metrics"
+s_script_path=""
+metrics_dir_path=""
+use_debug_mode=""
+
+deadEndDirs=()
+
+orig_args=( "$@" )
+
+set +u
+if ! [ -z "$S_DEBUGGER" ]; then
+    use_debug_mode="1"
+fi
+set -u
+
+IS_TOPLEVEL_CALL=$(if [[ -z ${S_INNER_CALL:-""} ]]; then echo 1; else echo 0; fi)
+export S_INNER_CALL=1
+
+checkScriptDir() {
+    dir="$1"
+    shift
+    while [[ $# > 0 ]]; do
+        command="$1"
+        s_script_path="$s_script_path/$command"
+        # TODO investigate why this happens with args
+        # ~/.local/scripts-dir-metrics/cookie-monger/github.com/cookie-monger/github.com/cookie-monger/
+
+        metrics_dir_path="$execution_tracker/$s_script_path"
+
+        shift
+        if [[ -d "$dir/$command" ]]; then
+            dir="$dir/$command"
+        elif [[ -f "$dir/$command" ]]; then
+            if [[ -x "$dir/$command" ]]; then
+                # recording metrics on how often they are used
+                mkdir -p "$metrics_dir_path/"{executions,invocations}
+
+                if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
+                    echo "${orig_args[@]}" >"$metrics_dir_path/invocations/$(date +%s)"
+                fi
+                if [[ -f "$dir/$command.inproc" ]]; then
+                    source "$dir/$command" "$@"
+                elif [ -n "$use_debug_mode" ]; then
+                    bash -x "$dir/$command" "$@"
+                else
+                    "$dir/$command" "$@"
+                fi
+                if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
+                    echo "$@" >"$metrics_dir_path/executions/$(date +%s)"
+                fi
+                exit 0
+            fi
+        fi
+    done
+    deadEndDirs+=( "$dir" )
+}
+
+no_commands=1
+for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+  checkScriptDir "$scriptdir" "${orig_args[@]}"
+done
+
+# TODO if deadEndDirs has length
+# do below
+    # if [[ -e "$dir.help" ]]; then
+    #     cat "$dir.help" > /dev/stderr
+    #     echo
+    # else
+    #     command=$(basename "$dir")
+    #     echo "$command commands" > /dev/stderr
+    #     echo
+    # fi
+
+    # # for file in $(find "$dir" -maxdepth 1 -mindepth 1 -exec test -x {} \; -print); do
+    # #     command=$(basename "$file")
+    # #     helpfile="$file.help"
+    # #     if [[ -f "$helpfile" ]]; then
+    # #         help=$(head -n1 "$helpfile")
+    # #     elif [[ -d "$file" ]]; then
+    # #         help="$command commands"
+    # #     else
+    # #         help=$(sed -nE -e '/^#!/d' -e '/^#/{s/^# *//; p; q;}' "$file")
+    # #     fi
+    # #     # this should really be a two-pass thing to calculate
+    # #     # the longest filename instead of hardcoding the spacing...
+    # #     # but oh well whatever
+    # #     if [[ -d "$file" ]]; then
+    # #         command="$command ..."
+    # #     fi
+    # #     printf '%-10s -- %s\n' "$command" "$help"
+    # #     no_commands=0
+    # # done
+
+
+if [[ "$no_commands" -eq 1 ]]; then
+    echo "(no subcommands found)"
+fi
