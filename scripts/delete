@@ -2,24 +2,22 @@
 
 set -euo pipefail
 
-tgt_file="$(s which "$@")"
+tgt_file="$(s which "$@" | xargs realpath)"
 
 cd $(dirname "$tgt_file")
 
-should_commit=$(if s git is-pristine; then echo 1; else echo 0; fi)
+if (for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do fd -t x . "$scriptdir"; done | rg "s $*"); then
+    s Yn "This script appears to be referenced in some other scripts! Continue?"
+fi
 
-rm -f "$tgt_file"
+git stash --all
+
+git rm -f "$tgt_file"
 
 # Try deleting all related files that may exist or not
-rm -f "$tgt_file.help"
-rm -f "$tgt_file.inproc"
+git rm --ignore-unmatch -f "$tgt_file.help"
+git rm --ignore-unmatch -f "$tgt_file.inproc"
 
-if (for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do fd -t x . "$scriptdir"; done | rg "s $*"); then
-    echo "This script appears to be referenced in some other scripts!"
-fi
+git commit -m "deleted script"
 
-if [[ $should_commit -eq 1 ]]; then
-    git add "$tgt_file"'*'
-    git add "$dest_file"'*'
-    git commit -m "deleted script"
-fi
+git stash pop

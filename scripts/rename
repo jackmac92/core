@@ -19,21 +19,21 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-tgt_file="$(s which "$tgt_file_cmpts")"
+tgt_file="$(s which "$tgt_file_cmpts" | xargs realpath)"
 
 if [[ -z $dest_file_cmpts ]]; then
     echo "Enter destination for script:\n"
     read dest_file_cmpts
 fi
 
-dest_file="$(s which "$dest_file_cmpts")"
-
-scriptgit() {
-    git -C "$dest_dir" $*
-}
+dest_file="$(s which "$dest_file_cmpts" | xargs realpath)"
 
 dest_dir=$(dirname "$dest_file")
 mkdir -p "$dest_dir"
+
+scriptgit() {
+    git -C "$dest_dir" "$@"
+}
 
 scriptgit stash --all
 
