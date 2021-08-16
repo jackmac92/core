@@ -1,0 +1,48 @@
+#compdef s
+
+function __list_commands {
+  local -a subcmds
+  local line dir next
+  orig_dir="$1"
+  dir="$1"
+  # the parens after the glob contains "glob qualifiers" (see man zshexpn):
+  # * executable
+  # - follow symlinks
+  # , "or" separator
+  # / directories
+  for file in "$dir"/*(-*,/); do
+    command=$(basename "$file")
+    helpfile="$file.help"
+    if [[ -f "$helpfile" ]]; then
+      # Show first line of helpfile in completion
+      help=$(head -n1 "$helpfile")
+    elif [[ -d "$file" ]]; then
+      # Show dir name + 'commands' in completion
+      help="$command commands"
+    else
+      help=$(sed -nE -e '/^#!/d' -e '/^#/{s/^# *//; p; q;}' "$file" || echo "completion err'd")
+    fi
+    subcmds=($subcmds "$command:\"$help\"")
+  done
+
+  # calling _arguments populates `line` variable
+  _arguments -C ": :(($subcmds))" "*::arg:->args"
+
+
+  # HACK if calling a command which uses the path of another command (e.g. cat,edit), hide that command from the completion script (do a reset)
+  if [ "$line[1]" = "cat" ] || [ "$line[1]" = "which" ] || [ "$line[1]" = "new" ] || [ "$line[1]" = "edit" ] || [ "$line[1]" = "rename" ] || [ "$line[1]" = "delete" ]; then
+      next="$dir"
+  else
+      next="$dir/$line[1]"
+  fi
+
+  # TODO what does recalling this do exactly?
+  # ! -z $line[1] indicates there is more text being completed i think, e.g. s util g[TAB]
+  if [[ ! -z $line[1] && -d "$next" ]]; then
+    __list_commands "$next"
+  fi
+}
+
+for i in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+  __list_commands "$i"
+done
