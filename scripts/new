@@ -20,7 +20,7 @@ done
 script_name=$(echo "$script_name" | sd '\s*$' '')
 
 script_name="$(echo "$script_name")"
-script_path="$(s which $script_name)"
+script_path="$(s which $script_name | xargs realpath)"
 >&2 echo "Script name is: $script_name"
 >&2 echo "Script path is: $script_path"
 
