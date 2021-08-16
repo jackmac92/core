@@ -26,8 +26,9 @@ script_path="$(s which $script_name | xargs realpath)"
 
 dest_dir=$(dirname "$script_path")
 scriptgit() {
-    git -C "$dest_dir" "$*"
+    git -C "$dest_dir" "$@"
 }
+
 scriptgit switch master
 
 scriptgit stash --all
