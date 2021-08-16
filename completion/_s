@@ -1,5 +1,7 @@
 #compdef s
 
+S_SCRIPT_PASSTHRU_CMDS=(cat which whicha mkhelp new edit delete rename duplicate)
+
 function __list_commands {
   local -a subcmds
   local line dir next
@@ -30,7 +32,8 @@ function __list_commands {
 
 
   # HACK if calling a command which uses the path of another command (e.g. cat,edit), hide that command from the completion script (do a reset)
-  if [ "$line[1]" = "cat" ] || [ "$line[1]" = "which" ] || [ "$line[1]" = "new" ] || [ "$line[1]" = "edit" ] || [ "$line[1]" = "rename" ] || [ "$line[1]" = "delete" ]; then
+  pattern="$line[1]"
+  if (($S_SCRIPT_PASSTHRU_CMDS[(Ie)$pattern])); then
       next="$dir"
   else
       next="$dir/$line[1]"
