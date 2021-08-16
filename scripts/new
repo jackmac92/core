@@ -20,7 +20,9 @@ done
 script_name=$(echo "$script_name" | sd '\s*$' '')
 
 script_name="$(echo "$script_name")"
-script_path="$(s which $script_name | xargs realpath)"
+script_path="$(s which $script_name)"
+mkdir -p "$(dirname "$script_path")"
+script_path="$(realpath "$script_path")"
 >&2 echo "Script name is: $script_name"
 >&2 echo "Script path is: $script_path"
 
@@ -33,7 +35,6 @@ scriptgit switch master
 
 scriptgit stash --all
 
-mkdir -p "$(dirname "$script_path")"
 cat > "$script_path" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
