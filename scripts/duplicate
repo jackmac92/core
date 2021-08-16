@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -uo pipefail
+
+tgt_file_cmpts=""
+dest_file_cmpts=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --)
+            shift
+            dest_file_cmpts=$(echo "$*" | xargs) # xargs to trim whitespace
+            tgt_file_cmpts=$(echo "$tgt_file_cmpts" | xargs)
+            break
+            ;;
+        *)
+            tgt_file_cmpts="$tgt_file_cmpts$1 "
+            ;;
+    esac
+    shift
+done
+
+tgt_file="$(s which "$tgt_file_cmpts" | xargs realpath)"
+
+if [[ -z $dest_file_cmpts ]]; then
+    echo "Enter destination for duplicate:\n"
+    read dest_file_cmpts
+fi
+
+dest_file="$(s which "$dest_file_cmpts" | xargs realpath)"
+
+dest_dir=$(dirname "$dest_file")
+mkdir -p "$dest_dir"
+
+scriptgit() {
+    git -C "$dest_dir" "$@"
+}
+
+scriptgit stash --all
+
+scriptgit cp "$tgt_file" "$dest_file"
+
+if [ -e "$tgt_file.inproc" ]; then
+    scriptgit cp "$tgt_file.inproc" "$dest_file.inproc"
+fi
+
+s edit "$dest_file_cmpts"
+s mkhelp "$dest_file_cmpts"
+
+scriptgit commit -m "duplicated script $tgt_file_cmpts -> $dest_file_cmpts"
+
+scriptgit stash pop
