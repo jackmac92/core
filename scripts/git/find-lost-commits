@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+git fsck --lost-found | rg '^dangling commit' | choose 2 | fzf --preview='git show {}' --multi
+
