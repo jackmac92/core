@@ -4,7 +4,7 @@ sha=$(git rev-parse HEAD)
 lastCommitPipelineId=""
 attempts=0
 
-while true; do
+while [ -z ${lastCommitPipelineId:-""} ]; do
   lastCommitPipelineId=$(s gitlab this-project-request "pipelines" sha=="$sha" private_token=="$LAB_CORE_TOKEN" | jq '.[0].id')
   attempts=$(($attempts + 1))
   if ! [ -z $lastCommitPipelineId ]; then
@@ -17,4 +17,5 @@ while true; do
   sleep 1.5
 done
 
-s gitlab pipelines track by-id "$lastCommitPipelineId"
+s gitlab pipelines status by-id "$lastCommitPipelineId"
+

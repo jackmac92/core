@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s gitlab pipelines track by-project-and-id "$(s gitlab get-gitlab-project-name-from-remote)" "$1"
+s gitlab pipelines status by-project-and-id "$(s gitlab get-gitlab-project-name-from-remote)" "$1"
