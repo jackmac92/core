@@ -1,7 +1,0 @@
-register href-router default
-- cbi stop work
-- cbi workon ticket
-first time it is called, use cbix to ask which services are required, store this info
-open workspace for each repo, fetches remote latest, then creates/checks out ticket branch name
-
-- tmux util to easily create/attach to task specific sessions

@@ -10,4 +10,4 @@ read -r helpinfo
 
 echo "$helpinfo" >> "$script_path.help"
 
-git -C "$(realpath "$script_path")" add "*.help"
+git -C "$(realpath "$script_path")" add "*.help" || echo "whoops mkhelp git error"

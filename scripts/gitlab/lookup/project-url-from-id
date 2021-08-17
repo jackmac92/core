@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab request projects/$1 | jq -r '.web_url'
+
