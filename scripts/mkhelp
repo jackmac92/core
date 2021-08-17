@@ -5,9 +5,9 @@ script_name="$1"
 
 script_path=$(s which "$script_name")
 
-echo "Enter help info"
+echo "Enter help info (for $script_name)"
 read -r helpinfo
 
 echo "$helpinfo" >> "$script_path.help"
 
-git -C "$(realpath "$script_path")" add "*.help" || echo "whoops mkhelp git error"
+git -C "$(realpath $(dirname "$script_path"))" add "*.help" || echo "whoops mkhelp git error"
