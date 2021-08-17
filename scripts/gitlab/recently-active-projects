@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s gitlab request "projects" order_by==updated_at
+s gitlab request "projects" order_by==updated_at min_access_level==40
 
