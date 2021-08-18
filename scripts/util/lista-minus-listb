@@ -4,8 +4,6 @@ set -euo pipefail
 python -c '
 import sys
 
-print(sys.argv)
-
 listapath = sys.argv[1]
 listaf = open(listapath)
 lista = [l.strip() for l in listaf.readlines()]

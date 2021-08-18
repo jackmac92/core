@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-toRemove=$(echo "$PATH" | tr : \\n | fzf --multi -i | tr \\n :)
+pathParts=$(echo "$PATH" | tr : \\n)
+toRemove=$(echo "$pathParts" | fzf --multi --header "Select components to remove from PATH")
 
-echo "$toRemove" "$(echo "$PATH" | tr : \\n)" | sort | uniq -d
+newPathParts=$(s util lista-minus-listb <(echo "$pathParts") <(echo "$toRemove"))
+
+PATH=$(echo "$newPathParts" | tr $'\n' ':' | sd ':$' '')
+
+export PATH
