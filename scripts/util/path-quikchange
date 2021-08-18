@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+toRemove=$(echo "$PATH" | tr : \\n | fzf --multi -i | tr \\n :)
+
+echo "$toRemove" "$(echo "$PATH" | tr : \\n)" | sort | uniq -d
