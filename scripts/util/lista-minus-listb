@@ -1,3 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
-python -c 'import csv; import sys; import json; print(json.dumps(list(csv.DictReader(sys.stdin))))'
+
+python -c '
+import sys
+
+print(sys.argv)
+
+listapath = sys.argv[1]
+listaf = open(listapath)
+lista = [l.strip() for l in listaf.readlines()]
+
+listbpath = sys.argv[2]
+listbf = open(listbpath)
+listb = [l.strip() for l in listbf.readlines()]
+
+[print(q) for q in set(lista) - set(listb)]
+' $*
