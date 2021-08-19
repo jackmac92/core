@@ -6,6 +6,8 @@ if ! [ -z $CBI_ENV_OVERRIDE ]; then
   exit 0
 fi
 
-s cbi local-env || echo 'dev
-stg
-prd' | fzf
+s cbi local-env || echo stg
+
+#   || echo 'dev
+# stg
+# prd' | fzf
