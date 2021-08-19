@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -o pipefail
 
 oldGossServePid=$(lsof -i :7321 | tail -n 1 | awk '{ print $2 }')
 if [ -n "$oldGossServePid" ]; then kill -9 "$oldGossServePid"; fi
