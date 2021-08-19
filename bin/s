@@ -11,7 +11,7 @@ use_debug_mode=""
 
 deadEndDirs=()
 
-orig_args=( "$@" )
+orig_args=("$@")
 
 set +u
 if ! [ -z "$S_DEBUGGER" ]; then
@@ -39,10 +39,10 @@ checkScriptDir() {
         elif [[ -f "$dir/$command" ]]; then
             if [[ -x "$dir/$command" ]]; then
                 # recording metrics on how often they are used
-                mkdir -p "$metrics_dir_path/"{executions,invocations}
+                mkdir -p "$metrics_dir_path/"{executions,invocations} || true
 
                 if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
-                    echo "${orig_args[@]}" >"$metrics_dir_path/invocations/$(date +%s)"
+                    echo "${orig_args[@]}" >"$metrics_dir_path/invocations/$(date +%s)" || true
                 fi
                 if [[ -f "$dir/$command.inproc" ]]; then
                     source "$dir/$command" "$@"
@@ -52,51 +52,50 @@ checkScriptDir() {
                     "$dir/$command" "$@"
                 fi
                 if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
-                    echo "$@" >"$metrics_dir_path/executions/$(date +%s)"
+                    echo "$@" >"$metrics_dir_path/executions/$(date +%s)" || true
                 fi
                 exit 0
             fi
         fi
     done
-    deadEndDirs+=( "$dir" )
+    deadEndDirs+=("$dir")
 }
 
 no_commands=1
 for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
-  checkScriptDir "$scriptdir" "${orig_args[@]}"
+    checkScriptDir "$scriptdir" "${orig_args[@]}"
 done
 
 # TODO if deadEndDirs has length
 # do below
-    # if [[ -e "$dir.help" ]]; then
-    #     cat "$dir.help" > /dev/stderr
-    #     echo
-    # else
-    #     command=$(basename "$dir")
-    #     echo "$command commands" > /dev/stderr
-    #     echo
-    # fi
+# if [[ -e "$dir.help" ]]; then
+#     cat "$dir.help" > /dev/stderr
+#     echo
+# else
+#     command=$(basename "$dir")
+#     echo "$command commands" > /dev/stderr
+#     echo
+# fi
 
-    # # for file in $(find "$dir" -maxdepth 1 -mindepth 1 -exec test -x {} \; -print); do
-    # #     command=$(basename "$file")
-    # #     helpfile="$file.help"
-    # #     if [[ -f "$helpfile" ]]; then
-    # #         help=$(head -n1 "$helpfile")
-    # #     elif [[ -d "$file" ]]; then
-    # #         help="$command commands"
-    # #     else
-    # #         help=$(sed -nE -e '/^#!/d' -e '/^#/{s/^# *//; p; q;}' "$file")
-    # #     fi
-    # #     # this should really be a two-pass thing to calculate
-    # #     # the longest filename instead of hardcoding the spacing...
-    # #     # but oh well whatever
-    # #     if [[ -d "$file" ]]; then
-    # #         command="$command ..."
-    # #     fi
-    # #     printf '%-10s -- %s\n' "$command" "$help"
-    # #     no_commands=0
-    # # done
-
+# # for file in $(find "$dir" -maxdepth 1 -mindepth 1 -exec test -x {} \; -print); do
+# #     command=$(basename "$file")
+# #     helpfile="$file.help"
+# #     if [[ -f "$helpfile" ]]; then
+# #         help=$(head -n1 "$helpfile")
+# #     elif [[ -d "$file" ]]; then
+# #         help="$command commands"
+# #     else
+# #         help=$(sed -nE -e '/^#!/d' -e '/^#/{s/^# *//; p; q;}' "$file")
+# #     fi
+# #     # this should really be a two-pass thing to calculate
+# #     # the longest filename instead of hardcoding the spacing...
+# #     # but oh well whatever
+# #     if [[ -d "$file" ]]; then
+# #         command="$command ..."
+# #     fi
+# #     printf '%-10s -- %s\n' "$command" "$help"
+# #     no_commands=0
+# # done
 
 if [[ "$no_commands" -eq 1 ]]; then
     echo "(no subcommands found)"
