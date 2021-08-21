@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python -c 'import sys, os; print(os.path.commonprefix(list(map(lambda l: l.strip(), sys.stdin.readlines()))))'
