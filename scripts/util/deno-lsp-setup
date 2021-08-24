@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo '{"compilerOptions":{"plugins":[{"name":"typescript-deno-plugin","enable":true,"importmap":"import_map.json"}],"target":"es2019","module":"commonjs","outDir":"./lib","moduleResolution":"node","esModuleInterop":true},"include":["src"],"exclude":["node_modules"]}' >tsconfig.json
+echo '{"devDependencies":{"typescript-deno-plugin":"^1.31.0"}}' >package.json
