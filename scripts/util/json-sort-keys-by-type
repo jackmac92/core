@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python -c '
+import json
+import sys
+
+def sort_keys_by_type(obj):
+    k = obj.keys()
+    result = {}
+    for z in sorted(k, key=lambda x: {str: 0, int: 0, bool: 0, dict: 10, list: 20}[type(obj[x])]):
+        if type(obj[z]) == dict:
+            result[z] = sort_keys_by_type(obj[z])
+        else:
+            result[z] = obj[z]
+    return result
+print(sort_keys_by_type(json.load(sys.stdin)))
+'
