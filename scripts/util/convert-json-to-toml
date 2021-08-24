@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python -c '
+import toml
+import sys
+import json
+
+input = json.load(sys.stdin)
+print(toml.dumps(input))
+'
