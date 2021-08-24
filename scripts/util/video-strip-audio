@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+inputfile=${1:-$(fd -e mp4 -e avi -e mkv -e webm -e mov | fzf | xargs realpath)}
+
+outputextension=${2:-"$(echo "$inputfile" | sd '.*\.(.*)' '$1')"}
+
+outputfile=$(echo "$inputfile" | sd '(.*)\..*' '$1-optimized.'"$outputextension")
+
+set -x
+# 265 is an improvement on stock codec
+# higher crf values lower bitrate (smaller video, maybe lower quality), don't go higher than 30
+ffmpeg -i "$inputfile" -sn -map 0 -map -0:s -c copy -vcodec libx265 -crf 30 "$outputfile"
+
+echo "$outputfile"
