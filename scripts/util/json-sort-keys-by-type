@@ -2,17 +2,24 @@
 set -euo pipefail
 
 python -c '
+from collections import OrderedDict
 import json
 import sys
 
+def _sort_json_types(val):
+    t = type(val)
+    return {str: 1, int: 1, bool: 1, dict: 30, list: 20}[t]
+
 def sort_keys_by_type(obj):
     k = obj.keys()
-    result = {}
-    for z in sorted(k, key=lambda x: {str: 0, int: 0, bool: 0, dict: 10, list: 20}[type(obj[x])]):
+    result = OrderedDict()
+    for z in sorted(k, key=_sort_json_types):
         if type(obj[z]) == dict:
             result[z] = sort_keys_by_type(obj[z])
         else:
             result[z] = obj[z]
     return result
-print(sort_keys_by_type(json.load(sys.stdin)))
+result = sort_keys_by_type(json.load(sys.stdin))
+out = json.dumps(result)
+print(out)
 '
