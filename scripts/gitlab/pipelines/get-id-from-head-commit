@@ -2,11 +2,12 @@
 set -euo pipefail
 
 sha=$(git rev-parse HEAD)
+ref=$(git current-branch)
 lastCommitPipelineId=""
 attempts=0
 
 while [ -z ${lastCommitPipelineId:-""} ]; do
-    lastCommitPipelineId=$(s gitlab this-project-request "pipelines" sha=="$sha" private_token=="$LAB_CORE_TOKEN" | jq '.[0].id')
+    lastCommitPipelineId=$(s gitlab this-project-request "pipelines" sha=="$sha" ref=="$ref" | jq '.[0].id')
     attempts=$(($attempts + 1))
     if ! [ -z $lastCommitPipelineId ]; then
         break
