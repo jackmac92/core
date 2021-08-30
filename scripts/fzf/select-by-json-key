@@ -25,9 +25,8 @@ jq -r --arg tgtVal "\$1" '.[] | select(.$display_key | contains(\$tgtVal)) | .$p
 ___EOF
 
 chmod +x "$tmpscript"
-
 # TODO add fzf bindings to scroll, and to modify command e.g to just show json keys
-selection=$(for x in "${!choiceDict[@]}"; do echo "$x"; done | fzf --preview="$tmpscript "'{}')
+selection=$(for x in "${!choiceDict[@]}"; do echo "$x"; done | fzf ${JM_FZF_JZON_OPTS:-""} --preview="$tmpscript "'{}')
 
 if [[ -z $selection ]]; then
   echo "No selection" > /dev/stderr
