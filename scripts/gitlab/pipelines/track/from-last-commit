@@ -1,20 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
-sha=$(git rev-parse HEAD)
-lastCommitPipelineId=""
-attempts=0
 
-while true; do
-  lastCommitPipelineId=$(s gitlab this-project-request "pipelines" sha=="$sha" private_token=="$LAB_CORE_TOKEN" | jq '.[0].id')
-  attempts=$(($attempts + 1))
-  if ! [ -z $lastCommitPipelineId ]; then
-    break
-  fi
-  if [ $attempts -gt 5 ]; then
-    echo "Failed to find last commit pipeline id..."
-    exit 1
-  fi
-  sleep 1.5
-done
-
-s gitlab pipelines track by-id "$lastCommitPipelineId"
+s gitlab pipelines track by-id "$(s gitlab pipelines get-id-from-head-commit)"
