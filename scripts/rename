@@ -37,14 +37,14 @@ scriptgit() {
 
 scriptgit stash --all
 
-scriptgit mv "$tgt_file" "$dest_file"
+scriptgit mv "$tgt_file" "$dest_file" || mv "$tgt_file" "$dest_file"
 
 if [ -e "$tgt_file.help" ]; then
-    scriptgit mv "$tgt_file.help" "$dest_file.help"
+    scriptgit mv "$tgt_file.help" "$dest_file.help" || mv "$tgt_file.help" "$dest_file.help"
 fi
 
 if [ -e "$tgt_file.inproc" ]; then
-    scriptgit mv "$tgt_file.inproc" "$dest_file.inproc"
+    scriptgit mv "$tgt_file.inproc" "$dest_file.inproc" || mv "$tgt_file.inproc" "$dest_file.inproc"
 fi
 
 for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
