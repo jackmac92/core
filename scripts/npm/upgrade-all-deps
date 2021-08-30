@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+npminstallcmd="npm install"
+
+if [ -f yarn.lock ]; then
+    npminstallcmd="yarn add"
+elif [ -f pnpm-lock.yaml ]; then
+    npminstallcmd="pnpm add"
+fi
+
+jq '.dependencies + .devDependencies | keys | .[]' -r package.json | xargs $npminstallcmd
