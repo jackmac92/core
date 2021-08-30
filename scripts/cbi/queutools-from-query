@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jo username=$(s cbi db auth latest-creds-field USERNAME dev main) password=$(s cbi db auth latest-creds-field PASSWORD dev main) port=3306 default_db=cbi_data host=$(s cbi db get-hostname dev main) | yq - r -P
+
