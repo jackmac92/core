@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-jobsWithArtifacts=$(s gitlab this-project-request jobs | jq 'map(select((.artifacts | length) > 0 and (.artifacts[].filename | index("artifacts.zip")))) | del(.[].commit.message)' -c)
-jobInfo=$(echo "$jobsWithArtifacts" | tr '\r\n' ' ' | s fzf select-by-json-key "name")
-# TODO somehow I need to only keep the most recent of each build name
-# echo $jobsWithArtifacts | jq 'sort_by(.started_at) | last | .started_at'
 
+jobsWithArtifacts=$(s gitlab this-project-request jobs | jq 'map(select((.artifacts | length) > 0 and (.artifacts[].filename | index("artifacts.zip")))) | sort_by(.started_at) | reverse | unique_by(.name) | del(.[].commit.message)' -c)
+jobInfo=$(echo "$jobsWithArtifacts" | tr '\r\n' ' ' | s fzf select-by-json-key "name")
 targetJobName=$(echo "$jobInfo" | jq -r '.name' | sort -u | xargs)
 currentbranch=$(urlencode $(git current-branch))
 s gitlab this-project-request --download "jobs/artifacts/$currentbranch/download" "job==${targetJobName}"
