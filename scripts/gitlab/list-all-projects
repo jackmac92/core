@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 VERBOSE_OUTPUT="${1:-0}"
+LAST_PROJECT_REQUESTED_FILE="$HOME/.local/var/s-scripts/gitlab-list-all-projects-$(echo $GITLAB_INSTANCE_URL | sd "/" "")"
+
 PROJECT_LIST=()
 collecting_prjs=1
-most_recent_id=0
+most_recent_id=$(cat "$LAST_PROJECT_REQUESTED_FILE" || echo 0)
 while [[ $collecting_prjs -eq 1 ]]; do
 	if [ $VERBOSE_OUTPUT -ne 0 ]; then
 		printf "."
@@ -16,4 +19,5 @@ while [[ $collecting_prjs -eq 1 ]]; do
 	most_recent_prj="${PROJECT_LIST[-1]}"
 	most_recent_id=$(echo "$most_recent_prj" | jq -r '.id')
 done
+echo "$most_recent_id" >"$LAST_PROJECT_REQUESTED_FILE"
 printf '%s\n' "${PROJECT_LIST[@]}"
