@@ -2,6 +2,7 @@
 set -euo pipefail
 
 targetField=$1
-cbienv=$2
-targetDb=$3
+# TODO make case insensitive
+cbienv=${2:-$(s cbi env-select-dwim)}
+targetDb=${3:-"main"}
 s cbi db auth latest-creds "$cbienv" "$targetDb" | yq - r "$targetField"

@@ -3,12 +3,14 @@ set -o pipefail
 
 display_key="$1"
 shift
+# TODO allow multi display key, all args before -- are display keys, then preview keys after
 
 preview_key="$1"
 shift
 
 declare -A choiceDict
-IFS=$'\n'; for el in $(jq -r --arg displayKey "$display_key" '.[] | "\(.[$displayKey])=\(.)"'); do
+IFS=$'\n'
+for el in $(jq -r --arg displayKey "$display_key" '.[] | "\(.[$displayKey])=\(.)"'); do
   _k=$(echo "$el" | choose -f = 0)
   _v=$(echo "$el" | choose -f = 1:)
   choiceDict["$_k"]="$_v"
@@ -18,7 +20,7 @@ fullset=$(mktemp)
 for x in "${!choiceDict[@]}"; do echo "${choiceDict["$x"]}"; done | jq -s -c | sponge "$fullset"
 
 tmpscript=$(mktemp)
-cat <<___EOF >> "$tmpscript"
+cat <<___EOF >>"$tmpscript"
 #! /usr/bin/env bash
 jq -r --arg tgtVal "\$1" '.[] | select(.$display_key | contains(\$tgtVal)) | .$preview_key' "$fullset"
 
@@ -29,7 +31,7 @@ chmod +x "$tmpscript"
 selection=$(for x in "${!choiceDict[@]}"; do echo "$x"; done | fzf ${JM_FZF_JSON_OPTS:-} --preview="$tmpscript "'{}')
 
 if [[ -z $selection ]]; then
-  echo "No selection" > /dev/stderr
+  echo "No selection" >/dev/stderr
   exit 1
 fi
 
