@@ -14,4 +14,4 @@ chmod +x "$scriptname"
 
 $EDITOR "$scriptname"
 
-"$scriptname"
+./"$scriptname"
