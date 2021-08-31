@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+scriptname=$1
+
+mkdir -p $(dirname "$scriptname")
+cat >"$scriptname" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+EOF
+
+chmod +x "$scriptname"
+
+$EDITOR "$scriptname"
+
+"$scriptname"
