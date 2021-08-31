@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for rid in $(s gitlab request "runners"  | jq 'map(select(.online | not)) | .[].id' -r); do 
+
