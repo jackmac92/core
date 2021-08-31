@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+choice=$(s util pick-tailscale-ip "${1:-""}")
+shift
+
+if [ -z $choice ]; then
+    echo "fuck am i supposed to do then, pick a real host"
+    exit 1
+fi
+
+ssh "$choice" $*
