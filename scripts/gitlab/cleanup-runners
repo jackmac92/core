@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-for rid in $(s gitlab request "runners"  | jq 'map(select(.online | not)) | .[].id' -r); do 
-
+for rid in $(s gitlab request "runners" | jq 'map(select(.online | not)) | .[].id' -r); do
+    # leaves one project attached, gitlab api wants it that way
+    for prjid in $(s gitlab request runners/$rid | jq 'del(.projects[0]) | .projects[].id' -r); do
+        s gitlab request DELETE "projects/$prjid/runners/$rid"
+    done
+    s gitlab request DELETE "runners/$rid"
+done
