@@ -2,4 +2,4 @@
 set -euo pipefail
 
 ACTIVE_TICKET_FILE="$HOME/cbinsights/active-jira-ticket"
-rm -f "$ACTIVE_TICKET_FILE"
+cat "$ACTIVE_TICKET_FILE"
