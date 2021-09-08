@@ -4,7 +4,7 @@ set -euo pipefail
 reqflags=()
 
 while [[ $1 = --* ]]; do
-	reqflags+=( "$1" )
+	reqflags+=("$1")
 	shift
 done
 
@@ -18,5 +18,6 @@ fi
 req_path="$1"
 shift
 full_url=$(s gitlab request-Url "$req_path")
-
-http --ignore-stdin --check-status --body ${reqflags[@]} "$req_method" "$full_url" Private-Token:"$LAB_CORE_TOKEN" $*
+set -x
+http --ignore-stdin --check-status --body ${reqflags[@]} "$req_method" "$full_url" Private-Token:"$LAB_CORE_TOKEN" $* ${JM_GITLAB_REQ_EXTRA_PARAMS:-}
+set +x
