@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-jira available-tickets | jq '.issues | map({key: .key, description: .fields.summary, reporter: .fields.reporter.displayName })' | s fzf select-by-json-key "key" "description"
+ACTIVE_TICKET_FILE="$HOME/cbinsights/active-jira-ticket"
+
+# todo add filter for key arg
+jira available-tickets | jq '.issues | map({key: .key, description: .fields.summary, reporter: .fields.reporter.displayName })' | s fzf select-by-json-key "key" "description" | jq -r '.key | select(. != null)' | xargs >"$ACTIVE_TICKET_FILE"
+jira move-to-in-progress "$(cat "$ACTIVE_TICKET_FILE")"
