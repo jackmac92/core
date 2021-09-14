@@ -21,10 +21,14 @@ while [[ $collecting_prjs -eq 1 ]]; do
 		collecting_prjs=1
 		PROJECT_LIST+=("$prj_info")
 	done
-	most_recent_prj="${PROJECT_LIST[-1]}"
-	most_recent_id=$(echo "$most_recent_prj" | jq -r '.id')
+	if [[ -n "${PROJECT_LIST[@]}" ]]; then
+		most_recent_prj="${PROJECT_LIST[-1]}"
+		most_recent_id=$(echo "$most_recent_prj" | jq -r '.id')
+	fi
 done
+
+s touch "$LAST_PROJECT_REQUESTED_FILE"
 echo "$most_recent_id" >"$LAST_PROJECT_REQUESTED_FILE"
 outfile="$APP_FOLDER/$(date +%s)-output"
-touch "$outfile"
+s touch "$outfile"
 printf '%s\n' "${PROJECT_LIST[@]}" | tee "$outfile"
