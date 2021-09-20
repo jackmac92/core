@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+lclDevDbPath="${1:-"local-db-pull-$(date +%s).sqlite3"}"
+
+litestream restore -if-replica-exists -o "$lclDevDbPath" "$REPLICA_URL"
+
+litecli "$lclDevDbPath"
