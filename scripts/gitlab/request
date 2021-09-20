@@ -18,6 +18,13 @@ fi
 req_path="$1"
 shift
 full_url=$(s gitlab request-Url "$req_path")
-set -x
+
+if [ -n ${GITLAB_REQUEST_DEBUG:-""} ]; then
+	set -x
+fi
+
 http --ignore-stdin --check-status --body ${reqflags[@]} "$req_method" "$full_url" Private-Token:"$LAB_CORE_TOKEN" $* ${JM_GITLAB_REQ_EXTRA_PARAMS:-}
-set +x
+
+if [ -n ${GITLAB_REQUEST_DEBUG:-""} ]; then
+	set +x
+fi
