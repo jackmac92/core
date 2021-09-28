@@ -29,22 +29,41 @@ fi
 dest_file="$(s which "$dest_file_cmpts" | xargs realpath)"
 
 dest_dir=$(dirname "$dest_file")
+tgt_dir=$(dirname "$tgt_file")
 mkdir -p "$dest_dir"
 
+isWithinRepoMove=0
+if [[ $(git -C $tgt_dir remote get-url origin) = $(git -C $dest_dir remote get-url origin) ]]; then
+    isWithinRepoMove=1
+fi
+
 scriptgit() {
-    git -C "$dest_dir" "$@"
+    if [[ $isWithinRepoMove -eq 1 ]]; then
+        git -C "$dest_dir" "$@"
+    else
+        git -C "$dest_dir" "$@"
+        git -C "$tgt_dir" "$@"
+    fi
+}
+
+scriptmv() {
+    if [[ $isWithinRepoMove -eq 1 ]]; then
+        scriptgit mv $*
+    else
+        mv $*
+    fi
 }
 
 scriptgit stash --all
 
-scriptgit mv "$tgt_file" "$dest_file" || mv "$tgt_file" "$dest_file"
+scriptmv "$tgt_file" "$dest_file"
 
 if [ -e "$tgt_file.help" ]; then
-    scriptgit mv "$tgt_file.help" "$dest_file.help" || mv "$tgt_file.help" "$dest_file.help"
+    scriptmv "$tgt_file.help" "$dest_file.help"
 fi
 
 if [ -e "$tgt_file.inproc" ]; then
-    scriptgit mv "$tgt_file.inproc" "$dest_file.inproc" || mv "$tgt_file.inproc" "$dest_file.inproc"
+    scriptmv "$tgt_file.inproc" "$dest_file.inproc"
 fi
 
 for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
