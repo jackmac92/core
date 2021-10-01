@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 (
-	fd --max-depth=1 -t d -x echo {/} \; -- '-(service|job)$' ~/cbinsights
+	fd --max-depth=1 -t d -x echo {/} \; -- '-(service|job|utils)$' ~/cbinsights
 	echo "cbi-site"
 ) | fzf $*

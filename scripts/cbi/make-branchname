@@ -3,6 +3,7 @@ set -euo pipefail
 
 jiraticket=${1:-"$(s jira select-active-ticket-dwim)"}
 
+# TODO auto insert jira ticket desc here
 ticketdesc=$(s util prompt-and-confirm "$jiraticket terse ticket description" | sd ' ' '-')
 
 echo "$jiraticket-$ticketdesc"
