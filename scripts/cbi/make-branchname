@@ -3,9 +3,6 @@ set -euo pipefail
 
 jiraticket=${1:-"$(s jira select-active-ticket-dwim)"}
 
-ticketfeature=$(s util prompt-and-confirm "$jiraticket feature category" | sd ' ' '-')
 ticketdesc=$(s util prompt-and-confirm "$jiraticket terse ticket description" | sd ' ' '-')
 
-sprintnum=170
-
-echo "$sprintnum/$ticketfeature/$jiraticket-$ticketdesc"
+echo "$jiraticket-$ticketdesc"
