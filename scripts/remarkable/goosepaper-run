@@ -3,8 +3,9 @@ set -euo pipefail
 
 docker run -it --rm \
     -v $HOME/.config/goosepaper:/goosepaper/mount \
-    -v $HOME/.rmapy:/root/.rmapy \
+    -v $PWD:/goosepaper/out \
     j6k4m8/goosepaper \
-    goosepaper -c mount/config.json --upload # -o out/Goosepaper.pdf
-# TODO needs rmapy not rmapi
-\ # -v $PWD:/goosepaper/out
+    goosepaper -c mount/config.json -o out/Goosepaper.pdf
+
+# --upload
+# -v $HOME/.config/rmapi/rmapi.conf:/root/.rmapy \
