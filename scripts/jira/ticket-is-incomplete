@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-jira my-incomplete-tickets | jq -e '.issues | map(select(.key | contains("'"${1:-""}"'"))) | map(select(.fields.status.name | contains("Code Review") | not)) | first' > /dev/null
+tgt_ticket="${1:-"$(s jira get-active-ticket)"}"
+
+jira my-incomplete-tickets | jq -e '.issues | map(select(.key | contains("'"$tgt_ticket"'"))) | map(select(.fields.status.name | contains("Code Review") | not)) | first' >/dev/null
