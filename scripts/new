@@ -11,7 +11,8 @@ while test $# -gt 0; do
             cmd="$*"
             break
             ;;
-        *) script_name="$script_name$1 "
+        *)
+            script_name="$script_name$1 "
             ;;
     esac
     shift
@@ -23,8 +24,8 @@ script_name="$(echo "$script_name")"
 script_path="$(s which $script_name)"
 mkdir -p "$(dirname "$script_path")"
 script_path="$(realpath "$script_path")"
->&2 echo "Script name is: $script_name"
->&2 echo "Script path is: $script_path"
+echo >&2 "Script name is: $script_name"
+echo >&2 "Script path is: $script_path"
 
 dest_dir=$(dirname "$script_path")
 scriptgit() {
@@ -35,26 +36,24 @@ scriptgit switch master
 
 scriptgit stash --all
 
-cat > "$script_path" <<EOF
+s touch "$script_path"
+cat >"$script_path" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 
 EOF
 
-
 chmod +x "$script_path"
 if [[ -z "$cmd" ]]; then
     s edit "$script_name"
 else
-    echo "$cmd" >> "$script_path"
-    echo >> "$script_path"
+    echo "$cmd" >>"$script_path"
+    echo >>"$script_path"
 fi
-
 
 s mkhelp "$script_name"
 
-
 scriptgit add "$script_path*"
 scriptgit commit --message 'added new s script'
-# 
+#
 scriptgit stash pop

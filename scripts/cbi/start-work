@@ -3,10 +3,4 @@ set -euo pipefail
 
 curr_ticket=$(s jira select-active-ticket-dwim)
 
-if ! s jira ticket-is-incomplete "$curr_ticket" ; then
-   s jira change-active-ticket
-fi
-
-curr_ticket=$(s jira select-active-ticket-dwim)
-
 s cbi work-on "$curr_ticket"
