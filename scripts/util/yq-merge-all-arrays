@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+outfile=$(mktemp)
+
+for filetomerge in "$@"; do
+    yq -s '.[0] * .[1]' "$outfile" "$filetomerge" | sponge "$outfile"
+done
+
+cat "$outfile"
