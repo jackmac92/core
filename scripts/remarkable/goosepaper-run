@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-docker run -it --rm \
+docker run --rm \
     -v $HOME/.config/goosepaper:/goosepaper/mount \
     -v $HOME/Documents/remarkable:/goosepaper/out \
     j6k4m8/goosepaper \
