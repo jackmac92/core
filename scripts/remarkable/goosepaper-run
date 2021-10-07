@@ -1,15 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-outfile="Goosepaper_$(date +%F).pdf"
-
 docker run -it --rm \
     -v $HOME/.config/goosepaper:/goosepaper/mount \
-    -v $PWD:/goosepaper/out \
+    -v $HOME/Documents/remarkable:/goosepaper/out \
     j6k4m8/goosepaper \
-    goosepaper -c mount/config.json -o "out/$outfile"
-
-rmapi put "$outfile"
-
-# --upload
-# -v $HOME/.config/rmapi/rmapi.conf:/root/.rmapy \
+    goosepaper -c mount/config.json -o "out/Goosepaper_$(date +%F).pdf"
