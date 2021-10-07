@@ -8,8 +8,10 @@ inputFileBaseName=$(basename "$inputfile" ".$inputextension")
 outputFileDir=$(dirname "$inputfile")
 outputFileBasename=$(yad --entry --text="Video file name" || "$inputFileBaseName")
 
+LOSSLESSCUT_OUT_DIR="$(dirname "$inputFile")"
+
 losslesscut "$inputfile"
-final_cut=$(fd -e mkv "$inputFileBaseName" "$(dirname "$inputFile")" | rg -v "$inputfile" | sort -n -s | fzf)
+final_cut=$(fd -e mkv "$inputFileBaseName" "$LOSSLESSCUT_OUT_DIR" | rg -v "$inputfile" | sort -n -s | fzf)
 outputfile="$outputFileDir/Optimized-$outputFileBasename.$outputextension"
 
 extraFlags=""
