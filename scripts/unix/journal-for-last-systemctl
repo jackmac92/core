@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+prevCmd | sd 'systemctl' 'journalctl' | sd -- 'status' '--follow -u' | bash
