@@ -4,10 +4,12 @@ set -euo pipefail
 inputfile=${1:-$(fd -e mp4 -e avi -e mkv -e webm -e mov | fzf | xargs realpath)}
 inputextension=$(echo "$inputfile" | sd '.*\.(.*)' '$1')
 outputextension=${2:-"$inputextension"}
-
+inputFileBaseName=$(basename "$inputfile" ".$inputextension")
 outputFileDir=$(dirname "$inputfile")
-outputFileBasename=$(yad --entry --text="Video file name" || basename "$inputfile" ".$inputextension")
+outputFileBasename=$(yad --entry --text="Video file name" || "$inputFileBaseName")
 
+losslesscut "$inputfile"
+final_cut=$(fd -e mkv "$inputFileBaseName" "$(dirname "$inputFile")" | rg -v "$inputfile" | fzf)
 outputfile="$outputFileDir/Optimized-$outputFileBasename.$outputextension"
 
 extraFlags=""
