@@ -7,11 +7,6 @@ outputextension=${2:-"$inputextension"}
 inputFileBaseName=$(basename "$inputfile" ".$inputextension")
 outputFileDir=$(dirname "$inputfile")
 outputFileBasename=$(yad --entry --text="Video file name" || "$inputFileBaseName")
-
-LOSSLESSCUT_OUT_DIR="$(dirname "$inputFile")"
-
-losslesscut "$inputfile"
-final_cut=$(fd -e mkv "$inputFileBaseName" "$LOSSLESSCUT_OUT_DIR" | rg -v "$inputfile" | sort -n -s | fzf)
 outputfile="$outputFileDir/Optimized-$outputFileBasename.$outputextension"
 
 extraFlags=""
@@ -24,7 +19,7 @@ set -x
 
 # 265 is an improvement on stock codec
 # higher crf values lower bitrate (smaller video, maybe lower quality), don't go higher than 30
-ffmpeg -i "$final_cut" -sn -map 0 -map -0:s -c copy -vcodec libx265 -crf 20 $extraFlags "$outputfile" </dev/null
+ffmpeg -i "$inputfile" -sn -map 0 -map -0:s -c copy -vcodec libx265 -crf 20 $extraFlags "$outputfile" </dev/null
 # | yad --auto-kill --enable-log=details --log-expanded --progress --pulsate --text "Optimizing video"
 
 echo "$outputfile"

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+LOSSLESSCUT_OUT_DIR="$(dirname "$inputFile")"
+
+losslesscut "$inputfile"
+final_cut=$(fd -e mkv "$inputFileBaseName" "$LOSSLESSCUT_OUT_DIR" | rg -v "$inputfile" | sort -n -s | fzf)
+
+echo "$final_cut"
