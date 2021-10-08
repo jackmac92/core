@@ -5,15 +5,18 @@ REQ_URL="$(s gitlab request-Url)/projects/$(urlencode "$1")/pipelines/$2"
 
 python - <<___EOF
 import requests
+import requests_cache
+from datetime import timedelta
+
 from time import sleep
 request_url = "$REQ_URL"
 headers = {"Private-Token": "$LAB_CORE_TOKEN"}
 cistatus = "pending"
+session = requests_cache.CachedSession('gitlab_pipeline_cache', expire_after=timedelta(seconds=10))
+
 while cistatus in ["pending", "running"]:
-    api_res = requests.get(request_url, headers=headers).json()
+    api_res = session.get(request_url, headers=headers).json()
     cistatus = api_res.get('status')
-    # if cistatus is None:
-    #     print("Error!, no status in api_res\n{0}\nCalling '{1}'".format(api_res, request_url))
     sleep(3)
 print(cistatus)
 ___EOF
