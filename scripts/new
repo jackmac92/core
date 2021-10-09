@@ -22,6 +22,12 @@ script_name=$(echo "$script_name" | sd '\s*$' '')
 
 script_name="$(echo "$script_name")"
 script_path="$(s which $script_name)"
+
+if [ -f "$script_path" ]; then
+    echo "File already exists!"
+    exit 1
+fi
+
 mkdir -p "$(dirname "$script_path")"
 script_path="$(realpath "$script_path")"
 echo >&2 "Script name is: $script_name"
