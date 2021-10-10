@@ -13,4 +13,3 @@ cistatus = api_res.get('status', 'not-found')
 print(cistatus)
 
 ___EOF
-

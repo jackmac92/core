@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-http --body https://3s1ehdl2012c9bryl8o5tydbsi9pfujz.ui.nabu.casa Authorization:"Bearer $(bw get field hass bearer-token)"
+endpoint=$1
+shift
+
+http --body https://3s1ehdl2012c9bryl8o5tydbsi9pfujz.ui.nabu.casa/api/$endpoint Authorization:"Bearer $(bw get item hass | jq '.fields[] | select(.name == "bearer-token").value' -r)" $*
