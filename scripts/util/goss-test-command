@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+orig_dir=$PWD
+
+cd $(mktemp -d)
+
+echo "Create gossfile and exit when done"
+
+$SHELL
+
+echo "What should the file name be?"
+printf ">> "
+read testname
+
+mv $(ls *.yml *.yaml | fzf --header= --select-1) "~/.local/share/chezmoi/private_dot_config/exact_goss/$testname.yml"
+
+cd "$orig_dir"
