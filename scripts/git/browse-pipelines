@@ -7,10 +7,10 @@ set -euo pipefail
 url=$(s git remote-to-http-url)
 
 if [[ $url = *gitlab* ]]; then
-    xdg-open "$url/-/pipelines"
+    xdg-open "$url/-/pipelines" &
     exit 0
 elif [[ $url = *github* ]]; then
-    xdg-open "$url/actions"
+    xdg-open "$url/actions" &
     exit 0
 fi
 

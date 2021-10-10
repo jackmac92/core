@@ -9,7 +9,7 @@ from time import sleep
 request_url = "$REQ_URL"
 headers = {"Private-Token": "$LAB_CORE_TOKEN"}
 api_res = requests.get(request_url, headers=headers).json()
-cistatus = api_res.get('status')
+cistatus = api_res.get('status', 'not-found')
 print(cistatus)
 
 ___EOF

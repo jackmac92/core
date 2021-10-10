@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cookieSite="${1:-"$(s chrome history-urls | s util strip-protocol | s util extract-base-domain | sort -u | fzf)"}"
-tmpDir=$(mktemp -d)
-set +e
-for el in $(jq "to_entries | .[]" -c ~/.cookie-monger-profile-port-map); do
-    profileid=$(jq ".key" -r <<<"$el")
-    port=$(jq ".value" -r <<<"$el")
-    http ":$port/cookies" domain=="$cookieSite" --body >"$tmpDir/$profileid"
-done
-set -e
-s util yq-merge-all-arrays $tmpDir/*
+profileName="$1"
+tgtProfileId=$(python -c 'print({"personal": "QW-EuxLBAUMUTLJvgHd7C", "cbi":"h3jJMwMHUSWsBCZqHmCgV"}["'"$profileName"'"])')
+cookieSite="${2:-"$(s chrome history-urls | s util strip-protocol | s util extract-base-domain | sort -u | fzf)"}"
+port=$(jq '.'"$tgtProfileId" ~/.cookie-monger-profile-port-map)
+http ":$port/cookies" domain=="$cookieSite" --body

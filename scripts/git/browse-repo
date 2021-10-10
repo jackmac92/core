@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-xdg-open "$(s git remote-to-http-url)"
+xdg-open "$(s git remote-to-http-url)" &
