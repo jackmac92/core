@@ -2,7 +2,7 @@
 set -euo pipefail
 
 jiraticket=$(s jira select-active-ticket-dwim "${1:-""}")
-REGISTRY_FILE="$HOME/cbinsights/ticket-repo-registry.json"
+REGISTRY_FILE="$JIRA_TICKET_REPO_REGISTRY_FILE"
 
 # ensure branchname has been setup
 s cbi get-branchname-dwim "$jiraticket" >/dev/null

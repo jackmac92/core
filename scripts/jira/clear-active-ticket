@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ACTIVE_TICKET_FILE="$HOME/cbinsights/active-jira-ticket"
-rm -f "$ACTIVE_TICKET_FILE"
+rm -f "$JIRA_ACTIVE_TICKET_FILE"

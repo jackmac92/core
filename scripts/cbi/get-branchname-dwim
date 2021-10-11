@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REGISTRY_FILE="$HOME/cbinsights/ticket-branch-name-registry.json"
-
+REGISTRY_FILE="$JIRA_TICKET_BRANCHNAME_REGISTRY_FILE"
 
 jiraticket=${1:-"$(s jira select-active-ticket-dwim)"}
 
