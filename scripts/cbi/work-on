@@ -5,7 +5,7 @@ jiraticket=$(s jira select-active-ticket-dwim "${1:-""}")
 REGISTRY_FILE="$HOME/cbinsights/ticket-repo-registry.json"
 
 # ensure branchname has been setup
-s cbi get-branchname-dwim "$jiraticket" > /dev/null
+s cbi get-branchname-dwim "$jiraticket" >/dev/null
 
 # NOTE this should be a string JSON array
 knownRepos=$(cat "$REGISTRY_FILE" | jq -r --arg ticket $jiraticket '.[$ticket] | select(. != null)')
@@ -17,5 +17,6 @@ else
     reposForTicket=$(echo "$knownRepos" | jq -c)
 fi
 
+export CBI_SERVICE_TMUX_SESSION_TICKET="$jiraticket"
 echo "Starting services"
 echo "$reposForTicket" | jq -r '.[]' | tee | xargs -n1 s cbi start-service

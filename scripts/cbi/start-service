@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 target_service=${1:-$(s cbi svc-select-dwim)}
 if [ -z $target_service ]; then
   echo "Must provide a service name"
   exit 1
 fi
 tmpfile="$(mktemp).yaml"
+
 panes=$(
-	python - <<___EOF
+  python - <<___EOF
 import copy
 import json
 start_after_lcl_svc = "s cbi maybe-checkout-branch-for-current-ticket; waitForIt 127.0.0.1:8500/v1/kv/Environment\?raw -- make local"
@@ -24,13 +26,43 @@ options = {
 print(json.dumps(options.get("$target_service", default)))
 ___EOF
 )
+
+sessname=${CBI_SERVICE_TMUX_SESSION_TICKET:-$target_service}
+
 bat <<EOF >$tmpfile
-session_name: $target_service
+session_name: $sessname
 windows:
   - focus: "true"
     start_directory: ~/cbinsights/$target_service
     window_name: $target_service
     panes: $panes
     window_name: $target_service
+
 EOF
-tmuxp load -a $tmpfile
+
+echo $tmpfile
+
+selectionSession=$(cat $tmpfile | yq -r '.session_name')
+currentSessions=$(tmux list-sessions | cut -d: -f1)
+
+if python -c '
+import sys
+tgt="'"$selectionSession"'".strip().lower()
+for i in sys.stdin.readlines():
+    l = i.strip()
+    if l.lower() == tgt:
+        break
+else:
+    # print("No match found!")
+    sys.exit(1)
+' <<<"$currentSessions"; then
+  if [[ -z $TMUX ]]; then
+    # always "switch" to target session
+    tmux switchc -t "$selectionSession"
+  fi
+  cmdFlags="-a"
+else
+  cmdFlags="-y"
+fi
+
+tmuxp load $cmdFlags $* $tmpfile
