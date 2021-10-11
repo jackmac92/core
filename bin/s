@@ -22,6 +22,13 @@ set -u
 IS_TOPLEVEL_CALL=$(if [[ -z ${S_INNER_CALL:-""} ]]; then echo 1; else echo 0; fi)
 export S_INNER_CALL=1
 
+if [[ -z "$S_SCRIPT_ENV_SOURCED" ]]; then
+    # TODO update below path to not be hardcoded
+    for i in $(fd . $HOME/.local/scripts/core/env.d --ignore-file=<(echo "*.goss") --max-depth 1 -t f); do
+        . "$i"
+    done
+fi
+
 checkScriptDir() {
     dir="$1"
     shift
