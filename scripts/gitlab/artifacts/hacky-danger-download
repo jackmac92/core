@@ -4,7 +4,12 @@ set -euo pipefail
 project=$1
 job=$2
 
+# preserve calling PWD for auth switching by directory
 s gitlab project-request --download "$project" "jobs/$job/artifacts"
-mv --backup=t download.bin "artifacts-${targetJobName}.zip"
-s util auto-decompress "artifacts-${targetJobName}.zip"
-rm -f "artifacts-${targetJobName}.zip"
+origdir=$PWD
+cd $(mktemp -d)
+
+mv -f $origdir/artifacts.bin ./artifacts-tmp-dl.zip
+s util auto-decompress ./artifacts-tmp-dl.zip
+
+zsh -l
