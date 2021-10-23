@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rmapi -ni ls /substack | rg '^\[d\]' | choose 1 -1 | xargs -d $'\n' -n 1 bash -c "s remarkable listdirs $startdir/$1"
+
