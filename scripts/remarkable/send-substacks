@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+notmuch dump "tag:substack-post" | choose -1 | xargs -d $'\n' -n 1 s remarkable send-substack-by-id
