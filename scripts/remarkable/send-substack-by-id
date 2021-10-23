@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+emailid="$1"
+
+cd $(mktemp -d)
+
+info=$(s notmuch extract-subject-and-html "$emailid")
+
+jq -r .body <<<"$info" >./substack.html
+
+pdfpath=$(s util html-to-pdf $(realpath ./substack.html))
+
+author=$(jq -r .from <<<"$info" | sd '<.*>' '' | sd '^\s+' '' | sd '\s+$' '')
+
+tgtname="$(jq -r .title <<<"$info" | sd ' ' '_').pdf"
+
+mv "$pdfpath" "./$tgtname"
+
+rmapi -ni mkdir "/substack/$author" || true
+rmapi -ni put "$tgtname" "/substack/$author"
