@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+notmuch show --format=json --include-html "tag:substack-post AND subject:DiAngelo" | jq '.[][0][0].body[0].content[] | select(.["content-type"] | contains("html")) | .content' -r
+
