@@ -20,7 +20,7 @@ pdfpath=$(s util html-to-pdf $(realpath ./substack.html))
 
 author=$(jq -r .from <<<"$info" | sd '<.*>' '' | sd '^\s+' '' | sd '\s+$' '')
 
-tgtname="$(jq -r .title <<<"$info" | sd ' ' '_').pdf"
+tgtname="$(jq -r .title <<<"$info")--$(jq -r .date <<<"$info" | choose 2 1 3).pdf"
 
 mv "$pdfpath" "./$tgtname"
 
