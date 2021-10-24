@@ -3,6 +3,8 @@ set -euo pipefail
 
 emailid="$1"
 
+echo "Starting $emailid"
+
 SENT_ARTICLES_DIR="$HOME/.local/run/remarkable-send-substack"
 
 if [ -f "$SENT_ARTICLES_DIR/$emailid" ]; then
@@ -24,6 +26,7 @@ tgtname="$(jq -r .title <<<"$info")--$(jq -r .date <<<"$info" | choose 2 1 3).pd
 
 mv "$pdfpath" "./$tgtname"
 
-rmapi -ni mkdir "/substack/$author" || true
+rmapi -ni mkdir "/substack/$author" 2>/dev/null || true
+echo "Uploading $emailid"
 rmapi -ni put "$tgtname" "/substack/$author"
 date >"$SENT_ARTICLES_DIR/$emailid"
