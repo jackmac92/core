@@ -3,6 +3,13 @@ set -euo pipefail
 
 emailid="$1"
 
+SENT_ARTICLES_DIR="$HOME/.local/run/remarkable-send-substack"
+
+if [ -f "$SENT_ARTICLES_DIR/$emailid" ]; then
+    echo "Already done"
+    exit 1
+fi
+
 cd $(mktemp -d)
 
 info=$(s notmuch extract-subject-and-html "$emailid")
@@ -19,3 +26,4 @@ mv "$pdfpath" "./$tgtname"
 
 rmapi -ni mkdir "/substack/$author" || true
 rmapi -ni put "$tgtname" "/substack/$author"
+date >"$SENT_ARTICLES_DIR/$emailid"
