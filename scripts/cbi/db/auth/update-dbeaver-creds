@@ -4,8 +4,9 @@ set -euo pipefail
 cbienv=${1:-$(s cbi env-select-dwim)}
 targetDb=${2:-"main"}
 credsPath="$(s cbi db auth latest-creds-path "$cbienv" "$targetDb")"
-conn_username="$(cat "$credsPath" | rg USERNAME | yq r - USERNAME)"
-conn_password="$(cat "$credsPath" | rg PASSWORD | yq r - PASSWORD)"
+conn_username="$(cat "$credsPath" | rg USERNAME | yq -r .USERNAME)"
+conn_password="$(cat "$credsPath" | rg PASSWORD | yq -r .PASSWORD)"
+conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
 
 DBEAVERCONFIGBASE=""
 
@@ -22,7 +23,7 @@ DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sour
 cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(date +%s)"
 TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq ".connections | to_entries | map(select(.value.name == \"CBI $cbienv $targetDb\")) | first | .key" -r)
 NEWDBEAVERCONNECTIONSFILE=$(cat "$DBEAVERCONNECTIONSFILE" | jq --arg targetConn "$TARGETCONNECTIONKEY" \
-    '.connections[$targetConn].configuration.user = "'"$conn_username"'" | .connections[$targetConn].configuration.password = "'"$conn_password"'"')
+    '.connections[$targetConn].configuration.host = "'"$conn_host"'" |.connections[$targetConn].configuration.user = "'"$conn_username"'" | .connections[$targetConn].configuration.password = "'"$conn_password"'"')
 if ! [ -z "$NEWDBEAVERCONNECTIONSFILE" ]; then
     echo "$NEWDBEAVERCONNECTIONSFILE" >"$DBEAVERCONNECTIONSFILE"
 fi
