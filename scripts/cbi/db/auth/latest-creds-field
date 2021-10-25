@@ -5,4 +5,4 @@ targetField=$1
 # TODO make case insensitive
 cbienv=${2:-$(s cbi env-select-dwim)}
 targetDb=${3:-"main"}
-s cbi db auth latest-creds "$cbienv" "$targetDb" | yq - r "$targetField"
+s cbi db auth latest-creds "$cbienv" "$targetDb" | yq -r '.'"$targetField"

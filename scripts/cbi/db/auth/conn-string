@@ -1,11 +1,10 @@
 #! /usr/bin/env bash
 set -euo pipefail
 
-
 cbienv=${1:-$(s cbi env-select-dwim)}
 targetDb=${2:-"main"}
 credsPath=$(s cbi db auth latest-creds-path "$cbienv" "$targetDb")
-CREDS=$(head -n -1 $credsPath | yq - r --tojson)
+CREDS=$(head -n -1 $credsPath | yq)
 DBHOST=$(s cbi db get-hostname "$cbienv" "$targetDb")
 DBTABLE=""
 if [ "$targetDb" = "main" ]; then

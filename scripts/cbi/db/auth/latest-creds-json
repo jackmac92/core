@@ -4,4 +4,4 @@ set -euo pipefail
 cbienv=${1:-$(s cbi env-select-dwim)}
 targetDb=${2:-"main"}
 
-s cbi db auth latest-creds "$cbienv" "$targetDb" | yq r - --tojson
+s cbi db auth latest-creds "$cbienv" "$targetDb" | yq
