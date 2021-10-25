@@ -22,7 +22,22 @@ pdfpath=$(s util html-to-pdf $(realpath ./substack.html))
 
 author=$(jq -r .from <<<"$info" | sd '<.*>' '' | sd '^\s+' '' | sd '\s+$' '')
 
-tgtname="$(jq -r .title <<<"$info")--$(jq -r .date <<<"$info" | choose 2 1 3).pdf"
+monthlist=(Jan Feb Mar Apr May Jun Ful Aug Sep Oct Nov Dec)
+monthnumber() {
+    cnt=0
+    for el in "''${monthlist[@]}"; do
+        [[ $el == "$1" ]] && echo $cnt && break
+        ((++cnt))
+    done
+}
+articledateinfo=$(jq -r .date <<<"$info" | choose 2 1 3)
+articleyear=$(choose -1 <<<"$articledateinfo")
+articleday=$(choose 1 <<<"$articledateinfo")
+articlemonthstr=$(choose 0 <<<"$articledateinfo")
+articlemonth=$(monthnumber "$articlemonthstr")
+articledate="$articleyear-$articlemonth-$articleday"
+
+tgtname="$articledate--$(jq -r .title <<<"$info").pdf"
 
 mv "$pdfpath" "./$tgtname"
 
