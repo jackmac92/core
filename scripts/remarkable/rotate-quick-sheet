@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "DONT USE THIS, quick sheets need to be refiled on the remarkable"
+echo "too much of a pain to rotate them" # can't upload just a sheet, if deleted remarkable must reboot
+exit 1
+
+cd $(mktemp -d)
+rmapi -ni geta "Quick sheets"
+archive_name="sheet-$(date +%s).pdf"
+mv "Quick sheets-annotations.pdf" "$archive_name"
+rmapi -ni put "$archive_name" quick-sheets-archive/
+rmapi -ni rm "Quick sheets"
