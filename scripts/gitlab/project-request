@@ -4,21 +4,26 @@ set -euo pipefail
 reqflags=()
 
 while [[ $1 = --* ]]; do
-	reqflags+=( "$1" )
+	reqflags+=("$1")
 	shift
 done
 
 gitlab_project=$1
 shift
 
-if [[ $1 = "POST" ]] || [[ $1 = "GET" ]] || [[ $1 = "PUT" ]] || [[ $1 = "DELETE" ]] || [[ $1 = "HEAD" ]]; then
+req_verb_arg="${1:-""}"
+shift
+
+if [[ $req_verb_arg = "POST" ]] || [[ $req_verb_arg = "GET" ]] || [[ $req_verb_arg = "PUT" ]] || [[ $req_verb_arg = "DELETE" ]] || [[ $req_verb_arg = "HEAD" ]]; then
 	req_method=$1
 	shift
 else
 	req_method="GET"
 fi
-api_path=$1
-shift
+
+api_path="${1:-""}"
+shift || true
+
 req_path="projects/$(urlencode "$gitlab_project")/$api_path"
 
 s gitlab request ${reqflags[@]} "$req_method" "$req_path" $*
