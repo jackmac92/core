@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+remote_val="${1:-"$(git remote get-url origin)"}"
+
 gitlabInstanceDomain=$(strip_all $GITLAB_INSTANCE_URL "https://")
-result=$(strip_all $(strip_all $(git remote get-url origin) "git@""$gitlabInstanceDomain"":") ".git")
+result=$(strip_all $(strip_all $remote_val "git@""$gitlabInstanceDomain"":") ".git")
 echo "$result"

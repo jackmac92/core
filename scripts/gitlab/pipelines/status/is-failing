@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_remote_url="$1"
+
+lateststatus=$(s gitlab pipelines status by-repo "$repo_remote_url" | jq -r '.[0].status')
+
+if [[ $lateststatus != success ]]; then
+    echo "$repo_remote_url $lateststatus"
+    exit 1
+fi

@@ -31,4 +31,5 @@ s touch "$LAST_PROJECT_REQUESTED_FILE"
 echo "$most_recent_id" >"$LAST_PROJECT_REQUESTED_FILE"
 outfile="$APP_FOLDER/$(date +%s)-output"
 s touch "$outfile"
-printf '%s\n' "${PROJECT_LIST[@]}" | tee "$outfile"
+printf '%s\n' "${PROJECT_LIST[@]}" >"$outfile"
+cat $APP_FOLDER/*-output

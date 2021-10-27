@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_remote_url="$1"
+
+s gitlab project-request "$1" pipelines ref==master order_by==updated_at
+# s gitlab project-request $(s gitlab get-gitlab-project-name-from-remote "$1") pipelines ref==master
