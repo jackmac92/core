@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-docker run --rm \
+goosedate=$(date +%F)
+
+cd $(mktemp -d)
+
+fd -e json . ~/.config/goosepaper -x echo {/.} | xargs -n 1 -I % docker run --rm \
     -v $HOME/.config/goosepaper:/goosepaper/mount \
-    -v $HOME/Documents/remarkable/sink:/goosepaper/out \
+    -v $PWD/outdir:/goosepaper/out \
     j6k4m8/goosepaper \
-    goosepaper -c mount/config.json -o "out/Goosepaper_$(date +%F).pdf"
+    goosepaper -c mount/%.json -o "out/$goosedate-daily-%.pdf"
+
+if [[ -n ${JM_GOOSE_SIT:-""} ]]; then
+    echo "Files at $PWD"
+    exit 0
+fi
+
+mv ./outdir/* $HOME/Documents/remarkable/sink
