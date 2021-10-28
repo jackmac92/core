@@ -65,4 +65,6 @@ else
   cmdFlags="-y"
 fi
 
+set -x
 tmuxp load $cmdFlags $* $tmpfile
+set +x
