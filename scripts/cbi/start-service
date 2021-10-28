@@ -2,6 +2,7 @@
 set -euo pipefail
 
 target_service=${1:-$(s cbi svc-select-dwim)}
+shift # TODO I think I need this to prevent target_service from being passed with $*
 if [ -z $target_service ]; then
   echo "Must provide a service name"
   exit 1
