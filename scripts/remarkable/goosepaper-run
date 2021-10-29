@@ -8,7 +8,7 @@ cd $(mktemp -d)
 fd -e json . ~/.config/goosepaper -x echo {/.} | xargs -I % docker run --rm \
     -v $HOME/.config/goosepaper:/goosepaper/mount \
     -v $PWD/outdir:/goosepaper/out \
-    --uid=$UID \
+    --user=$UID \
     j6k4m8/goosepaper \
     goosepaper -c mount/%.json -o "out/$goosedate-daily-%.pdf"
 
