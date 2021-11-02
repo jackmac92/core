@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s gitlab pipelines status by-id "$(s gitlab pipelines get-latest-for-branch)"
+s gitlab pipelines status by-id "$(s gitlab pipelines get-id-for-commit $1)"
