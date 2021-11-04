@@ -22,7 +22,7 @@ for x in "${!choiceDict[@]}"; do echo "${choiceDict["$x"]}"; done | jq -s -c | s
 tmpscript=$(mktemp)
 cat <<___EOF >>"$tmpscript"
 #! /usr/bin/env bash
-jq -r --arg tgtVal "\$1" '.[] | select(.$display_key | contains(\$tgtVal)) | .$preview_key' "$fullset"
+jq -r --arg tgtVal "\$1" '.[] | select(.$display_key == \$tgtVal) | .$preview_key' "$fullset"
 
 ___EOF
 
