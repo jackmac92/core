@@ -16,6 +16,11 @@ for el in $(jq -r --arg displayKey "$display_key" '.[] | "\(.[$displayKey])=\(.)
   choiceDict["$_k"]="$_v"
 done
 
+if [[ "${#choiceDict[@]}" -eq 0 ]]; then
+  echo "No choices found" >/dev/stderr
+  exit 1
+fi
+
 fullset=$(mktemp)
 for x in "${!choiceDict[@]}"; do echo "${choiceDict["$x"]}"; done | jq -s -c | sponge "$fullset"
 
@@ -35,4 +40,5 @@ if [[ -z $selection ]]; then
   exit 1
 fi
 
+# TODO figure out how to return multiple values
 echo "${choiceDict[$selection]}"
