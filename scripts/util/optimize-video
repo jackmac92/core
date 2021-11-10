@@ -6,7 +6,8 @@ inputextension=$(echo "$inputfile" | sd '.*\.(.*)' '$1')
 outputextension=${2:-"$inputextension"}
 inputFileBaseName=$(basename "$inputfile" ".$inputextension")
 outputFileDir=$(dirname "$inputfile")
-outputFileBasename=$(yad --entry --text="Video file name" || "$inputFileBaseName")
+# outputFileBasename=$(yad --entry --text="Video file name" || echo "$inputFileBaseName")
+outputFileBasename="$inputFileBaseName"
 outputfile="$outputFileDir/Optimized-$outputFileBasename.$outputextension"
 
 extraFlags=""
@@ -15,10 +16,34 @@ if [[ "$outputextension" = "mp4" ]]; then
     extraFlags="-c:a aac"
 fi
 
-set -x
+frames_in_input=$(ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0 $inputfile)
+
+dunst_title="Optimizing video file"
+
+progress_file=$(mktemp)
+original_notif=$(dunstify --printid "$dunst_title")
 
 # 265 is an improvement on stock codec
 # higher crf values lower bitrate (smaller video, maybe lower quality), don't go higher than 30
-ffmpeg -i "$inputfile" -sn -map 0 -map -0:s -c copy -vcodec libx265 -crf 20 $extraFlags "$outputfile" </dev/null
+ffmpeg -i "$inputfile" -sn -map 0 -map -0:s -c copy -vcodec libx265 -crf 20 $extraFlags -progress $progress_file "$outputfile" </dev/null >/dev/null 2>&1 &
+ffmpegpid=$!
 
+handleSendProgressNotif() {
+    currframe="$1"
+    if [ -z "$currframe" ]; then
+        echo "skipping"
+        return
+    fi
+    pctlvl=$((currframe / frames_in_input))
+    echo "Got $pctlvl for $currframe"
+    dunstify --replace=$original_notif --hints=int:value:$pctlvl "$dunst_title"
+}
+
+echo "reading progress file!"
+export -f handleSendProgressNotif
+unbuffer tail -f "$progress_file" --pid="$ffmpegpid" | unbuffer rg --color=never '^frame=' | unbuffer cut -d= -f2 | xargs bash -c 'handleSendProgressNotif "$@"' &
+
+echo "waiting for ffmpeg"
+wait $ffmpegpid
 echo "$outputfile"
+dunstify --replace=$original_notif --hints=int:value:100 "$dunst_title" "Video ready!"
