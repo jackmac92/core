@@ -9,7 +9,7 @@ for doctheme in $(fd -e json . ~/.config/goosepaper -x echo {/.}); do
     docker rm -f gooserun
     docker run --name gooserun \
         -v $HOME/.config/goosepaper:/goosepaper/mount \
-        j6k4m8/goosepaper \
+        jackzzz92/goosepaper \
         goosepaper -c=mount/$doctheme.json -o=out.pdf
     docker cp "gooserun:/goosepaper/out.pdf" "./outdir/$goosedate-daily-$doctheme.pdf"
 done
