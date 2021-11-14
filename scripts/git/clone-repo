@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# window.location.href.replace(`${window.location.protocol}//`, "")
+
+# get repo name from tabfs
+# execute above script via tabfs
+cd ~/git-repos

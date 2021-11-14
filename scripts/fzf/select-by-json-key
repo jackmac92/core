@@ -16,13 +16,18 @@ for el in $(jq -r --arg displayKey "$display_key" '.[] | "\(.[$displayKey])=\(.)
   choiceDict["$_k"]="$_v"
 done
 
+if [[ "${#choiceDict[@]}" -eq 0 ]]; then
+  echo "No choices found" >/dev/stderr
+  exit 1
+fi
+
 fullset=$(mktemp)
 for x in "${!choiceDict[@]}"; do echo "${choiceDict["$x"]}"; done | jq -s -c | sponge "$fullset"
 
 tmpscript=$(mktemp)
 cat <<___EOF >>"$tmpscript"
 #! /usr/bin/env bash
-jq -r --arg tgtVal "\$1" '.[] | select(.$display_key | contains(\$tgtVal)) | .$preview_key' "$fullset"
+jq -r --arg tgtVal "\$1" '.[] | select(.$display_key == \$tgtVal) | .$preview_key' "$fullset"
 
 ___EOF
 
@@ -35,4 +40,5 @@ if [[ -z $selection ]]; then
   exit 1
 fi
 
+# TODO figure out how to return multiple values
 echo "${choiceDict[$selection]}"

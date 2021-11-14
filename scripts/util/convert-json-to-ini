@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python -c '
+import configparser
+import sys
+import json
+
+config = configparser.ConfigParser()
+input = json.loads(sys.stdin.read().replace("%", "%%"))
+config.read_dict(input)
+config.write(sys.stdout, space_around_delimiters=False)
+'

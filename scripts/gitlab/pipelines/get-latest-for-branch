@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ref=$(git current-branch)
+ref="${1:-"$(git current-branch)"}"
+
 lastCommitPipelineId=""
 attempts=0
 
