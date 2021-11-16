@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xdotool search --onlyvisible --classname "Chrome" > ~/.local/focus-mode/allowed-chrome-id
+
