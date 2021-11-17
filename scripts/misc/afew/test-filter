@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+afew -vvv --tag --notmuch-config ~/.config/notmuch/notmuchrc $(s misc afew list-all-filters | fzf --multi | xargs printf "-e %s ") --dry-run "tag:inbox"
+
