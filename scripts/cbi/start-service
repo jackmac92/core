@@ -7,7 +7,8 @@ if [ -z $target_service ]; then
   echo "Must provide a service name"
   exit 1
 fi
-tmpfile="$(mktemp).yaml"
+tmpdir=$(mktemp -d)
+tmpfile="$tmpdir/this.yaml"
 
 panes=$(
   python - <<___EOF
@@ -15,12 +16,12 @@ import copy
 import json
 start_after_lcl_svc = "s cbi maybe-checkout-branch-for-current-ticket; waitForIt 127.0.0.1:8500/v1/kv/Environment\?raw -- make local"
 default = [{
-  "shell_command": start_after_lcl_svc,
+  "main": start_after_lcl_svc,
 }, {
-  "focus": "true"
+  "scratchspace": ""
 }]
 cbi_site_override = copy.deepcopy(default)
-cbi_site_override.insert(1, {"shell_command": "waitForIt -t 60 127.0.0.1:3000 -- make logs"})
+cbi_site_override.insert(1, {"server logs": "waitForIt -t 60 127.0.0.1:3000 -- make logs"})
 options = {
 	"cbi-site": cbi_site_override
 }
@@ -31,41 +32,18 @@ ___EOF
 sessname=${CBI_SERVICE_TMUX_SESSION_TICKET:-$target_service}
 
 bat <<EOF >$tmpfile
-session_name: $sessname
+name: $sessname
+root: ~/cbinsights/$target_service
+
 windows:
-  - focus: "true"
-    start_directory: ~/cbinsights/$target_service
-    window_name: $target_service
+  - $target_service:
+    layout: main-vertical
     panes: $panes
-    window_name: $target_service
 
 EOF
 
 echo $tmpfile
 
-selectionSession=$(cat $tmpfile | yq -r '.session_name')
-currentSessions=$(tmux list-sessions | cut -d: -f1)
-
-if python -c '
-import sys
-tgt="'"$selectionSession"'".strip().lower()
-for i in sys.stdin.readlines():
-    l = i.strip()
-    if l.lower() == tgt:
-        break
-else:
-    # print("No match found!")
-    sys.exit(1)
-' <<<"$currentSessions"; then
-  if [[ -z $TMUX ]]; then
-    # always "switch" to target session
-    tmux switchc -t "$selectionSession"
-  fi
-  cmdFlags="-a"
-else
-  cmdFlags="-y"
-fi
-
 set -x
-tmuxp load $cmdFlags $* $tmpfile
+tmuxinator start this $*
 set +x
