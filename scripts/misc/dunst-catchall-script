@@ -16,4 +16,4 @@ set -euo pipefail
 # DUNST_DESKTOP_ENTRY,
 # DUNST_STACK_TAG.
 
-s notify dwim
+s notify dwim "$DUNST_SUMMARY" "$DUNST_BODY"
