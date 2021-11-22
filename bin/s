@@ -4,7 +4,7 @@ set -euo pipefail
 
 # dir=$SCRIPTS_DIR_ROOT
 
-execution_tracker="$HOME/.local/scripts-dir-metrics"
+execution_tracker="$HOME/.local/scripts-dir-metrics/$(date +%F)"
 s_script_path=""
 metrics_dir_path=""
 use_debug_mode=""
