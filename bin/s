@@ -32,7 +32,7 @@ export S_INNER_CALL=1
 checkScriptDir() {
     dir="$1"
     shift
-    while [[ $# > 0 ]]; do
+    while [[ $# -gt 0 ]]; do
         command="$1"
         s_script_path="$s_script_path/$command"
         # TODO investigate why this happens with args
