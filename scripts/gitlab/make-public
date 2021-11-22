@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-gitleaks  $(git remote get-url origin)
+gitleaks $(git remote get-url origin)
 
 # review commit history
 tmux split-window 'git log --oneline'
@@ -15,7 +15,7 @@ fi
 
 s Yn "Confirm making repo public?"
 
-s util gitlabphorm
+s util gitlabphorm public
 
 # NOTE it would be nice to automatically make CI private even while repo is public, but can't figure that out with API or gitlabform
 # gitlabThisProjectRequest PUT "/" public_builds=false
