@@ -24,4 +24,4 @@ fi
 
 git switch "$ticketbranch"
 
-emacsclient -e "(setq current-prefix-arg '(13))" -e '(+workspaces-switch-to-project-h "'"$PWD"'")'
+e -e "(setq current-prefix-arg '(13))" -e '(+workspaces-switch-to-project-h "'"$PWD"'")'
