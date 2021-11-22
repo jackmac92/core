@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-notmuch show --format=json --include-html "${1:?"need a notmuch query"}" | jq '.[][0][0].body[0].content[] | select(.["content-type"] | contains("html")) | .content' -r

@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-notmuch show --format=json --include-html "${1:?"need a notmuch query"}" | jq '.[][0][0].headers.Date as $senddate | .[][0][0].headers.From as $sender | .[][0][0].headers.Subject as $subject | .[][0][0].body[0].content[] | select(.["content-type"] | contains("html")) | { title: $subject, body: .content, from: $sender, date: $senddate }'

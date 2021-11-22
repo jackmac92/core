@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-cat ~/.config/afew/config | rg '^\[(.*)\]' --only-matching --replace '$1' | rg -v '\.' | sd '\(.*' ''

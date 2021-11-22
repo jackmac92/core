@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-(
-    echo "chronic mbsync -a"
-    fd . ~/.local/share/mail -t d --maxdepth=1 --exclude=realemail | xargs -n 1 -d $'\n' printf "chronic gmi sync --resume -C %s\n"
-) | xargs xargs -n 1 -d $'\n' -P 8 bash
