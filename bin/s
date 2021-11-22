@@ -34,11 +34,8 @@ checkScriptDir() {
     shift
     while [[ $# -gt 0 ]]; do
         command="$1"
-        s_script_path="$s_script_path/$command"
-        # TODO investigate why this happens with args
-        # ~/.local/scripts-dir-metrics/cookie-monger/github.com/cookie-monger/github.com/cookie-monger/
 
-        metrics_dir_path="$execution_tracker/$s_script_path"
+        metrics_dir_path="$execution_tracker/$dir/$command"
 
         shift
         if [[ -d "$dir/$command" ]]; then
@@ -46,10 +43,12 @@ checkScriptDir() {
         elif [[ -f "$dir/$command" ]]; then
             if [[ -x "$dir/$command" ]]; then
                 # recording metrics on how often they are used
-                mkdir -p "$metrics_dir_path/"{executions,invocations} || true
+                mkdir -p "$metrics_dir_path/"{executions,invocations}
 
                 if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
-                    echo "${orig_args[@]}" >"$metrics_dir_path/invocations/$(date +%s)" || true
+                    set +e
+                    echo "${orig_args[@]}" >"$metrics_dir_path/invocations/$(date +%s)"
+                    set -e
                 fi
                 if [[ -f "$dir/$command.inproc" ]]; then
                     source "$dir/$command" "$@"
@@ -59,7 +58,9 @@ checkScriptDir() {
                     "$dir/$command" "$@"
                 fi
                 if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
-                    echo "$@" >"$metrics_dir_path/executions/$(date +%s)" || true
+                    set +e
+                    echo "$@" >"$metrics_dir_path/executions/$(date +%s)"
+                    set -e
                 fi
                 exit 0
             fi
