@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-rm -f /tmp/notmuch-count-* \n echo '{{ range $index, $info := .email_accounts.full_info }}{{ $info.short_name  }}\n{{ end }}' | chezmoi execute-template | xargs -n 1 bash ~/.local/share/notmuch/new-mail-notifier-single.sh
-
+rm -f /tmp/notmuch-count-*
+echo '{{ range $index, $info := .email_accounts.full_info }}{{ $info.short_name  }}\n{{ end }}' | chezmoi execute-template | xargs -n 1 bash ~/.local/share/notmuch/new-mail-notifier-single.sh
