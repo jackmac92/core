@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-git clone "$repourl" ~/all-git-repos/$(echo "$repourl" | sd 'https://' '')
+repourl="$1"
 
+git clone "$repourl" ~/all-git-repos/$(echo "$repourl" | sd 'https://' '')

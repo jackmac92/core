@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s tabfs list-urls | rg git | fzf --multi | s git clean-repo-site-url | xargs -n 1 -d $'\n' s git grab-repo
