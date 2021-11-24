@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
-set -o pipefail
+set -eo pipefail
 
 oldGossServePid=$(lsof -i :7321 | tail -n 1 | awk '{ print $2 }')
 if [ -n "$oldGossServePid" ]; then kill -9 "$oldGossServePid"; fi
 
-goss serve --gossfile ~/cbinsights/local-service/goss.yaml --listen-addr ":7321" >/dev/null 2>&1 &
+goss --gossfile ~/cbinsights/local-service/goss.yaml serve --listen-addr ":7321" >/dev/null 2>&1 &
+
+set +e
 
 while true; do
     echo "Checking connections: $(date)"
-    error_info=$(curl --silent -H "Accept: application/json" 127.0.0.1:7321/healthz | jq -r '.results | map(select(.successful | not)) | map(if .meta==null then .["summary-line"] else (.meta | to_entries | map("\(.key): \(.value)") | add) end) | .[]')
+    error_info=$(http --body :7321/healthz Accept:"application/json" | jq -r '.results | map(select(.successful | not)) | map(if .meta==null then .["summary-line"] else (.meta | to_entries | map("\(.key): \(.value)") | add) end) | .[]')
+
+    dunstify --close=89658983
     if [[ -n "$error_info" ]]; then
         dunstify --appname=cbigosscheck --replace=89658983 --timeout=100000 "CBI Local Service error!" "$error_info"
     fi
