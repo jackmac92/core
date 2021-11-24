@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-gcalcli --config-folder .local/gcalcli/cbi agenda --nodeclined --nostarted --tsv 2021-11-23 2021-11-24
+target_cal="${1:-j79}"
 
+todayd=$(date +%F)
+tomorrowd=$(date +%F -d "$todayd + 1 day")
+
+gcalcli --config-folder ~/.local/gcalcli/$target_cal agenda --nodeclined --nostarted --tsv $todayd $tomorrowd
