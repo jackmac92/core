@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-(
-	__enhancd::cd $1
-	echo $(s gitlab get-gitlab-project-name-from-remote)
-)
+
+cd $1
+echo $(s gitlab get-gitlab-project-name-from-remote)
