@@ -8,6 +8,9 @@ goss serve --gossfile ~/cbinsights/local-service/goss.yaml --listen-addr ":7321"
 
 while true; do
     echo "Checking connections: $(date)"
-    curl --silent -H "Accept: application/json" 127.0.0.1:7321/healthz | jq '.results | map(select(.successful | not)) | map(.meta)'
+    error_info=$(curl --silent -H "Accept: application/json" 127.0.0.1:7321/healthz | jq -r '.results | map(select(.successful | not)) | map(if .meta==null then .["summary-line"] else (.meta | to_entries | map("\(.key): \(.value)") | add) end) | .[]')
+    if [[ -n "$error_info" ]]; then
+        dunstify --appname=cbigosscheck --replace=89658983 --timeout=100000 "CBI Local Service error!" "$error_info"
+    fi
     sleep 30s
 done
