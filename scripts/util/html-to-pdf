@@ -3,15 +3,7 @@ set -euo pipefail
 
 cd $(mktemp -d)
 
-deno eval --unstable '
-import puppeteer from "https://deno.land/x/puppeteer@9.0.2/mod.ts";
-
-const browser = await puppeteer.launch();
-const page = await browser.newPage();
-const fullPath = Deno.args[0]
-await page.goto(`file://${fullPath}`);
-await page.pdf({ path: "./puppet.pdf" })
-await browser.close()
-' $1
+# TODO customize percollate css
+cat "$1" | chronic npx percollate pdf - --output=puppet.pdf
 
 realpath ./puppet.pdf
