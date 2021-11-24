@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd $(mktemp -d)
+
+deno eval --unstable '
+import puppeteer from "https://deno.land/x/puppeteer@9.0.2/mod.ts";
+
+const browser = await puppeteer.launch();
+const page = await browser.newPage();
+const fullPath = Deno.args[0]
+await page.goto(`file://${fullPath}`);
+const content = page.$("body");
+await content.screenshot({ path: "./puppet.png", omitBackground: true })
+await browser.close()
+' $1
+
+realpath ./puppet.pdf
