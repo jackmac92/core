@@ -8,7 +8,7 @@ LAST_PROJECT_REQUESTED_FILE="$APP_FOLDER/last-check-$(echo $GITLAB_INSTANCE_URL 
 PROJECT_LIST=()
 collecting_prjs=1
 most_recent_id=""
-if [ -s "$LAST_PROJECT_REQUESTED_FILE" ]; then
+if [ -s "$LAST_PROJECT_REQUESTED_FILE" ] && [ -z "${GITLAB_PROJECTS_REQUEST_PARAMS:-""}" ]; then
 	most_recent_id=$(cat "$LAST_PROJECT_REQUESTED_FILE")
 fi
 
@@ -17,7 +17,7 @@ while [[ $collecting_prjs -eq 1 ]]; do
 		printf "."
 	fi
 	collecting_prjs=0
-	for prj_info in $(s gitlab request "projects" sort==asc order_by==id min_access_level==30 archived==false id_after==$most_recent_id | jq --arg keys_to_keep '["path_with_namespace", "id", "ssh_url_to_repo", "web_url"]' '.[] | with_entries(select(.key as $k | any($keys_to_keep | fromjson[]; . == $k)))' -c); do
+	for prj_info in $(s gitlab request "projects" sort==asc order_by==id min_access_level==30 archived==false id_after==$most_recent_id ${GITLAB_PROJECTS_REQUEST_PARAMS:-""} | jq --arg keys_to_keep '["path_with_namespace", "id", "ssh_url_to_repo", "web_url"]' '.[] | with_entries(select(.key as $k | any($keys_to_keep | fromjson[]; . == $k)))' -c); do
 		collecting_prjs=1
 		PROJECT_LIST+=("$prj_info")
 	done
@@ -27,9 +27,13 @@ while [[ $collecting_prjs -eq 1 ]]; do
 	fi
 done
 
-s touch "$LAST_PROJECT_REQUESTED_FILE" >/dev/null
-echo "$most_recent_id" >"$LAST_PROJECT_REQUESTED_FILE"
-outfile="$APP_FOLDER/$(date +%s)-output"
-s touch "$outfile" >/dev/null
-printf '%s\n' "${PROJECT_LIST[@]}" >"$outfile"
-cat $APP_FOLDER/*-output
+if [ -z "${GITLAB_PROJECTS_REQUEST_PARAMS:-""}" ]; then
+	s touch "$LAST_PROJECT_REQUESTED_FILE" >/dev/null
+	echo "$most_recent_id" >"$LAST_PROJECT_REQUESTED_FILE"
+	outfile="$APP_FOLDER/$(date +%s)-output"
+	s touch "$outfile" >/dev/null
+	printf '%s\n' "${PROJECT_LIST[@]}" >"$outfile"
+	cat $APP_FOLDER/*-output
+else
+	printf '%s\n' "${PROJECT_LIST[@]}"
+fi
