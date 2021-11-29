@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+new_password=$(bw generate)
+bw get template item | jq '. + {name: "'"$1"'", login: { password: "'"$new_password"'" }}' | bw create item
