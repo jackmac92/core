@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-new_password=$(bw generate)
-bw get template item | jq '. + {name: "'"$1"'", login: { password: "'"$new_password"'" }}' | bw create item
+
+tgt_item=$(bw list items --search $1 | s fzf select-by-json-key name)
+tgt_item_id=$(jq '.id' -r <<<"$tgt_item")
+bw get item $tgt_item_id | vipe | bw encode | bw edit item $tgt_item_id
