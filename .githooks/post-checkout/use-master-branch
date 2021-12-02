@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+PREV_COMMIT=$1
+POST_COMMIT=$2
+IS_BRANCH_CHANGE=$3
+
+if [ -n "$DOOM_ALLOW_BRANCH_CHANGE" ]; then
+  exit 0
+fi
+
+git switch master
