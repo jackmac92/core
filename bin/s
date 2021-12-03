@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+if ! [ -z "$S_DEBUGGER" ]; then
+    use_debug_mode="1"
+fi
+
+if [ -n "$use_debug_mode" ]; then
+    set -x
+fi
 
 # dir=$SCRIPTS_DIR_ROOT
 
@@ -14,9 +21,6 @@ deadEndDirs=()
 orig_args=("$@")
 
 set +u
-if ! [ -z "$S_DEBUGGER" ]; then
-    use_debug_mode="1"
-fi
 
 if [ -z "$S_SCRIPT_ENV_SOURCED" ]; then
     # TODO update below path to not be hardcoded
@@ -28,6 +32,8 @@ set -u
 
 IS_TOPLEVEL_CALL=$(if [[ -z ${S_INNER_CALL:-""} ]]; then echo 1; else echo 0; fi)
 export S_INNER_CALL=1
+
+set +x
 
 checkScriptDir() {
     dir="$1"
