@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-if ! [ -z "$S_DEBUGGER" ]; then
+use_debug_mode=""
+if ! [ -z "${S_DEBUGGER:-""}"]; then
     use_debug_mode="1"
 fi
 
@@ -14,7 +15,6 @@ fi
 execution_tracker="$HOME/.local/scripts-dir-metrics/$(date +%F)"
 s_script_path=""
 metrics_dir_path=""
-use_debug_mode=""
 
 deadEndDirs=()
 
