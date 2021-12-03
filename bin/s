@@ -24,7 +24,7 @@ set +u
 
 if [ -z "$S_SCRIPT_ENV_SOURCED" ]; then
     # TODO update below path to not be hardcoded
-    for i in $(fd . $HOME/.local/scripts/core/env.d --ignore-file=<(echo "*.goss") --max-depth 1 -t f); do
+    for i in $(fd . $HOME/.local/s-scripts/env.d --ignore-file=<(echo "*.goss") --max-depth 1 -t f); do
         . "$i"
     done
 fi
