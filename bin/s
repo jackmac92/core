@@ -39,7 +39,7 @@ checkScriptDir() {
     while [[ $# -gt 0 ]]; do
         command="$1"
 
-        metrics_dir_path="$execution_tracker/$dir/$command"
+        metrics_dir_path="$execution_tracker$dir/$command"
 
         shift
         if [[ -d "$dir/$command" ]]; then
