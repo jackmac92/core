@@ -33,8 +33,6 @@ set -u
 IS_TOPLEVEL_CALL=$(if [[ -z ${S_INNER_CALL:-""} ]]; then echo 1; else echo 0; fi)
 S_INNER_CALL=1
 
-set +x
-
 checkScriptDir() {
     dir="$1"
     shift
@@ -79,6 +77,7 @@ no_commands=1
 for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
     checkScriptDir "$scriptdir" "${orig_args[@]}"
 done
+set +x
 
 # TODO if deadEndDirs has length
 # do below
