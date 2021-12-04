@@ -4,7 +4,7 @@ set -euo pipefail
 exclude=${1:-"____unmatchable____"}
 LIMIT=${2-1}
 
-fd 'executions' ~/.local/scripts-dir-metrics -x bash -c 'echo {}/* | tr " " "\n"' |
+fd --hidden 'executions' ~/.local/scripts-dir-metrics -x bash -c 'echo {}/* | tr " " "\n"' |
     choose -f / 4: |
     choose -- -1 :-2 |
     sed -e 's/ executions$//g' |
