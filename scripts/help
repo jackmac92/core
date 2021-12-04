@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export S_INNER_CALL=1
+# export S_INNER_CALL=1
 
 if [[ -z ${@:-""} ]]; then
-    argument="$(s meta last-invoked "(edit|cat|whicha?)")"
+  argument="$(s meta last-invoked "(edit|cat|whicha?)")"
 else
-    argument="$@"
+  argument="$@"
 fi
 
 file="$(s which "$argument")"
