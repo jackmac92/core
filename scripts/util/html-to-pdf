@@ -4,6 +4,6 @@ set -euo pipefail
 cd $(mktemp -d)
 
 # TODO customize percollate css
-cat "$1" | chronic npx percollate pdf - --output=puppet.pdf
+cat "$1" | chronic npx percollate pdf - --output=puppet.pdf --css "a:after { display: none }"
 
 realpath ./puppet.pdf
