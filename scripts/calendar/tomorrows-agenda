@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-target_cal="${1:-j79}"
+target_cal="$1"
+shift
 
 todayd=$(date +%F)
 tomorrowd=$(date +%F -d "$todayd + 1 day")
+dayafternextd=$(date +%F -d "$tomorrowd + 1 day")
 
-gcalcli --config-folder ~/.local/gcalcli/$target_cal agenda --nodeclined --nostarted --tsv $todayd $tomorrowd
+s calendar helper $target_cal agenda $tomorrowd $dayafternextd --nodeclined --nostarted --tsv $*
