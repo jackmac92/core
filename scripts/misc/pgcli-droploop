@@ -3,4 +3,4 @@ set -euo pipefail
 
 docker rm -f dbeaver-helper
 docker run --name dbeaver-helper --network=drop-loop-net -d -p 5432:5432 alpine/socat TCP-LISTEN:5432,fork TCP:postgres_core:5432
-pgcli postgres://$(bw get username postgres-self-hosted):$(bw get password postgres-self-hosted)@localhost:5432
+pgcli postgres://$(bw get username postgres-self-hosted):$(bw get password postgres-self-hosted)@localhost:5432/mqtt
