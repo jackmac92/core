@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo touch /boot/ssh
+
+s misc rasb-pi-setup-wifi $(bw get username "Apartment Wifi") $(bw get password "Apartment Wifi") | sudo tee /boot/wpa_supplicant.conf
