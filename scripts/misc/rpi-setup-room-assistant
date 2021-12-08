@@ -14,13 +14,14 @@ sleep 120
 
 s misc raspiusbnet
 
-sleep 45
+roomname="$(s util prompt-and-confirm "Room name for this assistant?")"
+s misc pgcli-emqx-add-user "$roomname" roomassistant
 
 sshpass -p raspberry ssh pi@raspberrypi.local $'
 wget -O - https://gist.githubusercontent.com/mKeRix/88b7b81e9bca044f74de1dc51696efb2/raw/799a20bca44cc61d8f8ae93878f2f28af8365a69/getNodeLTS.sh | bash
 echo \'PATH="$PATH:/opt/nodejs/bin"\' >> ~/.profile
 source ~/.profile
-sudo apt-get update && sudo apt-get install build-essential libavahi-compat-libdnssd-dev libsystemd-dev bluetooth libbluetooth-dev libudev-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+sudo apt-get update -y && sudo apt-get install -y build-essential libavahi-compat-libdnssd-dev libsystemd-dev bluetooth libbluetooth-dev libudev-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
 sudo npm i --global --unsafe-perm room-assistant
 
@@ -29,22 +30,28 @@ sudo setcap cap_net_raw+eip $(eval readlink -f `which hcitool`)
 sudo setcap cap_net_admin+eip $(eval readlink -f `which hciconfig`)
 
 mkdir -p ~/room-assistant/config
+'
 
+sshpass -p raspberry ssh pi@raspberrypi.local "
 cat <<EOF | tee ~/room-assistant/config/local.yml
 
 global:
-  instanceName: kitchen
+  instanceName: '$roomname'
   integrations:
     - homeAssistant
     - bluetoothClassic
     - bluetoothLowEnergy
 homeAssistant:
-  mqttUrl: "mqtt://jackm.pizza:1883"
+  mqttUrl: 'mqtt://jackm.pizza:1883'
   mqttOptions:
-    username: jackmac
-    password: peanuts
+    username: '$roomname'
+    password: roomassistant
 
 EOF
+
+"
+
+sshpass -p raspberry ssh pi@raspberrypi.local $'
 
 cat <<EOF | sudo tee /etc/systemd/system/room-assistant.service
 [Unit]
