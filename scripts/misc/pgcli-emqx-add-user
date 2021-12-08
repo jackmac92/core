@@ -6,5 +6,8 @@ pass=$2
 
 docker rm -f dbeaver-helper
 docker run --name dbeaver-helper --network=drop-loop-net -d -p 5432:5432 alpine/socat TCP-LISTEN:5432,fork TCP:postgres_core:5432
-pgcli postgres://$(bw get username postgres-self-hosted):$(bw get password postgres-self-hosted)@localhost:5432/mqtt -e "INSERT INTO mqtt_user (username, password, salt, is_superuser) VALUES ('emqx', '$(s util gen-sha256-auth "$pass")', NULL, false);"
+
+export PGPASSWORD=$(bw get password postgres-self-hosted)
+
+psql -h 127.0.0.1 -U $(bw get username postgres-self-hosted) -c "INSERT INTO mqtt_user (username, password, salt, is_superuser) VALUES ('$user', '$(s util gen-sha256-auth "$pass")', NULL, false);" mqtt
 docker rm -f dbeaver-helper
