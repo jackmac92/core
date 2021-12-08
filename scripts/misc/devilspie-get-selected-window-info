@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+winid=$(xdotool selectwindow)
+
+xdotool getwindowgeometry $winid
+xdotool getwindowname $winid
+xdotool getwindowclassname $winid
