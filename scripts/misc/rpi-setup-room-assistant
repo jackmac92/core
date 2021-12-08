@@ -6,8 +6,8 @@ s misc rpi-setup-new
 echo "Eject/remove the raspberry pi sd card, and plugin the raspberry pi"
 
 while ! s Yn "Done with the above?"; do
-    echo "Take your time"
-    sleep 1
+  echo "Take your time"
+  sleep 1
 done
 
 sleep 120
@@ -22,6 +22,7 @@ echo \'PATH="$PATH:/opt/nodejs/bin"\' >> ~/.profile
 source ~/.profile
 sudo apt-get update && sudo apt-get install build-essential libavahi-compat-libdnssd-dev libsystemd-dev bluetooth libbluetooth-dev libudev-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
+sudo npm i --global --unsafe-perm room-assistant
 
 sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 sudo setcap cap_net_raw+eip $(eval readlink -f `which hcitool`)
