@@ -31,19 +31,19 @@ ffmpegpid=$!
 handleSendProgressNotif() {
     currframe="$1"
     if [ -z "$currframe" ]; then
-        echo "skipping"
+        echo "skipping" >/dev/stderr
         return
     fi
     pctlvl=$((currframe / frames_in_input))
-    echo "Got $pctlvl for $currframe"
+    echo "Got $pctlvl for $currframe" >/dev/stderr
     dunstify --replace=$original_notif --hints=int:value:$pctlvl "$dunst_title"
 }
 
-echo "reading progress file!"
+echo "reading progress file!" >/dev/stderr
 export -f handleSendProgressNotif
 unbuffer tail -f "$progress_file" --pid="$ffmpegpid" | unbuffer rg --color=never '^frame=' | unbuffer cut -d= -f2 | xargs bash -c 'handleSendProgressNotif "$@"' &
 
-echo "waiting for ffmpeg"
+echo "waiting for ffmpeg" >/dev/stderr
 wait $ffmpegpid
 echo "$outputfile"
 dunstify --replace=$original_notif --hints=int:value:100 "$dunst_title" "Video ready!"
