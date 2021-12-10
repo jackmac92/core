@@ -23,7 +23,7 @@ if [ -n ${GITLAB_REQUEST_DEBUG:-""} ]; then
 	set -x
 fi
 
-http --ignore-stdin --check-status --body ${reqflags[@]} "$req_method" "$full_url" Private-Token:"$LAB_CORE_TOKEN" $* ${JM_GITLAB_REQ_EXTRA_PARAMS:-}
+http --ignore-stdin --check-status --follow ${reqflags[@]} "$req_method" "$full_url" Private-Token:"$LAB_CORE_TOKEN" $* ${JM_GITLAB_REQ_EXTRA_PARAMS:-}
 
 if [ -n ${GITLAB_REQUEST_DEBUG:-""} ]; then
 	set +x
