@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s docean kill-droplet $1 && s misc mkdroplet $1
+
