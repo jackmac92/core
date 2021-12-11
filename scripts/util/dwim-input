@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jo clipboard=$(pbpaste) stdin=$(cat /dev/stdin)
