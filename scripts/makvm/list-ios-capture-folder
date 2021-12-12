@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ssh makvm find /Users/jmccown/Library/Mobile\\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/org-capture
+
