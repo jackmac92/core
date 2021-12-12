@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ssh makvm bash /Users/jmccown/.launchdz/scripts/icloud-org-capture-exfil.sh
+
