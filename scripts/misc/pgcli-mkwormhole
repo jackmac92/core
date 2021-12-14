@@ -2,6 +2,7 @@
 set -euo pipefail
 
 if ! docker ps | rg -q dbeaver-helper; then
+    docker rm -f dbeaver-helper
     echo "Creating pg wormhole"
     docker run --name dbeaver-helper --network=drop-loop-net -d -p 5432:5432 alpine/socat TCP-LISTEN:5432,fork TCP:postgres_core:5432
 fi
