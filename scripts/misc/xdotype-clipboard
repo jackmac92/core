@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sleep ${1:-5} && pbpaste | while IFS=$'\n' read -r nextline ; do xdotool type --delay ${2:-400} $nextline ; sleep 1; xdotool key Return ; sleep 1; done
+
