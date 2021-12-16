@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+newname=$1
+currhostname="${2:-"raspberrypi.local"}"
+curruser="${2:-"pi"}"
+
+ssh $curruser@$currhostname "
+echo $newname | sudo tee /etc/hostname
+sudo sed -i -e 's/raspberrypi/$newname/g'
+"

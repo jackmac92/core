@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-sudo touch /media/jmccown/boot/ssh
-
-s misc rasb-pi-setup-wifi $(bw get username "Apartment Wifi") $(bw get password "Apartment Wifi") | sudo tee /media/jmccown/boot/wpa_supplicant.conf
+ssh-keygen -R raspberrypi.local
+sshpass -p raspberry ssh-copy-id pi@raspberrypi.local
+ssh pi@raspberrypi.local '
+sudo apt update -y
+sudo apt upgrade -y
+'
