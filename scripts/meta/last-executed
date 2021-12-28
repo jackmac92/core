@@ -5,13 +5,15 @@ exclude=${1:-"____unmatchable____"}
 LIMIT=${2-1}
 
 fd --hidden 'executions' ~/.local/scripts-dir-metrics -x bash -c 'echo {}/* | tr " " "\n"' |
-    choose -f / 4: |
-    choose -- -1 :-2 |
-    sed -e 's/ executions$//g' |
+    rg -v '\*$' |
+    choose -o _z_ -f / 4: |
+    choose -o _z_ -f _z_ -- -1 :-2 |
+    sed -e 's/executions$//g' |
     rg -v "$exclude" |
     rg -v 'meta last-(executed|invoked)$' |
     sort -n |
     tail -n $LIMIT |
     while read -r; do
-        echo "$REPLY" | choose 1:
+        fullpath=$(echo "$REPLY" | choose -f _z_ -o / 2:-1 | xargs printf "/%s")
+        s meta script-path-to-name "$fullpath"
     done

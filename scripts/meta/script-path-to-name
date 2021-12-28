@@ -7,4 +7,4 @@ for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
     res=$(sd "$root" "" <<<"$res")
 done
 
-echo "$res" | sd "/" " " | xargs printf "%s"
+echo "$res" | sd "/" " " | xargs
