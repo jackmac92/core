@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+res=$1
+
+for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    res=$(sd "$root" "" <<<"$res")
+done
+
+echo "$res" | sd "/" " " | xargs printf "%s"
