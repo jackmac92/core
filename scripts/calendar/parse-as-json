@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-jq 'split("\t") | map(select(. != "")) | { startDate: .[0], startTime: .[1], endDate: .[2], endTime: .[3], url: .[4], summary: .[5] }' -R -c | jq -s
+jq 'split("\t") | map(select(. != "")) | { start: [.[0], .[1]], end: [.[2], .[3]], url: .[4], summary: .[5] }' -R -c | jq -s
