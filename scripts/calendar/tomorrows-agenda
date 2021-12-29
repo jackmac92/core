@@ -8,4 +8,4 @@ todayd=$(date +%F)
 tomorrowd=$(date +%F -d "$todayd + 1 day")
 dayafternextd=$(date +%F -d "$tomorrowd + 1 day")
 
-s calendar helper $target_cal agenda $tomorrowd $dayafternextd --nodeclined --nostarted --tsv $*
+s calendar helper $target_cal agenda $tomorrowd $dayafternextd --nodeclined --nostarted --tsv --details url $*

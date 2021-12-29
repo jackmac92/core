@@ -7,4 +7,4 @@ shift
 todayd=$(date +%F)
 tomorrowd=$(date +%F -d "$todayd + 1 day")
 
-s calendar helper $target_cal agenda $todayd $tomorrowd --nodeclined --nostarted --tsv $*
+s calendar helper $target_cal agenda $todayd $tomorrowd --nodeclined --tsv --details url $*
