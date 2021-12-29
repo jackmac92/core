@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jq 'split("\t") | { startDate: .[0], startTime: .[1], endDate: .[2], endTime: .[3], summary: .[4] }' -R -c | jq -s
+
