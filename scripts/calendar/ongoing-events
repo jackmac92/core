@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# target_cal="$1"
+# shift
+# now=$(date "+%F %l:%M%p")
+# oneminfuture=$(date "+%F %l:%M%p" -d "now + 1 minute")
+
+# s calendar helper $target_cal agenda "$now" "$oneminfuture" --nodeclined --tsv --details url $*
+
+(
+    s calendar todays-agenda j79
+    s calendar todays-agenda cbi
+) | s calendar parse-as-json | racket ~/Projects/racket/current-mtg/main.rkt
