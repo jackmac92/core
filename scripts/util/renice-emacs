@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo renice -n -17 -p $(ps -ef | rg emacs | rg daemon=default | choose 1)
+
