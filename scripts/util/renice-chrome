@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo renice -n -17 -p $(ps -ef | rg google | rg renderer | choose 2 | tail -n 1)
+
