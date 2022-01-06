@@ -17,7 +17,7 @@ chmod 600 $input $output
 # # you can also set window dimensions via -g '=COLSxROWS', see man st.
 # st -c fzfmenu -n fzfmenu -e sh -c "cat $input | fzf $(printf -- " '%s'" "$@" | sed "s/^ ''$//") | tee $output" & disown
 
-alacritty --class dmenu --title "fzf dmenu" -e sh -c "cat $input | fzf $(printf -- " '%s'" "$@" | sed "s/^ ''$//") | tee $output" &
+alacritty --config-file ~/.config/alacritty/fzfdmenu.yml --class dmenu --title "fzf dmenu" -e sh -c "cat $input | fzf $(printf -- " '%s'" "$@" | sed "s/^ ''$//") | tee $output" &
 disown
 
 # handle ctrl+c outside child terminal window
