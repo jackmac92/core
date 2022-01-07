@@ -29,7 +29,6 @@ function __list_commands {
 
   # calling _arguments populates `line` variable
   _arguments -C ": :(($subcmds))" "*::arg:->args"
-  _files
 
 
   # HACK if calling a command which uses the path of another command (e.g. cat,edit), hide that command from the completion script (do a reset)
@@ -44,6 +43,8 @@ function __list_commands {
   # ! -z $line[1] indicates there is more text being completed i think, e.g. s util g[TAB]
   if [[ ! -z $line[1] && -d "$next" ]]; then
     __list_commands "$next"
+  else
+    _files
   fi
 }
 
