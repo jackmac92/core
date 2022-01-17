@@ -1,5 +1,2 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-j _nix && niv update && (cz apply ~/.config/nixpkgs && gc -am 'niv update' && gp) || gco -- nix/sources.json
-
+cd ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs
+niv update && (chezmoi apply ~/.config/nixpkgs && git add nix && git commit -m "niv update" && git push) || git checkout -- nix/sources.json
