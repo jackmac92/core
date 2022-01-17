@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+j _nix && niv update && (cz apply ~/.config/nixpkgs && gc -am 'niv update' && gp) || gco -- nix/sources.json
+
