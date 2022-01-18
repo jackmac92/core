@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -f yarn.lock ]; then
+    commitizen init cz-conventional-changelog --yarn --dev --exact
+else
+    commitizen init cz-conventional-changelog --save-dev --save-exact
+fi
