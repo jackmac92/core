@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jira move-to-done $(s jira get-active-ticket)
+
