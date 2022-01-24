@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-jobsWithArtifacts=$(s gitlab this-project-request jobs | jq 'map(select((.artifacts | length) > 0 and (.artifacts[].filename | index("artifacts.zip")))) | sort_by(.started_at) | reverse | unique_by(.name) | del(.[].commit.message)' -c)
+jobsWithArtifacts=$(s gitlab artifacts jobs-with-artifacts-for-this-repo)
 jobInfo=$(echo "$jobsWithArtifacts" | tr '\r\n' ' ' | s fzf select-by-json-key "name")
 targetJobName=$(echo "$jobInfo" | jq -r '.name' | sort -u | xargs)
 currentbranch=$(urlencode $(git current-branch))

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab this-project-request jobs | jq 'map(select((.artifacts | length) > 0 and (.artifacts[].filename | index("artifacts.zip")))) | sort_by(.started_at) | reverse | unique_by(.name) | del(.[].commit.message)' -c
