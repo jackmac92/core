@@ -43,8 +43,10 @@ function __list_commands {
   # ! -z $line[1] indicates there is more text being completed i think, e.g. s util g[TAB]
   if [[ ! -z $line[1] && -d "$next" ]]; then
     __list_commands "$next"
-  else
-    _files
+  # else
+  #   if [[ -z $line[1] ]]; then
+  #     _files
+  #   fi
   fi
 }
 
