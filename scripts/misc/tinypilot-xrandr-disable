@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xrandr --output DP-5 --off --auto
