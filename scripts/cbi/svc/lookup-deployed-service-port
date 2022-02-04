@@ -3,7 +3,7 @@ set -euo pipefail
 
 target_service=${1:-$(s cbi svc-select-dwim)}
 
-ALLOC_IDS=$(s cbi svc get-nomad-allocation-ids "$target_service")
+ALLOC_IDS=$(s cbi svc get-nomad-alloc-ids "$target_service")
 selected_allocation=$(echo $ALLOC_IDS | tr ' ' '
 ' | sort -R | head -n 1)
 s cbi nomad status $selected_allocation | rg --color=never -o 'grpcPort: (\S+)' -r '$1'
