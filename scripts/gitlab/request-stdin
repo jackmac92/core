@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+req_method=$1
+shift
+
+req_path="$1"
+shift
+
+full_url=$(s gitlab request-Url "$req_path")
+
+http --check-status --follow $* "$req_method" "$full_url" Private-Token:"$LAB_CORE_TOKEN"

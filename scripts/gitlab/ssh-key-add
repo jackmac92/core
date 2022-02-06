@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s gitlab request POST "/user/keys" \
+jo \
     title="${SSH_KEY_TITLE:-"s script sshkey $(date)"}" \
-    key="${SSH_KEY_TO_ADD:-"$(cat ~/.ssh/id_rsa.pub)"}"
+    key="${SSH_KEY_TO_ADD:-"$(cat ~/.ssh/id_rsa.pub)"}" |
+    s gitlab request-stdin POST "/user/keys"
