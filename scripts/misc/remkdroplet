@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+docker node rm -f $1 || true
+# TODO remove ssh key from gitlab
 s docean kill-droplet $1 && s misc mkdroplet $1
-
