@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TAILAUTH=$(bw get item tailscale | jq '.fields[] | select(.name == "api-key").value' -r)
+device_id=$(https --auth "$TAILAUTH:" "api.tailscale.com/api/v2/tailnet/jackmac79@gmail.com/devices" | jq --arg tgt quardin '.devices[] | select(.hostname == $tgt) | .id' -r)
+
+https --auth "$TAILAUTH:" DELETE "api.tailscale.com/api/v2/tailnet/jackmac79@gmail.com/device/$device_id"
