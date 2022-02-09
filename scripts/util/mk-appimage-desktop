@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-choice=$(ls ~/.local/app-image | fzf)
+APPIMAGEDIR="$HOME/.local/app-images"
+
+choice=$(ls $APPIMAGEDIR | fzf)
 
 cd $(mktemp -d)
 
-$choice --appimage-extract
+chronic $choice --appimage-extract
 
-dtopfile=$(ls squashfs-root/*.desktop)
+dtopfile=$(ls squashfs-root/*.desktop | fzf)
 
-cat $dtopfile | sed '/^Exec/c\Exec=$HOME/.local/app-image/'"$choice" >"~/.local/share/applications/$choice.desktop"
+cat $dtopfile | sed '/^Exec/c\Exec='"$APPIMAGEDIR/$choice" | sponge "~/.local/share/applications/$choice.desktop"
 
 rm -rf squashfs-root
