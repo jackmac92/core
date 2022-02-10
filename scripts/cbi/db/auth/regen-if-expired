@@ -6,8 +6,8 @@ targetDb=${2:-"main"}
 
 curr_creds=$(s cbi db auth latest-creds-json "$cbienv" "$targetDb")
 expiry=$(jq -r '.EXPIRY' <<<"$curr_creds")
-expire_ts=$gdate -d "$expiry" +%s)
-now=$gdate +%s)
+expire_ts=$(date -d "$expiry" +%s)
+now=$(date +%s)
 if [ $expire_ts -lt $now ]; then
     s cbi db auth regen-creds "$cbienv" "$targetDb"
 fi
