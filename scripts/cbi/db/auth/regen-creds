@@ -19,4 +19,4 @@ if [[ $(echo "$NEW_CREDS" | rg ":" | wc -l) -lt 3 ]]; then
 	exit 1
 fi
 # TODO read EXPIRY field and run 'at' command to regenerate
-echo "$NEW_CREDS" | rg ":" >"$(s cbi db auth creds-dir "$cbienv" "$targetDb")/$(date +%s)"
+echo "$NEW_CREDS" | rg ":" >"$(s cbi db auth creds-dir "$cbienv" "$targetDb")/$(gdate +%s)"
