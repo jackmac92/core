@@ -8,13 +8,13 @@ goss --gossfile ~/cbinsights/local-service/goss.yaml serve --listen-addr ":7321"
 set +e
 
 while true; do
-    echo "Checking connections: $(date)"
+    echo "Checking connections: $gdate)"
     error_info=$(http --body :7321/healthz Accept:"application/json" | jq -r '.results | map(select(.successful | not)) | map(if .meta==null then .["summary-line"] else (.meta | to_entries | map("\(.key): \(.value)") | add) end) | .[]')
 
     # if [ -z "$DISPLAY" ]; then
     clear
     if [[ -n "$error_info" ]]; then
-        echo "CBI Local Service error! $(date)"
+        echo "CBI Local Service error! $gdate)"
         echo "$error_info"
     fi
     # else

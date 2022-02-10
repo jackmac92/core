@@ -20,7 +20,7 @@ else
 fi
 
 DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sources.json"
-cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(date +%s)"
+cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$gdate +%s)"
 TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq ".connections | to_entries | map(select(.value.name == \"CBI $cbienv $targetDb\")) | first | .key" -r)
 NEWDBEAVERCONNECTIONSFILE=$(cat "$DBEAVERCONNECTIONSFILE" | jq --arg targetConn "$TARGETCONNECTIONKEY" \
     '.connections[$targetConn].configuration.host = "'"$conn_host"'" |.connections[$targetConn].configuration.user = "'"$conn_username"'" | .connections[$targetConn].configuration.password = "'"$conn_password"'"')
