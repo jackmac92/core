@@ -3,16 +3,18 @@ set -euo pipefail
 
 cd $(mktemp -d)
 
+cat "$1" | chronic npx percollate pdf - --output=puppet.pdf
+
 # TODO customize percollate css
-cat "$1" | chronic npx percollate pdf - --output=puppet.pdf --css "
-:root {
-    --main-font: Palatino, 'Palatino Linotype', 'Times New Roman',
-        'Droid Serif', Times, 'Source Serif Pro', serif, 'Apple Color Emoji',
-        'Segoe UI Emoji', 'Segoe UI Symbol';
-    --alt-font: 'helvetica neue', ubuntu, roboto, noto, 'segoe ui', arial,
-        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-    --code-font: Menlo, Consolas, monospace;
-}
-a:after { display: none }
-"
+# --css "
+# :root {
+#     --main-font: Palatino, 'Palatino Linotype', 'Times New Roman',
+#         'Droid Serif', Times, 'Source Serif Pro', serif, 'Apple Color Emoji',
+#         'Segoe UI Emoji', 'Segoe UI Symbol';
+#     --alt-font: 'helvetica neue', ubuntu, roboto, noto, 'segoe ui', arial,
+#         sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+#     --code-font: Menlo, Consolas, monospace;
+# }
+# a:after { display: none }
+# "
 realpath ./puppet.pdf
