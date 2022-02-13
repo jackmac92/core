@@ -2,7 +2,7 @@
 
 set -euo pipefail
 use_debug_mode=""
-if ! [ -z "${S_DEBUGGER:-""}"]; then
+if ! [ -z "${S_DEBUGGER:-""}" ]; then
     use_debug_mode="1"
 fi
 
