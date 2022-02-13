@@ -2,9 +2,11 @@
 
 set -euo pipefail
 use_debug_mode=""
-if ! [ -z "${S_DEBUGGER:-""}"]; then
+if ! [[ -z "${S_DEBUGGER:-""}" ]]; then
     use_debug_mode="1"
 fi
+
+IS_TOPLEVEL_CALL=$(if [[ -z ${S_INNER_CALL:-""} ]]; then echo 1; else echo 0; fi)
 
 if [ -n "$use_debug_mode" ]; then
     set -x
@@ -20,8 +22,6 @@ deadEndDirs=()
 
 orig_args=("$@")
 
-
-IS_TOPLEVEL_CALL=$(if [[ -z ${S_INNER_CALL:-""} ]]; then echo 1; else echo 0; fi)
 export S_INNER_CALL=1
 
 checkScriptDir() {
@@ -33,10 +33,11 @@ checkScriptDir() {
         metrics_dir_path="$execution_tracker$dir/$command"
 
         shift
-        if [[ -d "$dir/$command" ]]; then
-            dir="$dir/$command"
-        elif [[ -f "$dir/$command" ]]; then
-            if [[ -x "$dir/$command" ]]; then
+        realdircom=$(realpath "$dir/$command")
+        if [[ -d "$realdircom" ]]; then
+            dir="$realdircom"
+        elif [[ -f "$realdircom" ]]; then
+            if [[ -x "$realdircom" ]]; then
                 # recording metrics on how often they are used
                 mkdir -p "$metrics_dir_path/"{executions,invocations}
 
@@ -45,12 +46,12 @@ checkScriptDir() {
                     echo "${orig_args[@]}" >"$metrics_dir_path/invocations/$(date +%s)"
                     set -e
                 fi
-                if [[ -f "$dir/$command.inproc" ]]; then
-                    source "$dir/$command" "$@"
+                if [[ -f "$realdircom.inproc" ]]; then
+                    source "$realdircom" "$@"
                 elif [ -n "$use_debug_mode" ]; then
-                    bash -x "$dir/$command" "$@"
+                    bash -x "$realdircom" "$@"
                 else
-                    "$dir/$command" "$@"
+                    "$realdircom" "$@"
                 fi
                 if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
                     set +e
