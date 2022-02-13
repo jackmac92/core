@@ -1,2 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
 cd ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs
-niv update && (chezmoi apply -i files ~/.config/nixpkgs && chezmoi apply ~/.config/nixpkgs && git add nix && git commit -m "niv update" && git push) || git checkout -- nix/sources.json
+
+niv update
+chezmoi apply -i files ~/.config/nixpkgs
+chezmoi apply ~/.config/nixpkgs
+git add nix
+git commit -m "niv update" && git push
+
+# TODO trap failing exit and do below
+# git checkout -- nix/sources.json
