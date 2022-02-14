@@ -25,4 +25,4 @@ if [[ $# -gt 1 ]]; then shift; fi
 
 req_path="projects/$(urlencode "$gitlab_project")/$api_path"
 
-s gitlab request ${reqflags[@]} "$req_method" "$req_path"
+s gitlab request ${reqflags[@]} "$req_method" "$req_path" $*
