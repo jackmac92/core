@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-target_service=${1:-$(s cbi svc-select-dwim)}
+target_service=${1:-$(s cbi svc select-dwim)}
 
 ALLOC_IDS=$(s cbi svc get-nomad-alloc-ids "$target_service")
 selected_allocation=$(echo $ALLOC_IDS | tr ' ' '

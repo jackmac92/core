@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-proto_path=${1:-"$(s cbi svc-name-to-proto-path "$(s cbi svc-select-dwim)")"}
+proto_path=${1:-"$(s cbi svc-name-to-proto-path "$(s cbi svc select-dwim)")"}
 import_path="$(s cbi proto walkup-for-import-path "$proto_path")"
 rpc_method="${2:-"$(s proto pick-rpc "$proto_path")"}"
 
