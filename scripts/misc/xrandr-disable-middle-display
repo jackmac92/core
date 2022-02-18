@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xrandr -d :1 --output HDMI-0 --off --auto
+
