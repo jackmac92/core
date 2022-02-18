@@ -1,6 +1,7 @@
 #compdef s
 
 S_SCRIPT_PASSTHRU_CMDS=(cat which whicha mkhelp new edit delete rename duplicate)
+S_SCRIPT_IGNORED_DIRNAMES=(goss.d)
 
 function __list_commands {
   local -a subcmds
@@ -18,7 +19,7 @@ function __list_commands {
     if [[ -f "$helpfile" ]]; then
       # Show first line of helpfile in completion
       help=$(head -n1 "$helpfile")
-    elif [[ -d "$file" ]]; then
+    elif [[ -d "$file" ]] && ! (($S_SCRIPT_IGNORED_DIRNAMES[(Ie)$file])) ; then
       # Show dir name + 'commands' in completion
       help="$command commands"
     else
