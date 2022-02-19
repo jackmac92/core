@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sctlu list-units G archivebox | choose 0 | rg '^arch' | rg -v '^\W' X systemctl --user disable --now
+
