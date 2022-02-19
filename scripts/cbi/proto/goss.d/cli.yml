@@ -1,0 +1,4 @@
+command:
+  has protoc cli:
+    exec: which protoc
+    exit-status: 0
