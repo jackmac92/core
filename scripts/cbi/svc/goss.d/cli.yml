@@ -1,0 +1,7 @@
+command:
+  has nomad cli:
+    exec: which nomad
+    exit-status: 0
+  has consul helper:
+    exec: which consul
+    exit-status: 0
