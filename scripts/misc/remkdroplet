@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+docker node demote $1 || true
 docker node rm -f $1 || true
 s util tailscale-remove-device $1
 # TODO remove ssh key from gitlab
