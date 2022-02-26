@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s misc pgcli-mkwormhole
-pgcli postgres://$(bw get username postgres-self-hosted):$(bw get password postgres-self-hosted)@localhost:5432/mqtt
+pgcli postgres://$(bw get username postgres-self-hosted):$(bw get password postgres-self-hosted)@$PG_SELFHOSTED_ADDR/${1:-sandbox}
