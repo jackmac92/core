@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+https --verify=false ciao.priv.jackm.pizza/checks.json > ciao-backup.json
+
