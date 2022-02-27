@@ -7,6 +7,14 @@ import yaml
 import sys
 import os
 from deepmerge import always_merger
+import json
+
+def distinct(lst):
+    return list(set(lst))
+def distinctify(obj, key):
+    if obj is not None and key in obj:
+        obj[key] = distinct(obj[key])
+
 
 tgt = os.path.join(sys.argv[1], "*yml")
 ymlfiles = glob.glob(tgt)
@@ -14,9 +22,28 @@ objs = [yaml.safe_load(open(i, "r")) for i in ymlfiles]
 result = {}
 for x in objs:
     result = always_merger.merge(result, x)
+conf = result
+
+for svcname in conf["services"]:
+    svc = conf["services"][svcname]
+
+    distinctify(svc, "networks")
+    distinctify(svc.get("deploy"), "labels")
+
+    img = svc.get("image", "")
+    if not (img.startswith("jackzzz92") or img.startswith("whales.jackm.pizza")):
+        continue
+
+    imgcomponents = img.split(":")
+    if len(imgcomponents) > 1:
+        continue
+
+    build_id = os.environ.get("CI_PIPELINE_IID")
+    if build_id is not None:
+        svc["image"]+= ":" + build_id
 
 with os.fdopen(sys.stdout.fileno(), "wb", closefd=False) as stdout:
-    stdout.write(yaml.dump(result, encoding="utf-8"))
+    stdout.write(yaml.dump(conf, encoding="utf-8"))
     stdout.flush()
 
 ' "${1:-"./"}"
