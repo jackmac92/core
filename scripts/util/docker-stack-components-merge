@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python -c '
+import glob
+import yaml
+import sys
+import os
+from deepmerge import always_merger
+
+tgt = os.path.join(sys.argv[1], "*yml")
+ymlfiles = glob.glob(tgt)
+objs = [yaml.safe_load(open(i, "r")) for i in ymlfiles]
+result = {}
+for x in objs:
+    result = always_merger.merge(result, x)
+
+with os.fdopen(sys.stdout.fileno(), "wb", closefd=False) as stdout:
+    stdout.write(yaml.dump(result, encoding="utf-8"))
+    stdout.flush()
+
+' "${1:-"./"}"
