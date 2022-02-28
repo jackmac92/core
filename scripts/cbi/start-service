@@ -10,7 +10,7 @@ if [ -z $target_service ]; then
 fi
 
 if [ $target_service = cbi-site ]; then
-  tmuxinator start cbi-site
+  tmuxinator start cbi-site $target_service
   exit 0
 fi
 
