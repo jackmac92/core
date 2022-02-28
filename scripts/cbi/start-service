@@ -8,43 +8,21 @@ if [ -z $target_service ]; then
   echo "Must provide a service name"
   exit 1
 fi
-tmpdir=$(mktemp -d)
-tmpfile="$tmpdir/this.yaml"
 
-panes=$(
-  python - <<___EOF
-import copy
-import json
-start_after_lcl_svc = "s cbi maybe-checkout-branch-for-current-ticket; waitForIt 127.0.0.1:8500/v1/kv/Environment\?raw -- make local"
-default = [{
-  "main": start_after_lcl_svc,
-}, {
-  "scratchspace": ""
-}]
-cbi_site_override = copy.deepcopy(default)
-cbi_site_override.insert(1, {"server logs": "waitForIt -t 60 127.0.0.1:3000 -- make logs"})
-options = {
-	"cbi-site": cbi_site_override
-}
-print(json.dumps(options.get("$target_service", default)))
-___EOF
-)
+if [ $target_service = cbi-site ]; then
+  tmuxinator start cbi-site
+  exit 0
+fi
 
-sessname=${CBI_SERVICE_TMUX_SESSION_TICKET:-$target_service}
+if [ -f ~/cbinsights/$target_service/go.mod ]; then
+  tmuxinator start cbi-golang-service $target_service
+  exit 0
+fi
 
-bat <<EOF >$tmpfile
-name: $sessname
-root: ~/cbinsights/$target_service
+if [ -f ~/cbinsights/$target_service/src/setup.cfg ]; then
+  tmuxinator start cbi-python-service $target_service
+  exit 0
+fi
 
-windows:
-  - $target_service:
-    layout: main-vertical
-    panes: $panes
-
-EOF
-
-echo $tmpfile
-
-set -x
-tmuxinator start this $*
-set +x
+echo "Unsupported service type?"
+exit 1
