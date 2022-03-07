@@ -3,4 +3,11 @@ set -euo pipefail
 
 cbienv=${1:-$(s cbi env-select-dwim)}
 targetDb=${2:-"main"}
+
+# TODO use for osx
+# keychain -s "cbi-db-$targetDb-$cbienv" -p
+
+# TODO use for linux
+# secret-tool lookup --label="cbi-db-$targetDb-$cbienv" password
+
 cat "$(s cbi db auth latest-creds-path "$cbienv" "$targetDb")" | head -n 3

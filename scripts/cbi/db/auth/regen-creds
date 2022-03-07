@@ -21,6 +21,12 @@ fi
 # TODO read EXPIRY field and run 'at' command to regenerate
 echo "$NEW_CREDS" | rg ":" >"$(s cbi db auth creds-dir "$cbienv" "$targetDb")/$(gdate +%s)"
 
+# TODO use for osx
+# security add-generic-password -s "cbi-db-$targetDb-$cbienv" -a $USER -w "$NEW_CREDS"
+
+# TODO use for linux
+# secret-tool store --label="cbi-db-$targetDb-$cbienv" password "$NEW_CREDS"
+
 set +e
 set -x
 echo "s cbi db auth regen-creds $cbienv $targetDb" | at $(gdate -d "$(jq -r .EXPIRY <<<"$NEW_CREDS")")
