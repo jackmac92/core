@@ -11,23 +11,15 @@ fi
 if [ $targetDb = "table" ]; then
 	vault_targetDb="table-service"
 fi
-cbi vault -s "db_$vault_targetDb-full" -e "$cbienv" >$tmpfile
+cbi vault -s "db_$vault_targetDb-full" -e "$cbienv" | tee $tmpfile
 echo "New creds stored in $tmpfile"
 NEW_CREDS=$(cat "$tmpfile")
+
 if [[ $(echo "$NEW_CREDS" | rg ":" | wc -l) -lt 3 ]]; then
 	echo "Failed to generate new db creds for $cbienv $targetDb"
 	exit 1
 fi
-# TODO read EXPIRY field and run 'at' command to regenerate
-echo "$NEW_CREDS" | rg ":" >"$(s cbi db auth creds-dir "$cbienv" "$targetDb")/$(gdate +%s)"
 
-# TODO use for osx
-# security add-generic-password -s "cbi-db-$targetDb-$cbienv" -a $USER -w "$NEW_CREDS"
+echo "$NEW_CREDS" | s cbi db auth store-creds "$cbienv" "$targetDb"
 
-# TODO use for linux
-# secret-tool store --label="cbi-db-$targetDb-$cbienv" password "$NEW_CREDS"
-
-set +e
-set -x
-echo "s cbi db auth regen-creds $cbienv $targetDb" | at $(gdate -d "$(jq -r .EXPIRY <<<"$NEW_CREDS")")
-set +x
+# echo "s cbi db auth regen-creds $cbienv $targetDb" | at $(gdate -d "$(jq -r .EXPIRY <<<"$NEW_CREDS")")

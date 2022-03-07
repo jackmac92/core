@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+cbienv=$1
+targetDb=$2
+
+rg ":" >"$(s cbi db auth creds-dir "$cbienv" "$targetDb")/$(gdate +%s)"
+
+# TODO use for osx
+# security add-generic-password -s "cbi-db-$targetDb-$cbienv" -a $USER -w "$NEW_CREDS"
+
+# TODO use for linux
+# secret-tool store --label="cbi-db-$targetDb-$cbienv" password "$NEW_CREDS"
