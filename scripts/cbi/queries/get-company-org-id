@@ -1,16 +1,12 @@
 #! /usr/bin/env bash
 set -euo pipefail
 
+cbienv=${1:-$(s cbi env-select-dwim)}
+targetDb=${2:-"main"}
 
-tmpcsvfile=$(mktemp --suffix .csv)
-tmpjsonfile=$(mktemp --suffix .json)
-tgt_env=${2:-$(s cbi env-select-dwim)}
-
-mycli --csv $(s cbi db auth conn-string "$tgt_env") -e "
+mycli --login-path "$cbienv-$targetDb" --csv -e "
 		SELECT c.company, c.id_cbi_entity
 		FROM cbi_data.company c
 		WHERE
 			c.company LIKE '$1%'
 		" | s util convert-csv-to-json | s fzf select-by-json-key "company" | jq -r '.id_cbi_entity'
-
-

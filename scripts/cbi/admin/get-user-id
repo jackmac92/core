@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
 set -euo pipefail
 
-tmpcsvfile=$(mktemp --suffix .csv)
-tmpjsonfile=$(mktemp --suffix .json)
-tgt_env=${2:-$(s cbi env-select-dwim)}
-mycli --csv $(s cbi db auth conn-string "$tgt_env") -e "
+cbienv=${2:-$(s cbi env-select-dwim)}
+targetDb="main"
+
+mycli --login-path "$cbienv-$targetDb" --csv -e "
 		SELECT u.email, u.id_user
 		FROM cbi_user.cbi_user u
 		WHERE
