@@ -10,7 +10,7 @@ if (for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do fd -t x . "$scrip
     s Yn "This script appears to be referenced in some other scripts! Continue?"
 fi
 
-git stash --all
+# git stash --all
 
 git rm -f "$tgt_file"
 
@@ -20,4 +20,4 @@ git rm --ignore-unmatch -f "$tgt_file.inproc"
 
 git commit -m "deleted script"
 
-git stash pop
+# git stash pop

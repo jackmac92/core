@@ -35,7 +35,7 @@ scriptgit() {
     git -C "$dest_dir" "$@"
 }
 
-scriptgit stash --all
+# scriptgit stash --all
 
 scriptgit cp "$tgt_file" "$dest_file"
 
@@ -48,4 +48,4 @@ s mkhelp "$dest_file_cmpts"
 
 scriptgit commit -m "duplicated script $tgt_file_cmpts -> $dest_file_cmpts"
 
-scriptgit stash pop
+# scriptgit stash pop

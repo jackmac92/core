@@ -40,7 +40,7 @@ scriptgit() {
 
 scriptgit switch master
 
-scriptgit stash --all
+# scriptgit stash --all
 
 s touch "$script_path"
 cat >"$script_path" <<EOF
@@ -62,4 +62,4 @@ s mkhelp "$script_name"
 scriptgit add "$script_path*"
 scriptgit commit --message 'added new s script'
 #
-scriptgit stash pop
+# scriptgit stash pop

@@ -54,7 +54,7 @@ scriptmv() {
     fi
 }
 
-scriptgit stash --all
+# scriptgit stash --all
 
 scriptmv "$tgt_file" "$dest_file"
 
@@ -72,4 +72,4 @@ done | sad --exact "s $*" "s $dest_file_cmpts"
 
 scriptgit commit -m "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
 
-scriptgit stash pop
+# scriptgit stash pop
