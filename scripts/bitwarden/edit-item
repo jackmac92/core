@@ -3,4 +3,4 @@ set -euo pipefail
 
 tgt_item=$(bw list items --search $1 | s fzf select-by-json-key name)
 tgt_item_id=$(jq '.id' -r <<<"$tgt_item")
-bw get item $tgt_item_id | vipe | bw encode | bw edit item $tgt_item_id
+bw get item "$tgt_item_id" | vipe --suffix json | bw encode | bw edit item "$tgt_item_id"
