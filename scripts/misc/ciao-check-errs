@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-https --body --verify=false ciao.priv.jackm.pizza/checks.json | jq 'map(select(try(.status | tonumber) catch (500) < 400 | not))[] | "\(.name): \(.status)"' -r
-
+https --body --verify=false ciao.priv.$PRIMARY_PERSONAL_DOMAIN/checks.json | jq 'map(select(try(.status | tonumber) catch (500) < 400 | not))[] | "\(.name): \(.status)"' -r

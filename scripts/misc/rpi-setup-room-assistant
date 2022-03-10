@@ -42,7 +42,7 @@ global:
     - bluetoothClassic
     - bluetoothLowEnergy
 homeAssistant:
-  mqttUrl: 'mqtt://jackm.pizza:1883'
+  mqttUrl: 'mqtt://$PRIMARY_PERSONAL_DOMAIN:1883'
   mqttOptions:
     username: '$roomname'
     password: roomassistant

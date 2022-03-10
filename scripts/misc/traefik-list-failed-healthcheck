@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-https --auth $DROPLOOP_TRAEFIK_USER:$DROPLOOP_TRAEFIK_PASS traefik.jackm.pizza/api/http/services |
+https --auth $DROPLOOP_TRAEFIK_USER:$DROPLOOP_TRAEFIK_PASS traefik.$PRIMARY_PERSONAL_DOMAIN/api/http/services |
     jq -c 'map(select(.serverStatus)) | map(select([ .serverStatus[] ] | any(contains("DOWN"))))[]'
