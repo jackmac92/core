@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd -e yml . .config/goss -x chronic goss -g {} v --format=json | jq '.results[]' -c | jq -s
+
