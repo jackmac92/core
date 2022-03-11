@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bw list items --search "${1:-""}" | s fzf select-by-json-key name
+
