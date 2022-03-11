@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
-tgt_item=$(bw list items --search $1 | s fzf select-by-json-key name)
+tgt_item=$(s bitwarden select-one $1)
 tgt_item_id=$(jq '.id' -r <<<"$tgt_item")
 bw get item "$tgt_item_id" | vipe --suffix json | bw encode | bw edit item "$tgt_item_id"
+bw sync
