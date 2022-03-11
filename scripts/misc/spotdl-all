@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd $HOME/Music
+
+spotdl \
+    'https://open.spotify.com/playlist/6rijnFwd7bnQxqNnOKMn3k' `# memrees` \
+    'https://open.spotify.com/playlist/2MlTBVFpq4H95eykqW8bDW' `# shower` \
+    'https://open.spotify.com/playlist/316eaC3j7calzoMq0XpGUM' `# poolside` \
+    'https://open.spotify.com/playlist/3JJ2DbJiqIWBUxtNfKtEN6' `# thug shit` \
+    'https://open.spotify.com/playlist/5LtGXIevpu6cvmTkBnY5wp' `# nantucket memrees` \
+    'https://open.spotify.com/playlist/6nz3z1dX5nkh6H16lXhmz1' `# standout` \
+    'https://open.spotify.com/playlist/1L5zd6fiUZ981uxgAOtE0q' `# triumphant` \
+    'https://open.spotify.com/playlist/1o0M7FIELN02nFnlMr5qv7' `# emoish` \
+    'https://open.spotify.com/playlist/5OlL0VhaM6zTWWXMDLuKIM' `# finds` \
+    'https://open.spotify.com/playlist/0psvSY0p61rk2wgmUFDf8A' `# Classics` \
+    --m3u --dt 10 --st 16

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p $HOME/Music/spotify-discover-weekly
+cd $HOME/Music/spotify-discover-weekly
+todayweek=$(date -u +%Y-%m__%U)
+mkdir $todayweek
+cd $todayweek
+
+spotdl 'https://open.spotify.com/playlist/37i9dQZEVXcMPONlU8pAtl' --m3u --dt 10 --st 16
