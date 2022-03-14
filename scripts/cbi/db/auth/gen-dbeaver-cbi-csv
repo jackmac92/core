@@ -6,3 +6,4 @@ CBI dev main,mysql-dev.cbinsights.com,3306,,mysql,jdbc:mysql://mysql-dev.cbinsig
 CBI stg main,mysql-staging.cbinsights.com,3306,,mysql,jdbc:mysql://mysql-staging.cbinsights.com:3306/cbi_data,USER,PASSWORD,stg
 CBI prd main,mysql.cbinsights.com,3306,,mysql,jdbc:mysql://mysql.cbinsights.com:3306/cbi_data,USER,PASSWORD,prd
 '
+# TODO add mysql-1 db
