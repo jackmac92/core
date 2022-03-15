@@ -3,4 +3,5 @@ set -euo pipefail
 
 bw get template item |
     jq '. + {name: "'"$1"'", login: { password: "'"${2:-"$(bw generate)"}"'" }}' |
+    bw encode |
     bw create item
