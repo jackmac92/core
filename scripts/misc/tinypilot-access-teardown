@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-sudo howdy disable 1
+sudo howdy disable 0
 rm -f ~/.config/monitors.xml
-cp ~/monitors.xml-tinypilot-only ~/.config/monitors.xml
+cp ~/monitors.xml-tinypilot-disabled ~/.config/monitors.xml
 sudo rm -f ~gdm/.config/monitors.xml
 
 sudo cp ~/.config/monitors.xml ~gdm/.config/
-if s Yn "Reboot to complete tinypilot setup?"; then
+if s Yn "Reboot to complete tinypilot teardown?"; then
     sudo reboot
 fi
