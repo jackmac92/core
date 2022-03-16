@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo howdy disable 1
+unalias cp
+cp ~/monitors.xml-tinypilot-only ~/.config/monitors.xml
+sudo cp ~/.config/monitors.xml ~gdm/.config/
+if s Yn "Reboot to complete tinypilot setup?"; then
+    sudo reboot
+fi
