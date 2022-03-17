@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
-sudo howdy disable 1
+sudo howdy disable 1 || true
 rm -f ~/.config/monitors.xml
 cp ~/monitors.xml-tinypilot-only ~/.config/monitors.xml
 sudo rm -f ~gdm/.config/monitors.xml
