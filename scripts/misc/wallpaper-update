@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+$HOME/apps/styli.sh/styli.sh -g -p -m 3 -s $(cat $HOME/.local/wallpaper-query)
+
