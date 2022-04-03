@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+zfs list | rg -v MOUNTPOINT | while IFS= read val ; do if [[ "$(echo $val | choose 2 | sd '[A-Za-z]' '')" -eq 0 ]] ; then echo $val | choose 1 ; fi ; done
+
