@@ -8,3 +8,5 @@ if [ -z "$THEME" ]; then
 else
     $HOME/apps/styli.sh/styli.sh --gnome --termcolor --nitrogen --monitors 3 --search "$THEME"
 fi
+
+systemctl --user restart racket-notifs-email.service
