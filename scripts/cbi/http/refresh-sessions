@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+https --session cbi-dev POST app-dev.cbinsights.com/login email="$CBI_PLATFORM_EMAIL" password="$CBI_PLATFORM_PASSWORD"
+https --session cbi-stg POST app-stg.cbinsights.com/login email="$CBI_PLATFORM_EMAIL" password="$CBI_PLATFORM_PASSWORD"
+https --session cbi-prd POST app.cbinsights.com/login email="$CBI_PLATFORM_EMAIL" password="$CBI_PLATFORM_PASSWORD"

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+currenv=$(s cbi env-select-dwim)
+
+req_path=$1
+shift
+
+https --session cbi-$currenv app-$currenv.cbinsights.com/$req_path $*
