@@ -2,5 +2,5 @@
 set -euo pipefail
 
 https --quiet --session cbi-dev POST app-dev.cbinsights.com/login email="$CBI_PLATFORM_EMAIL" password="$CBI_PLATFORM_PASSWORD"
-https --quiet --session cbi-stg POST app-stg.cbinsights.com/login email="$CBI_PLATFORM_EMAIL" password="$CBI_PLATFORM_PASSWORD"
+https --quiet --session cbi-stg POST app-staging.cbinsights.com/login email="$CBI_PLATFORM_EMAIL" password="$CBI_PLATFORM_PASSWORD"
 https --quiet --session cbi-prd POST app.cbinsights.com/login email="$CBI_PLATFORM_EMAIL" password="$CBI_PLATFORM_PASSWORD"
