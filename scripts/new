@@ -57,7 +57,7 @@ else
     echo >>"$script_path"
 fi
 
-s mkhelp "$script_name"
+# s mkhelp "$script_name"
 
 scriptgit add "$script_path*"
 scriptgit commit --message 'added new s script'
