@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+orig_dir=$PWD
+
+cd $(mktemp -d)
+workingdir="$PWD"
+
+echo "Create gossfile and exit when done"
+
+$SHELL
+
+echo "What should the file name be?"
+printf ">> "
+read testname
+
+# TODO handle multiple?
+# mv $(ls $workingdir/*.yml $workingdir/*.yaml | fzf --header= --select-1) "~/.local/share/chezmoi/private_dot_config/exact_goss/$testname.yml"
+tgt_path="$HOME/.config/goss/$testname.yml"
+mv goss.yaml "$tgt_path"
+
+chezmoi add "$tgt_path"
+
+cd "$orig_dir"
