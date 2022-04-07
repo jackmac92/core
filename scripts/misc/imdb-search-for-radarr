@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-http "https://imdb-api.com/en/API/SearchMovie/k_9bbziss4/$*" |
-    jq '.results' |
-    s fzf select-by-json-key 'title' |
-    jq -r '.id'

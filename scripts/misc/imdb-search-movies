@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+http "https://imdb-api.com/en/API/SearchMovie/$IMDB_API_TOKEN/$*" |
+    jq '.results' |
+    s fzf select-by-json-key 'title'
