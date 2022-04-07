@@ -20,5 +20,7 @@ tgt_path="$HOME/.config/goss/$testname.yml"
 mv goss.yaml "$tgt_path"
 
 chezmoi add "$tgt_path"
+chezmoi git add "private_dot_config/exact_goss"
+chezmoi git commit -- -m "autocommit goss test"
 
 cd "$orig_dir"
