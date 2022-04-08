@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s misc radarr-add-movie $(s misc imdb-search-movies "$(s cast get-current-title)" | jq '"'\''\(.title)'\'' \(.id)"' -r)
+
