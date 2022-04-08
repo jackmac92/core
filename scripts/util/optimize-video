@@ -42,4 +42,6 @@ unbuffer tail -f "$progress_file" --pid="$ffmpegpid" | unbuffer rg --color=never
 
 wait $ffmpegpid
 echo "$outputfile"
-dunstify --replace=$original_notif --hints=int:value:100 "$dunst_title" "Video ready!"
+if dunstify --action="default,Show Video" --replace=$original_notif --hints=int:value:100 "$dunst_title" "Video ready!" | rg -q default; then
+    xdg-open $(dirname $outputfile)
+fi
