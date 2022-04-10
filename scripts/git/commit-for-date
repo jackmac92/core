@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -u
 
 tgt_date="${1:-$(yad --calendar)}"
 
 git log --pretty='format:%C(yellow)%h %G? %ad%Cred%d %Creset%s%C(cyan) [%cn]' --decorate --before="$tgt_date 23:59" | head -n 1 | choose 0
+
