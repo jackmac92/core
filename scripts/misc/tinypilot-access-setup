@@ -7,6 +7,6 @@ cp ~/monitors.xml-tinypilot-only ~/.config/monitors.xml
 sudo rm -f ~gdm/.config/monitors.xml
 
 sudo cp ~/.config/monitors.xml ~gdm/.config/
-if s Yn "Reboot to complete tinypilot setup?"; then
-    sudo reboot
-fi
+echo "Rebooting in 7 sec..."
+sleep 7
+sudo reboot
