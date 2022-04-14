@@ -3,5 +3,5 @@ set -euo pipefail
 
 jo \
     title="${SSH_KEY_TITLE:-"s script sshkey $(date)"}" \
-    key="${SSH_KEY_TO_ADD:-"$(cat ~/.ssh/id_rsa.pub)"}" |
+    key="${SSH_KEY_TO_ADD:-"$(cat ~/.ssh/id_ed25519.pub)"}" |
     s gitlab request-stdin POST "/user/keys"
