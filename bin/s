@@ -112,4 +112,5 @@ set +x
 
 if [[ "$no_commands" -eq 1 ]]; then
     echo "(no subcommands found)"
+    exit 1
 fi
