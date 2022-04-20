@@ -4,6 +4,11 @@ set -euo pipefail
 cbienv=$1
 targetDb=$2
 
+if [[ "$cbienv" = "prd" ]]; then
+    echo "No cache for prod creds"
+    exit 0
+fi
+
 rg ":" >"$(s cbi db auth creds-dir "$cbienv" "$targetDb")/$(gdate +%s)"
 
 # TODO use for osx
