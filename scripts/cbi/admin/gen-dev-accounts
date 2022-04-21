@@ -1,0 +1,12 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+cd ~/cbinsights/user-v2-service
+
+fname=$1
+lname=$2
+
+USER_INFO=$(jo email=$(echo "$fname.$lname@cbinsights.com" | tr '[:upper:]' '[:lower:]') password=password123 active=true agreeTos=true idPackage=42 recurring=true firstName="$fname" lastName="$lname")
+
+CBI_ENV_OVERRIDE=dev s cbi grpc make-request - SimpleSignUp <<<"$USER_INFO"
+CBI_ENV_OVERRIDE=stg s cbi grpc make-request - SimpleSignUp <<<"$USER_INFO"
