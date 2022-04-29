@@ -2,18 +2,24 @@
 set -uo pipefail
 
 testresults=$(goss validate --format=json --format-options=verbose)
-for e in "$(jq -r '.results | map(select(.successful | not)) | map(select(.meta!=null)) | map(.meta) | map(select(.fix!=null)) | .[].fix' <<<"$testresults" | rg -v "^\s*$" | sort -u)"; do
-	if [[ -n $e ]] && s Yn "Run: '$e'?"; then
-		eval "$e"
-	fi
-done
+echo "Got test results"
 
-# autofix groups
-jq -r '.results
+echo "Running..."
+(
+	jq -r '.results
+   		| map(select(.successful | not))
+		| map(select(.meta!=null))
+		| map(.meta)
+		| map(select(.fix!=null))
+		| .[].fix' <<<"$testresults"
+	# autofix groups
+	jq -r '.results
    		| map(select((.successful | not) and ."resource-type" == "User" and .property == "groups"))[]
-		| "usermod --append --groups \(.expected | first | fromjson | join(",")) \(."resource-id")"' <<<"$testresults" |
-	sudo xargs --no-run-if-empty -n 1 -d $'\n' bash -c
-
-# autofix services
-jq -r '.results | map(select((.successful | not) and ."resource-type" == "Service" and .property == "running"))[] | "systemctl restart \(."resource-id").service"' <<<"$testresults" |
-	sudo xargs --no-run-if-empty -n 1 -d $'\n' bash -c
+		| "usermod --append --groups \(.expected | first | fromjson | join(",")) \(."resource-id")"' <<<"$testresults" | xargs --no-run-if-empty -n 1 -d $'\n' printf "sudo %s\n"
+	# autofix services
+	jq -r '.results | map(select((.successful | not) and ."resource-type" == "Service" and .property == "running"))[] | "systemctl restart \(."resource-id").service"' <<<"$testresults" | xargs --no-run-if-empty -n 1 -d $'\n' printf "sudo %s\n"
+) |
+	rg -v "^\s*$" |
+	sort -u |
+	tee |
+	xargs --no-run-if-empty -n 1 -d $'\n' bash -c
