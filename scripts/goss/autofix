@@ -21,5 +21,5 @@ echo "Running..."
 ) |
 	rg -v "^\s*$" |
 	sort -u |
-	tee |
+	tee /dev/stdout |
 	xargs --no-run-if-empty -n 1 -d $'\n' bash -c
