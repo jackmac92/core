@@ -15,9 +15,9 @@ cmdz=$(
 		# autofix groups
 		jq -r '.results
    		| map(select((.successful | not) and ."resource-type" == "User" and .property == "groups"))[]
-		| "usermod --append --groups \(.expected | first | fromjson | join(",")) \(."resource-id")"' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "sudo %s\n"
+		| "\(.expected | first | fromjson | join(",")) \(."resource-id")"' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "sudo usermod --append --groups %s\n"
 		# autofix services
-		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Service" and .property == "running"))[] | "systemctl restart \(."resource-id").service"' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "sudo %s\n"
+		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Service" and .property == "running"))[]' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "sudo systemctl restart %s.service\n"
 	) |
 		rg -v "^\s*$" |
 		sort -u |
