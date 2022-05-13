@@ -2,7 +2,7 @@
 set -euo pipefail
 
 VERBOSE_OUTPUT="${1:-0}"
-APP_FOLDER="$HOME/.local/var/s-scripts/gitlab-list-all-projects${JM_GITLAB_REQ_EXTRA_PARAMS:-""}"
+APP_FOLDER="$SCRIPTS_LOCAL_DIR/gitlab-list-all-projects/params-of-${JM_GITLAB_REQ_EXTRA_PARAMS:-""}"
 LAST_PROJECT_REQUESTED_FILE="$APP_FOLDER/last-check-$(echo $GITLAB_INSTANCE_URL | sd "/" "")"
 
 PROJECT_LIST=()
