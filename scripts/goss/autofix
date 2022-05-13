@@ -12,6 +12,8 @@ cmdz=$(
 		| map(.meta)
 		| map(select(.fix!=null))
 		| .[].fix' <<<"$testresults"
+		# autofix missing pkgs
+		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Package" and .property == "installed"))[]."resource-id"' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "s util syspkg-install %s\n"
 		# autofix groups
 		jq -r '.results
    		| map(select((.successful | not) and ."resource-type" == "User" and .property == "groups"))[]
