@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-gitleaks $(git remote get-url origin)
-
 # review commit history
 tmux split-window 'git log --oneline'
 echo "Press enter when done reviewing previous commits"
