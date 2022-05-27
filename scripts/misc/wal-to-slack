@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat ~/.cache/wal/colors.json | jq '.colors | to_entries[].value' -r | sort -R | xargs -n 1 printf "%s;" | pbcopy
+
