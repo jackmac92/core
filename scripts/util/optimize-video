@@ -21,7 +21,7 @@ frames_in_input=$(ffprobe -v error -select_streams v:0 -count_packets -show_entr
 dunst_title="Optimizing video file"
 
 progress_file=$(mktemp)
-original_notif=$(dunstify --printid "$dunst_title")
+dunstify --hints=string:x-dunst-stack-tag:optimize-video "$dunst_title"
 
 # 265 is an improvement on stock codec
 # higher crf values lower bitrate (smaller video, maybe lower quality), don't go higher than 30
@@ -34,7 +34,7 @@ handleSendProgressNotif() {
         return
     fi
     pctlvl=$((currframe / frames_in_input))
-    dunstify --replace=$original_notif --hints=int:value:$pctlvl "$dunst_title"
+    dunstify --hints=string:x-dunst-stack-tag:optimize-video --hints=int:value:$pctlvl "$dunst_title"
 }
 
 export -f handleSendProgressNotif
@@ -42,6 +42,6 @@ unbuffer tail -f "$progress_file" --pid="$ffmpegpid" | unbuffer rg --color=never
 
 wait $ffmpegpid
 echo "$outputfile"
-if dunstify --action="default,Show Video" --replace=$original_notif --hints=int:value:100 "$dunst_title" "Video ready!" | rg -q default; then
+if dunstify --action="default,Show Video" --hints=string:x-dunst-stack-tag:optimize-video --hints=int:value:100 "$dunst_title" "Video ready!" | rg -q default; then
     xdg-open $(dirname $outputfile)
 fi
