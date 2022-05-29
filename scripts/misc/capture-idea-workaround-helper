@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+msg=$1
+captureContent=$(cat /dev/stdin | jq -c '.template |= if .==null then "note" else . end')
+
+jo \
+    branch=main \
+    commit_message="$msg" \
+    actions="$(jo -a "$(jo action=create file_path="$(date)/Dictionary.json" content=" $captureContent")")" # | s gitlab request-stdin POST projects/34035963/repository/commits
