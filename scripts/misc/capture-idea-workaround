@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jo branch=main commit_message="s script test commit" actions="$(jo -a "$(jo action=create file_path="$(date)/Dictionary.json" content=hello)" )"  | s gitlab request-stdin POST projects/34035963/repository/commits 
+
