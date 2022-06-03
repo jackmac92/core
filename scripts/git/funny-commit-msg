@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sort -R .local/misc/funny-commit-messages.txt | head -n 1
+
