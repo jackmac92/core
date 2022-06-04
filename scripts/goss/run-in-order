@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TARGET_DIR=${1:w"Required arg"}
+TARGET_DIR=${1:?"Required arg"}
 
-fd -t d --max-depth=1 . $TARGET_DIR | sort | xargs -I_ bash -c "s goss run-in-order $TARGET_DIR/_"
-fd -t f -t l --max-depth=1 . $TARGET_DIR | sort | xargs -I_ bash -c "echo 'running _'; chronic goss -g $TARGET_DIR/_ validate || exit 255"
+fd -t d --max-depth=1 . $TARGET_DIR | sort | xargs -I_ bash -c "s goss run-in-order _"
+fd -t f -t l --max-depth=1 . $TARGET_DIR | sort | xargs -I_ bash -c "echo -en '\r\033[Krunning _'; chronic goss -g _ validate || exit 255"
