@@ -3,8 +3,7 @@ set -euo pipefail
 
 cd ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs
 
-niv update nixpkgs-unstable
-niv update nixos-unstable
+niv update
 
 trap "git checkout -- nix/sources.json; exit 1" ERR
 chezmoi apply -i files ~/.config/nixpkgs
