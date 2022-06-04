@@ -4,4 +4,4 @@ set -euo pipefail
 TARGET_DIR=${1:?"Required arg"}
 
 fd -t d --max-depth=1 . $TARGET_DIR | sort --numeric-sort | xargs -I_ bash -c "s goss run-in-order _"
-fd -t f -t l --max-depth=1 . $TARGET_DIR | sort --numeric-sort | xargs -I_ bash -c 'echo -en "\r\033[Ktesting $(basename _ | choose -f \. 0)"; chronic goss -g _ validate || exit 255'
+fd -t f -t l --max-depth=1 . $TARGET_DIR | sort --numeric-sort | xargs -I_ bash -c 'echo -en "\r\033[Ktesting $(basename _)"; chronic goss -g _ validate || exit 255'
