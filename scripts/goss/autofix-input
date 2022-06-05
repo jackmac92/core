@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+testresults=$(cat /dev/stdin)
+cmdz=$(
+	(
+		jq -r '.results
+   		| map(select(.successful | not))
+		| map(select(.meta!=null))
+		| map(.meta)
+		| map(select(.fix!=null))
+		| .[].fix' <<<"$testresults"
+		# autofix missing pkgs
+		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Package" and .property == "installed"))[]."resource-id"' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "s util syspkg-install %s\n"
+		# autofix groups
+		jq -r '.results
+   		| map(select((.successful | not) and ."resource-type" == "User" and .property == "groups"))[]
+		| "\(.expected | first | fromjson | join(",")) \(."resource-id")"' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "sudo usermod --append --groups %s\n"
+		# autofix services
+		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Service" and .property == "running"))[]' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "sudo systemctl restart %s.service\n"
+	) |
+		rg -v "^\s*$" |
+		sort -u |
+		xargs --no-run-if-empty -n 1 -d $'\n' printf '"%s"\n'
+)
+
+echo "Running..."
+echo $cmdz
+xargs --no-run-if-empty -n 1 bash -c <<<"$cmdz"
