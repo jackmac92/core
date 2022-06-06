@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt=$1
+
+raco exe $tgt.rkt && mv -f $tgt ~/.local/bin
