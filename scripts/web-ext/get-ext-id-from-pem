@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-2>/dev/null openssl rsa -in key.pem -pubout -outform DER |  shasum -a 256 | head -c32 | tr 0-9a-f a-p 
+tgt=${1:-"key.pem"}
 
+openssl 2>/dev/null rsa -in "$tgt" -pubout -outform DER | shasum -a 256 | head -c32 | tr 0-9a-f a-p

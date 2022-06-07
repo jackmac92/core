@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt=${1:-"key.pem"}
+
+openssl 2>/dev/null rsa -in "$tgt" -pubout -outform DER | openssl base64 -A

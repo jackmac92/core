@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Installing folder $1 as a crx (ASSUMES build folder)"
+tgt=$(realpath "$1")
+destpath="$HOME/.local/crx/$extname.crx"
+
+extname="${tgt##*/}"
+
+s web-ext chrome-crxify-unpacked "$tgt/build"
+extid=$(s web-ext get-ext-id-from-pem build.pem)
+extversion=$(jq -r build/manifest.json .version)
+extkey=$(s web-ext get-ext-manifest-key-from-pem build.pem)
+
+jq --arg k "$extkey" manifest.json '.key = $k' | sponge manifest.json
+
+cp $tgt/build.crx $destpath
+
+s web-ext generate-preinstall-json "$destpath" "$extversion" |
+    tee /usr/share/google-chrome/extensions/$extid.json
