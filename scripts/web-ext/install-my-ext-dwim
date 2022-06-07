@@ -1,20 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Installing folder $1 as a crx (ASSUMES build folder)"
+echo "Installing subfolder $1 as a crx"
 tgt=$(realpath "$1")
+extname="$(
+    cd $(git root-directory)
+    echo "${PWD##*/}"
+)"
+buildnames="$(
+    cd $tgt
+    echo "${PWD##*/}"
+)"
+buildloc=$(dirname $tgt)
 destpath="$HOME/.local/crx/$extname.crx"
+extkey=""
+## NOTE no need to insert key in manifest, if I keep the build.pem for the next build
+# if [ -f $buildloc/$buildnames.pem ]; then
+#     extkey=$(s web-ext get-ext-manifest-key-from-pem $buildloc/$buildnames.pem)
+#     cat $tgt/manifest.json | jq --arg k "$extkey" '.key = $k' | sponge $tgt/manifest.json
+#     # mv --backup $buildloc/$buildnames.pem $buildloc/prev-$buildnames.pem
+# fi
 
-extname="${tgt##*/}"
+set +e
+s web-ext chrome-crxify-unpacked "$tgt"
+set -e
+extid=$(s web-ext get-ext-id-from-pem $buildloc/$buildnames.pem)
+extversion=$(cat $tgt/manifest.json | jq -r .version)
 
-s web-ext chrome-crxify-unpacked "$tgt/build"
-extid=$(s web-ext get-ext-id-from-pem build.pem)
-extversion=$(jq -r build/manifest.json .version)
-extkey=$(s web-ext get-ext-manifest-key-from-pem build.pem)
-
-jq --arg k "$extkey" manifest.json '.key = $k' | sponge manifest.json
-
-cp $tgt/build.crx $destpath
+rm -f $destpath
+cp $buildloc/$buildnames.crx $destpath
 
 s web-ext generate-preinstall-json "$destpath" "$extversion" |
     tee /usr/share/google-chrome/extensions/$extid.json
