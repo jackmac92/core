@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -o pipefail
+
+errs=$(s goss run-in-order ~/.config/goss)
+o=$?
+
+if [[ $o -ne 0 ]]; then
+    # TODO check if any of the errors have an autofix
+    # if none do then exit non 0
+    echo "Something borked, trying to fix and then rerunning goss fixer"
+    s goss autofix-input <<<"$errs"
+    s goss fix-all-in-order
+fi
