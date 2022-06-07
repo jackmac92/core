@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tput sc
+
+bash -c "$*"
+
+tput rc
+tput ed
