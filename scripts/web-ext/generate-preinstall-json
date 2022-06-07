@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# [[https://developer.chrome.com/docs/extensions/mv3/external_extensions/][chrome docs]]
+
+jo external_crx=$1 external_version=${2:-"0.0.0"} | jq
