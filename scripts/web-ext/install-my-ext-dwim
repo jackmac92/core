@@ -12,14 +12,11 @@ buildnames="$(
     echo "${PWD##*/}"
 )"
 buildloc=$(dirname $tgt)
-destpath="$HOME/.local/crx/$extname.crx"
-extkey=""
-## NOTE no need to insert key in manifest, if I keep the build.pem for the next build
-# if [ -f $buildloc/$buildnames.pem ]; then
-#     extkey=$(s web-ext get-ext-manifest-key-from-pem $buildloc/$buildnames.pem)
-#     cat $tgt/manifest.json | jq --arg k "$extkey" '.key = $k' | sponge $tgt/manifest.json
-#     # mv --backup $buildloc/$buildnames.pem $buildloc/prev-$buildnames.pem
-# fi
+destpath="$HOME/.local/crx/$extname-$(date +%s).crx"
+
+# NOTE to ensure google sees the new version
+# but currently this happens after the build ...
+pnpm version --no-git-tag-version patch
 
 set +e
 s web-ext chrome-crxify-unpacked "$tgt"
@@ -27,8 +24,15 @@ set -e
 extid=$(s web-ext get-ext-id-from-pem $buildloc/$buildnames.pem)
 extversion=$(cat $tgt/manifest.json | jq -r .version)
 
-rm -f $destpath
 cp $buildloc/$buildnames.crx $destpath
 
 s web-ext generate-preinstall-json "$destpath" "$extversion" |
     tee /usr/share/google-chrome/extensions/$extid.json
+
+## NOTE no need to insert key in manifest, if I keep the build.pem for the next build
+# extkey=""
+# if [ -f $buildloc/$buildnames.pem ]; then
+#     extkey=$(s web-ext get-ext-manifest-key-from-pem $buildloc/$buildnames.pem)
+#     cat $tgt/manifest.json | jq --arg k "$extkey" '.key = $k' | sponge $tgt/manifest.json
+#     # mv --backup $buildloc/$buildnames.pem $buildloc/prev-$buildnames.pem
+# fi
