@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tmpfile=$(mktemp)
+
+if [[ $# > 1 ]]; then
+    s util gitlabformgen-noninteractive $* >"$tmpfile"
+else
+    s util gitlabformgen $* >"$tmpfile"
+fi
+echo "$tmpfile"
+docker run -it -v "$tmpfile":/config/config.yml egnyte/gitlabform:latest gitlabform "$(s gitlab get-gitlab-project-name-from-remote)"
