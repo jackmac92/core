@@ -8,7 +8,7 @@ proto_path=$(realpath $proto_path)
 pkg_name=$(cat "$proto_path" | s cbi proto get-pkg-name-from-file)
 ENDPOINT=${2:-$(s cbi proto pick-rpc "$proto_path")}
 
-SVCSMUSHEDNAME=$(echo "$SERVICE_NAME" | tr -d '-')
+SVCNAMEONLYALPHA=$(echo "$SERVICE_NAME" | tr -d '-')
 
 SRC_PROTO_DIR=$(if test -d "$CBI_DEV_DIRECTORY/$SERVICE_NAME/.__proto_dont_modify__"; then echo "$CBI_DEV_DIRECTORY/$SERVICE_NAME/.__proto_dont_modify__"; else
     echo "Warning! falling back to cbi-site folder for __proto_dont_modify__" >/dev/stderr
@@ -67,12 +67,12 @@ else
     ADMIN_METADATA=$(jo idUser=$CBI_USER_ID email="$CBI_USER_EMAIL" firstName=$(git config user.name | awk '{ print $1 }') lastName=$(git config user.name | awk '{ print $2 }') pagePermissions=\{\})
 fi
 
-REQ_PATH=$SVCSMUSHEDNAME.$SVC_CAMELCASE_NAME/$ENDPOINT
+REQ_PATH=$SVCNAMEONLYALPHA.$SVC_CAMELCASE_NAME/$ENDPOINT
 
 grpcurl \
     -plaintext \
     -import-path "$SRC_PROTO_DIR" \
-    -proto "$SRC_PROTO_DIR/cbinsights/$SVCSMUSHEDNAME/$SVCSMUSHEDNAME.proto" \
+    -proto "$SRC_PROTO_DIR/cbinsights/$SVCNAMEONLYALPHA/$SVCNAMEONLYALPHA.proto" \
     -H "grpcadminuserdata: $ADMIN_METADATA" \
     -H "grpcuserdata: $USER_METADATA" \
     -H "shouldDecodeMetadata: true" \
@@ -88,4 +88,4 @@ echo "$SERVICE_NAME" >>"$CALL_HISTORY_DIR/service"
 
 REQ_CACHE_FILE="$HOME/.local/run/grpccall/$SERVICE_NAME/$REQ_PATH/$(gdate +%s)"
 mkdir -p $(dirname "$REQ_CACHE_FILE")
-echo "$REQ_BODY" > "$REQ_CACHE_FILE"
+echo "$REQ_BODY" >"$REQ_CACHE_FILE"
