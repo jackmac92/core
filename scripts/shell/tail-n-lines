@@ -1,0 +1,22 @@
+#!/bin/sh
+
+i=0
+[ "$#" = 1 ] || {
+    echo >&2 "The number of lines should be provided"
+    exit 9
+}
+
+nlines=$1
+
+while IFS= read -r line; do
+    # clear
+    all="$all
+$line"
+    i=$((i + 1))
+    if [ "$i" -ge "$nlines" ]; then
+        all="${all#*
+}"
+    fi
+    printf '%s\n' "$all"
+
+done </dev/stdin
