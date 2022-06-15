@@ -9,7 +9,9 @@ cmdz=$(
 		| map(select(.meta!=null))
 		| map(.meta)
 		| map(select(.fix!=null))
-		| .[].fix' <<<"$testresults"
+		| .[]
+		| if (.fix | type)=="array" then .fix else [.fix] end
+		| .[]' <<<"$testresults"
 		# autofix missing pkgs
 		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Package" and .property == "installed"))[]."resource-id"' <<<"$testresults" | rg -v '^\s*$' | xargs -n 1 printf "s util syspkg-install %s\n"
 		# autofix groups
@@ -19,10 +21,7 @@ cmdz=$(
 		# autofix services
 		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Service" and .property == "running"))[]."resource-id"' <<<"$testresults" |
 			rg -v '^\s*$' | xargs -n 1 printf "echo 'wouldve run: sudo systemctl restart %s.service'\n"
-	) |
-		rg -v '^\s*$' |
-		sort -u |
-		xargs -n 1 printf '"%s"\n'
+	) | rg -v '^\s*$' | uniq
 )
 
 echo "Running..."
