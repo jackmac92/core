@@ -13,7 +13,7 @@ fi
 
 s Yn "Confirm making repo public?"
 
-s util gitlabphorm public
+s gitlab gitlabform-this-repo public
 
 # NOTE it would be nice to automatically make CI private even while repo is public, but can't figure that out with API or gitlabform
 # gitlabThisProjectRequest PUT "/" public_builds=false
