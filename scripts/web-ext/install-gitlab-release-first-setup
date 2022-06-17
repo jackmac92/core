@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-extid="$1"
 tgt="${PWD##*/}"
 
 echo "Installing subfolder $tgt as a crx"
+
+npm run build
+npm run pack
+
+s gitlab this-project-request --form POST secure_files name=key.pem file=@./build/key.pem
+
+extid="$(s web-ext get-ext-id-from-pem)"
 
 # TODO since I need to store key.pem as gitlab ci var, I could rely on s gitlab envrc to have synced the key.pem, and then use the gitlab helper to derivce the extension id from the key.pem
 s web-ext generate-preinstall-json "$tgt" | tee /usr/share/google-chrome/extensions/$extid.json
