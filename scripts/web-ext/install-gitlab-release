@@ -6,4 +6,5 @@ tgt="${PWD##*/}"
 
 echo "Installing subfolder $tgt as a crx"
 
+# TODO since I need to store key.pem as gitlab ci var, I could rely on s gitlab envrc to have synced the key.pem, and then use the gitlab helper to derivce the extension id from the key.pem
 s web-ext generate-preinstall-json "$tgt" | tee /usr/share/google-chrome/extensions/$extid.json
