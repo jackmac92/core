@@ -3,4 +3,4 @@ set -euo pipefail
 
 # [[https://developer.chrome.com/docs/extensions/mv3/external_extensions/][chrome docs]]
 
-jo external_update_url='https://web-ext-server.jackdmc.com?name='"$1" | jq
+jo external_update_url="https://web-ext-server.jackdmc.com/$1" | jq

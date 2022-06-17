@@ -8,6 +8,7 @@ echo "Installing subfolder $tgt as a crx"
 npm run build
 npm run pack
 
+# TODO this didn't work, did it via GUI last time
 s gitlab this-project-request --form POST secure_files name=key.pem file=@./build/key.pem
 
 extid="$(s web-ext get-ext-id-from-pem)"
