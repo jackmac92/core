@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+extid="$1"
+tgt="${PWD##*/}"
+
+echo "Installing subfolder $tgt as a crx"
+
+s web-ext generate-preinstall-json "$tgt" | tee /usr/share/google-chrome/extensions/$extid.json
