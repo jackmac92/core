@@ -3,6 +3,4 @@ set -euo pipefail
 
 # [[https://developer.chrome.com/docs/extensions/mv3/external_extensions/][chrome docs]]
 
-jo external_crx=$1 external_version=${2:-"0.0.0"} | jq
-
-# external_update_url https://myhost.com/mytestextension/updates.xml
+jo external_update_url='https://web-ext-server.jackdmc.com?name='"$1" | jq
