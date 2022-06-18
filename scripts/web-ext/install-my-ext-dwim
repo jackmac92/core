@@ -12,7 +12,7 @@ buildnames="$(
     echo "${PWD##*/}"
 )"
 buildloc=$(dirname $tgt)
-destpath="$HOME/.local/crx/$extname.crx"
+destpath="$HOME/.local/crx/$extname-$(date +%s).crx"
 
 set +e
 s web-ext chrome-crxify-unpacked "$tgt"
@@ -22,7 +22,7 @@ extversion=$(cat $tgt/manifest.json | jq -r .version)
 
 cp $buildloc/$buildnames.crx $destpath
 
-s web-ext generate-preinstall-json "$destpath" "$extversion" |
+s web-ext generate-local-preinstall-json "$destpath" "$extversion" |
     tee /usr/share/google-chrome/extensions/$extid.json
 
 ## NOTE no need to insert key in manifest, if I keep the build.pem for the next build

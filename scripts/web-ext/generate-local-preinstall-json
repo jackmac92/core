@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jo external_crx="$1" external_version="$2" | jq

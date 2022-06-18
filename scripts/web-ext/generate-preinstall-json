@@ -5,6 +5,6 @@ set -euo pipefail
 
 destpath="$HOME/.local/crx/$1-$(date +%s).crx"
 
-jo external_crx="$destpath" external_version=${2:-"0.0.0"} | jq
+jo external_crx="$1" external_version=${2:-"0.0.0"} | jq
 
 # jo external_update_url="https://web-ext-server.jackdmc.com/$1" | jq
