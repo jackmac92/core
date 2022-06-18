@@ -6,12 +6,11 @@ tgt="${PWD##*/}"
 echo "Installing subfolder $tgt as a crx"
 
 npm run build
-npm run pack
+pnpm run pack
 
-# TODO this didn't work, did it via GUI last time
-s gitlab this-project-request --form POST secure_files name=key.pem file=@./build/key.pem
+curl --request POST --header "PRIVATE-TOKEN: $LAB_CORE_TOKEN" "https://gitlab.com/api/v4/projects/$(s gitlab get-url-encoded-project-name-from-remote)/secure_files" --form "name=key.pem" --form "file=@./build/key.pem"
 
-extid="$(s web-ext get-ext-id-from-pem)"
+extid="$(s web-ext get-ext-id-from-pem build/key.pem)"
 
-# TODO since I need to store key.pem as gitlab ci var, I could rely on s gitlab envrc to have synced the key.pem, and then use the gitlab helper to derivce the extension id from the key.pem
+# TODO since I need to store key.pem as gitlab ci var, I could rely on s gitlab envrc to have synced the key.pem, and then use the gitlab helper to derive the extension id from the key.pem
 s web-ext generate-preinstall-json "$tgt" | tee /usr/share/google-chrome/extensions/$extid.json
