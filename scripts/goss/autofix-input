@@ -23,5 +23,10 @@ cmdz=$(
 	) | rg -v '^\s*$' | uniq
 )
 
+if [[ -z "$cmdz" ]]; then
+	echo "nothing to fix"
+	exit 2
+fi
+
 echo "Running..."
 bash -x <(echo "$cmdz")
