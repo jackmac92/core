@@ -12,11 +12,7 @@ buildnames="$(
     echo "${PWD##*/}"
 )"
 buildloc=$(dirname $tgt)
-destpath="$HOME/.local/crx/$extname-$(date +%s).crx"
-
-# NOTE to ensure google sees the new version
-# but currently this happens after the build ...
-pnpm version --no-git-tag-version patch
+destpath="$HOME/.local/crx/$extname.crx"
 
 set +e
 s web-ext chrome-crxify-unpacked "$tgt"
