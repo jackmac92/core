@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Installing subfolder $1 as a crx"
-tgt=$(realpath "$1")
+echo "Installing ASSUMES PLASMO"
+npm run build
+tgt=$(realpath "build/chrome-mv3-prod")
 extname="$(
     cd $(git root-directory)
     echo "${PWD##*/}"
