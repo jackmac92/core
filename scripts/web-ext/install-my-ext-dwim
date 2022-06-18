@@ -13,7 +13,7 @@ buildnames="$(
     echo "${PWD##*/}"
 )"
 buildloc=$(dirname $tgt)
-destpath="$HOME/.local/crx/$extname-$(date +%s).crx"
+destpath="$HOME/.local/crx/$extname.crx"
 
 set +e
 s web-ext chrome-crxify-unpacked "$tgt"
@@ -21,6 +21,7 @@ set -e
 extid=$(s web-ext get-ext-id-from-pem $buildloc/$buildnames.pem)
 extversion=$(cat $tgt/manifest.json | jq -r .version)
 
+rm -f $destpath
 cp $buildloc/$buildnames.crx $destpath
 
 s web-ext generate-local-preinstall-json "$destpath" "$extversion" |
