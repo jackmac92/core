@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bw get template item |
+    jq ". + {type: 2, name: '$1', secureNote: '$2'}" |
+    bw encode |
+    bw create item
