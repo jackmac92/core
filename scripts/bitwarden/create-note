@@ -2,6 +2,6 @@
 set -euo pipefail
 
 bw get template item |
-    jq ". + {type: 2, name: '$1', secureNote: '$2'}" |
+    jq --arg itemname "$1" --arg noteval "$2" '. + {type: 2, name: $itemname, secureNote: { type: 0 }, notes: $noteval}' |
     bw encode |
     bw create item

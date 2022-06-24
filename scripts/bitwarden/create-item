@@ -2,6 +2,6 @@
 set -euo pipefail
 
 bw get template item |
-    jq '. + {name: "'"$1"'", login: { password: "'"${2:-"$(bw generate)"}"'" }}' |
+    jq --arg itemname "$1" --arg pass "${2:-"$(bw generate)"}" '. + {name: $itemname, login: { password: $pass }}' |
     bw encode |
     bw create item
