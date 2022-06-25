@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+tgt_item=$(s bitwarden select-one "$1")
+tgt_item_id=$(jq '.id' -r <<<"$tgt_item")
+bw get item "$tgt_item_id" |
+    jq --arg noteval "$2" '. + {notes: $noteval}' |
+    bw encode |
+    bw edit item "$tgt_item_id"
+bw sync

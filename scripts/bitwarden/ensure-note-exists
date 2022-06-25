@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+tgt_item=$(s bitwarden select-one "$1")
+tgt_item_id=$(jq '.id' -r <<<"$tgt_item")
+if [[ -n "$tgt_item_id" ]]; then
+    exit 0
+fi
+
+s bitwarden create-note "$1" "EMPTYDEFAULTNOTE"
