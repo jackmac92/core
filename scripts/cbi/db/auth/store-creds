@@ -4,15 +4,7 @@ set -euo pipefail
 cbienv=$1
 targetDb=$2
 
-if [[ "$cbienv" = "prd" ]]; then
-    echo "No cache for prod creds"
-    exit 0
-fi
+bwnotename="cbi-db-auth-creds-dir-$cbienv-$targetDb"
 
-rg ":" >"$(s cbi db auth creds-dir "$cbienv" "$targetDb")/$(gdate +%s)"
-
-# TODO use for osx
-# security add-generic-password -s "cbi-db-$targetDb-$cbienv" -a $USER -w "$NEW_CREDS"
-
-# TODO use for linux
-# secret-tool store --label="cbi-db-$targetDb-$cbienv" password "$NEW_CREDS"
+s bitwarden ensure-note-exists "$bwnotename"
+s bitwarden update-note "$bwnotename" "$(rg ":")"
