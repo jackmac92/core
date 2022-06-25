@@ -3,8 +3,6 @@ set -euo pipefail
 
 # [[https://developer.chrome.com/docs/extensions/mv3/external_extensions/][chrome docs]]
 
-destpath="$HOME/.local/crx/$1-$(date +%s).crx"
-
-jo external_crx="$1" external_version=${2:-"0.0.0"} | jq
-
-# jo external_update_url="https://web-ext-server.jackdmc.com/$1" | jq
+# destpath="$HOME/.local/crx/$1-$(date +%s).crx"
+# external_crx="$destpath" external_version=${2:-"0.0.0"}
+jo external_update_url="https://jackmac92.gitlab.io/$1/update.xml" | jq
