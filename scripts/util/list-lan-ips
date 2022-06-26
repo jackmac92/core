@@ -2,4 +2,5 @@
 set -euo pipefail
 
 active_interface=$(nmcli device status | rg -e "\sconnected\s\s+" | choose 0 | head -n 1)
-sudo arp-scan --localnet --interface $active_interface
+echo "Scanning $active_interface" >/dev/stderr
+sudo arp-scan --localnet --interface $active_interface | rg -v '(DUP: \d+)' | rg --color=never '^192'
