@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REQ_URL="$1"
+
+python - <<___EOF
+import requests
+import requests_cache
+from datetime import timedelta
+
+request_url = "$REQ_URL"
+headers = {"Private-Token": "$LAB_CORE_TOKEN"}
+cistatus = "pending"
+session = requests_cache.CachedSession('gitlab_pipeline_cache', expire_after=timedelta(seconds=10))
+print(session.get(request_url, headers=headers).json())
+___EOF
