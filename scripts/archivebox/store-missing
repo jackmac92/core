@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /usr/backups/archivebox; archivebox update --status unarchived
+
