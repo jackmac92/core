@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /mnt/Media; fd --exclude='#recycle' --exclude=Pics --exclude="@eaDir" -e mp4 -e mkv -e avi   -x bash -c 'videogrep -i "{}" --transcribe'
+
