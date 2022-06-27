@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ytsearch="$1"
+clipsearch="$2"
+
+yt-dlp "https://www.youtube.com/results?search_query=$ytsearch" --write-auto-sub
+
+videogrep --input *.mp4 --search "$clipsearch"
