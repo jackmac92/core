@@ -66,9 +66,12 @@ if [ -e "$tgt_file.inproc" ]; then
     scriptmv "$tgt_file.inproc" "$dest_file.inproc"
 fi
 
-for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
-    fd -t x . "$scriptdir"
-done | sad --exact "s $*" "s $dest_file_cmpts"
+(
+    fd -t f . ~/.local/share/chezmoi
+    for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
+        fd -t x . "$scriptdir"
+    done
+) | sad --exact "s $*" "s $dest_file_cmpts"
 
 scriptgit commit -m "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
 
