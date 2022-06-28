@@ -4,6 +4,6 @@ set -euo pipefail
 docker node update $1 --availability=drain || true
 docker node demote $1 || true
 docker node rm -f $1 || true
-s util tailscale-remove-device $1 || echo "Ignoring failure to remove tailscale node"
+s tailscale remove-device $1 || echo "Ignoring failure to remove tailscale node"
 # TODO remove ssh key from gitlab
 s docean kill-droplet $1 && s misc mkdroplet $1
