@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-ifconfig | rg tail -A 1 | tail -n 1 | choose 1
-
