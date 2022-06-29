@@ -7,5 +7,7 @@ selection=$(s meta list-all | sd / " " | fzf --preview 's cat {}' )
 
 if [[ -n ${1:-""} ]]; then
   s $selection
+else
+  echo $selection
 fi
 
