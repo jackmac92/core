@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+set -uo pipefail
+
+for i in dev stg prd; do
+    for j in main table; do
+        expect <<-EOF >/dev/null
+		spawn mysql_config_editor set --skip-warn --login-path=$i-$j --user=$(s cbi db auth latest-creds-field USERNAME "$i" "$j") --host=$(s cbi db get-hostname "$i" "$j") --password
+		expect "Enter password: "
+		send "$(s cbi db auth latest-creds-field PASSWORD "$i" "$j")\r"
+		expect eof
+EOF
+    done
+done
