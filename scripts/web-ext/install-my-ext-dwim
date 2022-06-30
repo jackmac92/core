@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ $(uname) = "Linux" ]]; then
+    EXTERNAL_EXTS=/usr/share/google-chrome/extensions/
+elif [[ $(uname) = "Darwin" ]]; then
+    echo "Unsupported (just needs google-chrome available as a binary tho, easy fix)"
+    exit 1
+else
+    echo "Unsupported OS"
+    exit 1
+fi
+
 echo "Installing ASSUMES PLASMO"
 npm run build
 tgt=$(realpath "build/chrome-mv3-prod")
@@ -25,7 +35,7 @@ rm -f $destpath
 cp $buildloc/$buildnames.crx $destpath
 
 s web-ext generate-local-preinstall-json "$destpath" "$extversion" |
-    tee /usr/share/google-chrome/extensions/$extid.json
+    tee $EXTERNAL_EXTS/$extid.json
 
 ## NOTE no need to insert key in manifest, if I keep the build.pem for the next build
 # extkey=""
