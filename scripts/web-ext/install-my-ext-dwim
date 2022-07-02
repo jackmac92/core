@@ -4,8 +4,7 @@ set -euo pipefail
 if [[ $(uname) = "Linux" ]]; then
     EXTERNAL_EXTS=/usr/share/google-chrome/extensions/
 elif [[ $(uname) = "Darwin" ]]; then
-    echo "Unsupported (just needs google-chrome available as a binary tho, easy fix)"
-    exit 1
+    EXTERNAL_EXTS=$HOME/Library/Application\ Support/Chromium/External\ Extensions/
 else
     echo "Unsupported OS"
     exit 1
