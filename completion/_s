@@ -13,7 +13,7 @@ function __list_commands {
   # - follow symlinks
   # , "or" separator
   # / directories
-  for file in "$dir"/*(-*,/); do
+  for file in "$dir"/*(-*,/,-/); do
     file=$(realpath "$file")
     command=$(basename "$file")
     helpfile="$file.help"
