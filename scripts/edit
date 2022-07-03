@@ -5,6 +5,9 @@ set -euo pipefail
 argument=${@:-"$(s meta last-invoked "(edit|cat|whicha?)")"}
 
 tgt_file="$(s which "$argument")"
-# TODO test if this is a chezmoi managed source path, if so edit via chezmoi edit --apply
 
-$EDITOR "$tgt_file"
+if cat ~/.local/chezmoi-managed-paths | grep -q '^'"$tgt_file"; then
+    chezmoi edit --apply "$tgt_file"
+else
+    $EDITOR "$tgt_file"
+fi
