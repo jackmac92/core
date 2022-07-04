@@ -1,0 +1,4 @@
+command:
+  has zx for node shell scripts:
+    exec: which zx
+    exit-status: 0

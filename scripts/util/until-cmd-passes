@@ -1,0 +1,17 @@
+#!/usr/bin/env zx
+
+const argsAll = process.argv
+const argsScriptIdx = argsAll.findIndex(s => s.endsWith(__filename))
+const cmd = argsAll.slice(argsScriptIdx + 1)
+
+while (true) {
+  try {
+    await $`${cmd}`
+    break
+  } catch (e) {
+    console.log('.')
+    // console.dir(e)
+  }
+  await sleep(1000)
+  console.log("rechecking")
+}
