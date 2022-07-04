@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DENO_FLAGS="-A --no-check --reload"
+repo="$1"
+shift
+
+deno run $DENO_FLAGS https://gitlab.com/jackmac92/$1/-/raw/master/${DENO_ENTRY:-cli.ts} $*
