@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DENO_FLAGS="-A --no-check --reload"
+DENO_FLAGS=""
+if [[ -z ${DENO_STRICT:-""} ]]; then
+    DENO_FLAGS="$DENO_FLAGS -A --no-check"
+fi
+if [[ -n ${DENO_USELATEST:-""} ]]; then
+    DENO_FLAGS="$DENO_FLAGS --reload"
+fi
+
 repo="$1"
 shift
 
-deno run $DENO_FLAGS https://gitlab.com/jackmac92/$1/-/raw/master/${DENO_ENTRY:-cli.ts} $*
+deno run $DENO_FLAGS https://gitlab.com/jackmac92/$repo/-/raw/master/${DENO_ENTRY:-mod.ts}?private_token=$LAB_CORE_TOKEN $*
