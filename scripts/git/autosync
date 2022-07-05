@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+gitupdate "$1" || (git -C "$1" pull --ff-only && gitupdate "$1")
