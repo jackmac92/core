@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab this-project-request releases | jq 'first | .assets.links[] | select(.name == "build.zip") | .direct_asset_url' -r
+
