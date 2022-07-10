@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rm -f ~/Downloads/build.zip
+curDir=${PWD##*/}
+xdg-open "$(s web-ext get-latest-release-asset-url)"
+sleep 4
+rm -rf ~/.local/unpacked-extensions/$curDir
+unzip ~/Downloads/build.zip -d ~/.local/unpacked-extensions/$curDir
+xdg-open "chrome://extensions"
