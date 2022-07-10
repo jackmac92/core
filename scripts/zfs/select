@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-zfs list | fzf --header-lines=1
-
+zfs list | fzf --header-lines=1 | choose 0
