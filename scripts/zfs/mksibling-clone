@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+newname="$1"
+tgt=$(s fzf select)
+snap="$tgt@quikclone$(date +%s)"
+sudo zfs snapshot "$snap"
+sudo zfs clone "$snap" "$(dirname "$snap")/$newname"
