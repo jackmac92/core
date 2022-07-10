@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat ciao-backup.json| jq '.[]' -c X -I_ chronic bash -c "https --verify=false POST ciao.priv.jackdmc.com/checks.json<<<'_'"
+
