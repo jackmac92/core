@@ -2,9 +2,8 @@
 set -euo pipefail
 
 rm -f ~/Downloads/build.zip
-curDir=${PWD##*/}
-xdg-open "$(s web-ext get-latest-release-asset-url)"
+curDir=${1:-${PWD##*/}}
+xdg-open "$(s web-ext get-latest-release-asset-url "jackmac92/$curDir")"
 sleep 4
 rm -rf ~/.local/unpacked-extensions/$curDir
 unzip ~/Downloads/build.zip -d ~/.local/unpacked-extensions/$curDir
-xdg-open "chrome://extensions"
