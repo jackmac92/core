@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "not done"
+exit 1
+
+tgt=$1
+
+sudo zfs create
