@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "$(s gitlab this-project-request releases | jq '.[].assets.links[] | select(.name == "build.zip") | .direct_asset_url' -r)?private_token=$GITLAB_API_TOKEN"
+echo "$(s gitlab this-project-request releases | jq 'first | .assets.links[] | select(.name == "build.zip") | .direct_asset_url' -r)?private_token=$GITLAB_API_TOKEN"

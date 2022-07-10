@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-bw get item "$1" | jq --arg tgt "$2" '.fields | map(select(.name == $tgt)) | first | .value' -r
+bw get item "$1" | jq --arg tgt "$2" '.fields | map(select(.name == $tgt)) | first | .value' -r | rg -v '^\s*$' | xargs printf "%s"
