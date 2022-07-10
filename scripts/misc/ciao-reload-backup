@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cat ~/.config/custom/ciao-backup.json | jq '.[]' -c X -I_ chronic bash -c "https --verify=false POST ciao.priv.jackdmc.com/checks.json<<<'_'"
+https --body --verify=false ciao.priv.$PRIMARY_PERSONAL_DOMAIN/checks.json | jq '.[].id' | xargs -I_ https --verify=false DELETE ciao.priv.jackdmc.com/checks/_.json
+cat ~/.config/custom/ciao-backup.json | jq '.[]' -c | xargs -I_ chronic bash -c "https --verify=false POST ciao.priv.jackdmc.com/checks.json<<<'_'"
