@@ -1,0 +1,6 @@
+#!/usr/bin/env zx
+
+const argsAll = process.argv
+const argsScriptIdx = argsAll.findIndex(s => s.endsWith(__filename))
+const cmd = ["dunstify", "--action='default,doit'" "Notif title", "subtitle"]
+const response = await $`${cmd}`
