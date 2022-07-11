@@ -17,6 +17,11 @@ echo "Installing subfolder $tgt as a crx"
 npm run build
 pnpm run pack
 
+existing_id=$(curl --header "PRIVATE-TOKEN: $LAB_CORE_TOKEN" "https://gitlab.com/api/v4/projects/$(s gitlab get-url-encoded-project-name-from-remote)/secure_files" | jq 'select(.[].name == "key.pem") | first | .id')
+if [[ -n "${existing_id:-""}" ]]; then
+    curl --request DELETE --header "PRIVATE-TOKEN: $LAB_CORE_TOKEN" "https://gitlab.com/api/v4/projects/$(s gitlab get-url-encoded-project-name-from-remote)/secure_files/$existing_id"
+fi
+
 curl --request POST --header "PRIVATE-TOKEN: $LAB_CORE_TOKEN" "https://gitlab.com/api/v4/projects/$(s gitlab get-url-encoded-project-name-from-remote)/secure_files" --form "name=key.pem" --form "file=@./build/key.pem"
 
 extid="$(s web-ext get-ext-id-from-pem build/key.pem)"
