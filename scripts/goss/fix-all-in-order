@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 set -o pipefail
 
+tput sc
+printf "\n\n\n"
 errs=$(s goss run-in-order ~/.config/goss)
 o=$?
-
 if [[ $o -ne 0 ]]; then
     # TODO check if any of the errors have an autofix
     # if none do then exit non 0
     echo "Something borked, trying to fix and then rerunning goss fixer (unless fixing fails)"
     s goss autofix-input <<<"$errs" && s goss fix-all-in-order
+    sleep 1
+    tput rc
+    tput ed
 fi
