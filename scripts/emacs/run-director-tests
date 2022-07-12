@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+emacs -Q -nw -l ~/.local/share/emacs/director-test-bootstrap.el -l ~/.doom.d/emacs-config-tests.el
