@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+origWin=$(xdotool getactivewindow)
+
+xdotool windowactivate --sync $(xdotool search --onlyvisible --class $1 | head -n 1) key $2
+
+xdotool windowactivate $origWin
