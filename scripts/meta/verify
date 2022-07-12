@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Verifying 's' is readily available in path"
+which s
+echo "Verifying 's' is readily available in path of clean env"
+env -i which s
+
+echo "Verifying 's' is available to root"
+sudo which s
+
+echo "main script setup verified, found script paths $SCRIPTS_PATH"
+
+echo "Success"
