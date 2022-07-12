@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-https --body --verify=false ciao.priv.$PRIMARY_PERSONAL_DOMAIN/checks.json | jq '.[].id' | xargs -I_ https DELETE ciao.priv.jackdmc.com/checks/_.json
-cat ~/.config/custom/ciao-backup.json | jq '.[]' | xargs -I_ bash -c "echo '_' | https POST ciao.priv.jackdmc.com/checks.json"
+https ciao.priv.$PRIMARY_PERSONAL_DOMAIN/checks.json | jq '.[].id' | xargs -I_ https DELETE ciao.priv.$PRIMARY_PERSONAL_DOMAIN/checks/_.json
+cat ~/.config/custom/ciao-backup.json | jq '.[]' -c | xargs -I_ bash -c "https --print=B POST ciao.priv.$PRIMARY_PERSONAL_DOMAIN/checks.json<<<'_'"
