@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+systemctl --user restart emacs-{default,stable,tty,donkey,vanilla,v29}.service
