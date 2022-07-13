@@ -4,7 +4,7 @@ set -euo pipefail
 pipeline_sha="$1"
 repo_remote_url="$2"
 
-REQ_URL="$(s gitlab request-Url)/projects/$(urlencode "$1")/pipelines/$2"
+REQ_URL="$(s gitlab request-Url)/projects/$(s util urlencode "$1")/pipelines/$2"
 
 # s gitlab pipelines get-id-from-head-commit
 

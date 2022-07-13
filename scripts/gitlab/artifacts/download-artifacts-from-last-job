@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s gitlab this-project-request --download jobs/$jobId/$(urlencode $(git current-branch))/download job=="$jobName"
+s gitlab this-project-request --download jobs/$jobId/$(s util urlencode $(git current-branch))/download job=="$jobName"

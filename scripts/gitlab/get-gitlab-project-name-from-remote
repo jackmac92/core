@@ -5,6 +5,6 @@ remote_val="${1:-"$(git remote get-url origin)"}"
 remote_val=$(sd "ssh://" "" <<<"$remote_val")
 remote_val=$(sd ".com/" ".com:" <<<"$remote_val")
 
-gitlabInstanceDomain=$(strip_all $GITLAB_INSTANCE_URL "https://")
-result=$(strip_all $(strip_all $remote_val "git@""$gitlabInstanceDomain"":") ".git")
+gitlabInstanceDomain=$(s util strip_all $GITLAB_INSTANCE_URL "https://")
+result=$(s util strip_all $(s util strip_all $remote_val "git@""$gitlabInstanceDomain"":") ".git")
 echo "$result"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REQ_URL="$(s gitlab request-Url)/projects/$(urlencode "$1")/pipelines/$2"
+REQ_URL="$(s gitlab request-Url)/projects/$(s util urlencode "$1")/pipelines/$2"
 
 python - <<___EOF
 import requests

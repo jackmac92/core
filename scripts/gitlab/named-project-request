@@ -10,5 +10,5 @@ else
 fi
 api_path=$1
 shift
-req_path="projects/$(urlencode $project_name)/$api_path"
+req_path="projects/$(s util urlencode $project_name)/$api_path"
 s gitlab request "$req_method" "$req_path" $*
