@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euxo pipefail
 
-sudo renice -n -17 -p $(ps -ef | rg emacs | rg daemon=default | choose 1)
-
+sudo renice -n -17 -p $(ps -ef | rg emacs | rg daemon=${EMACS_SOCKET_NAME:-default} | choose 1)
