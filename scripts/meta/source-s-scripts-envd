@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    # todo how to handle env.d being in .local (search it but not all of local)
+    for i in "$(fd env.d "$(dirname "$root")" | xargs fd . -t f)"; do
+        echo $i
+        # . "$i"
+    done
+done
