@@ -1,3 +1,7 @@
 #!/home/jmccown/.nix-profile/bin/bash -l
 
+if git -C "$1" status | grep -q "nothing to commit, working tree clean"; then
+    exit 0
+fi
+
 gitupdate "$1" || (git -C "$1" pull --ff-only && gitupdate "$1")
