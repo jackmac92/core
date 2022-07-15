@@ -1,4 +1,3 @@
 #!/home/jmccown/.nix-profile/bin/bash -l
-set -euo pipefail
 
 gitupdate "$1" || (git -C "$1" pull --ff-only && gitupdate "$1")
