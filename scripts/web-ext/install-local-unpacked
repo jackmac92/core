@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+curDir=${PWD##*/}
+npm run build
+rm -rf ~/.local/unpacked-extensions/$curDir
+cp -r ${1:-build/chrome-mv3-prod} ~/.local/unpacked-extensions/$curDir
