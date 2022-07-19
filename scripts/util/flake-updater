@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+nix flake update ; cz add flake.lock ; s util niv-try-upgrade
+
