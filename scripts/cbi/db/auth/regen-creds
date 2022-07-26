@@ -20,6 +20,7 @@ if [[ $(echo "$NEW_CREDS" | rg ":" | wc -l) -lt 3 ]]; then
 	exit 1
 fi
 
+echo "$NEW_CREDS" | s cbi db auth write-creds-to-mycnf "$cbienv" "$targetDb"
 echo "$NEW_CREDS" | s cbi db auth store-creds "$cbienv" "$targetDb"
 echo "$NEW_CREDS" | s cbi db auth update-dbeaver-creds-via-stdin "$cbienv" "$targetDb"
 
