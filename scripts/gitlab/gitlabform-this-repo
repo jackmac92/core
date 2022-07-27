@@ -10,4 +10,7 @@ else
     s util gitlabformgen $* >./config.yml
 fi
 
-pipx run gitlabform "$reponame"
+cat config.yml
+echo "Updating for $reponame"
+
+GITLAB_TOKEN=$GITLAB_API_TOKEN pipx run gitlabform "$reponame"
