@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+notititle="$1"
+notitext="$2"
+notiurl="${3}"
+notitype="${4:-blank}"
+
+jo title="$notititle" \
+   text="$notitext" \
+   devices="$(jo -a "jacks iphone")" \
+   defaultAction="$(jo url="$notiurl")" |
+   http POST "$PUSHCUT_API_URL/notifications/$notitype" API-Key:"$PUSHCUT_API_KEY"

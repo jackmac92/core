@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+notitype="${4:-blank}"
+
+jo input="${PUSHCUT_INPUT:-""}" | http POST "$PUSHCUT_API_URL/execute" API-Key:"$PUSHCUT_API_KEY" shortcut=="$1"
+
+# shortcut
+# string
+# (query)
+# Shortcut
+
+# homekit
+# string
+# (query)
+# HomeKit scene
+
+# timeout
+# string
+# (query)
+# Timout in seconds, or 'nowait'
+
+# delay
+# string
+# (query)
+# Duration in which this request should be executed. Eg: 10s, 15m, 6h
+
+# identifier
+# string
+# (query)
+# Only used for delayed requests. Use an identifier to overwrite or cancel a scheduled execution.
