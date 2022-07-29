@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tmux list-panes -F '#{pane_active} #{pane_pid}'
