@@ -9,7 +9,7 @@ const MAX_TRIES_N = 100
 let final
 let i = 0
 while (true) {
-  if (i <= MAX_TRIES_N) {
+  if (i >= MAX_TRIES_N) {
     throw Error("Too many attempts!")
   }
   i += 1
@@ -17,16 +17,14 @@ while (true) {
     let p = await $`${cmd}`.quiet()
     break
   } catch (e) {
-    // console.dir(e)
+    await sleep(1000)
   }
-  await sleep(1000)
 }
 
 try {
     for await (const chunk of p.stdout) {
-      final = final + chunk
+      echo(chunk)
     }
-    echo(final)
 } catch (e2) {
-    echo`ignored error printing the final output`
+    // echo`ignored error printing the final output`
 }
