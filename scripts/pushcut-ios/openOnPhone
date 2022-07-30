@@ -10,4 +10,4 @@ jo title="$notititle" \
    text="$notitext" \
    devices="$(jo -a "jacks iphone")" \
    defaultAction="$(jo url="$notiurl")" |
-   http POST "$PUSHCUT_API_URL/notifications/$notitype" API-Key:"$PUSHCUT_API_KEY"
+   http -A creds POST "$PUSHCUT_API_URL/notifications/$notitype"

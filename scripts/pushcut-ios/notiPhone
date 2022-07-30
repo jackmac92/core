@@ -23,4 +23,4 @@ jo "title=$notititle" "text=$notitext" \
             httpHeader=$(jo -a $(jo key="MY-SECRET-HEADER" value="$RANDOM-VALUE")) \
             httpMethod="POST"))
    ) |
-   http POST "$PUSHCUT_API_URL/notifications/$notitype" API-Key:"$PUSHCUT_API_KEY"
+   http -A creds POST "$PUSHCUT_API_URL/notifications/$notitype"

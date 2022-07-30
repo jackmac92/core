@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-http --body https://api.pushcut.io/v1/$1 API-Key:"$PUSHCUT_API_KEY"
+https -A creds --body $PUSHCUT_API_URL/$1

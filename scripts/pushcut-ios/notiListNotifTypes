@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-http --body https://api.pushcut.io/v1/notifications API-Key:"$PUSHCUT_API_KEY" | jq -r '.[] | .id'
+s pushcut-ios helper notifications | jq -r '.[] | .id'
