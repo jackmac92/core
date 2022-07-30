@@ -56,6 +56,8 @@ checkScriptDir() {
                 fi
                 if [[ -f "$dir/$command.inproc" ]]; then
                     source "$dir/$command" "$@"
+                elif [[ -f "$dir/$command.direnv" ]]; then
+                    direnv exec $dir "$dir/$command" "$@"
                 elif [ -n "$use_debug_mode" ]; then
                     bash -x "$dir/$command" "$@"
                 else
