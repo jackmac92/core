@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# First time a new host is run, need to manually save the host on the phone, and then send another request to actually open it
+# NOTE need to set Key on the above first manual save for auth to work
+s pushcut-ios openOnPhone "Connect to terminal" "open" "ssh://jmccown@$(s tailscale this-device-ip):22?id=15579-1"
