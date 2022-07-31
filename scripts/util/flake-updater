@@ -4,4 +4,5 @@ set -euo pipefail
 cd ~/.config/nixpkgs
 nix flake update
 chezmoi add flake.lock
+trap "echo 'UPPER TRAP RAN!!'; exit 1" ERR
 s util niv-try-upgrade
