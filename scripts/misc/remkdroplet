@@ -6,8 +6,8 @@ docker node update $1 --availability=drain || true
 docker node demote $1 || true
 docker node rm -f $1 || true
 "
-gum spin --spinner pulse --title "Remove tailscale ip" -- sh -c '
-s tailscale remove-device $1 || true
+gum spin --spinner pulse --title "Remove tailscale ip" -- bash -lc '
+s tailscale remove-device $1
 s misc minions-do-async "rm -f .config/goss/tailscale-peers.yml"
 '
 
