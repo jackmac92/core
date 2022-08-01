@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname=${1:-"$(s util prompt-and-confirm "Enter a name for digital ocean vps: ")"}
+
+if [[ $vpsname = ${PRIMARY_BOX_NAME:-elixium} ]]; then
+    export DROPLET_SIZE="s-2vcpu-2gb"
+fi
+
+gum spin --spinner meter --title "Creating new host" -- s misc mkvps-dwim "$vpsname"
+bash <(s cat misc setup-droplet) "$vpsname"
