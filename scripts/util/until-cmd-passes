@@ -15,7 +15,11 @@ while (true) {
   }
   i += 1
   try {
-    let p = await $`${cmd}`.quiet()
+    let p = $`${cmd}`
+    if (!process.env.UNTIL_CMD_VERBOSE) {
+      p.quiet()
+    }
+    await p
     break
   } catch (e) {
     if (process.env.UNTIL_CMD_VERBOSE) {
