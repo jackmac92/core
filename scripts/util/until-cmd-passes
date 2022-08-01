@@ -5,6 +5,7 @@ const argsScriptIdx = argsAll.findIndex(s => s.endsWith(__filename))
 const cmd = argsAll.slice(argsScriptIdx + 1)
 
 const MAX_TRIES_N = 10000
+const INTER_ATTEMPT_WAIT_MS = 1500
 
 let final
 let i = 0
@@ -17,7 +18,10 @@ while (true) {
     let p = await $`${cmd}`.quiet()
     break
   } catch (e) {
-    await sleep(1000)
+    if (process.env.UNTIL_CMD_VERBOSE) {
+      console.log(`err... retrying after ${INTER_ATTEMPT_WAIT_MS}`)
+    }
+    await sleep(INTER_ATTEMPT_WAIT_MS)
   }
 }
 
