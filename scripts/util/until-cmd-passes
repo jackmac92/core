@@ -22,15 +22,15 @@ while (true) {
     await p
     break
   } catch (e) {
-    if (process.env.UNTIL_CMD_VERBOSE) {
-      console.log(`err... retrying for ${i} time in ${INTER_ATTEMPT_WAIT_MS}ms`)
+    if (process.env.UNTIL_CMD_LOG_ERRORS) {
+      console.log(`err[${i}]... retrying in ${INTER_ATTEMPT_WAIT_MS}ms`)
     }
     await sleep(INTER_ATTEMPT_WAIT_MS)
   }
 }
 
 try {
-    for await (const chunk of p.stdout) {
+    for (const chunk of p.stdout) {
       echo(chunk)
     }
 } catch (e2) {
