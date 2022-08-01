@@ -4,7 +4,7 @@ const argsAll = process.argv
 const argsScriptIdx = argsAll.findIndex(s => s.endsWith(__filename))
 const cmd = argsAll.slice(argsScriptIdx + 1)
 
-const MAX_TRIES_N = 100
+const MAX_TRIES_N = 10000
 
 let final
 let i = 0
