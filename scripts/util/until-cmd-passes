@@ -19,7 +19,7 @@ while (true) {
     break
   } catch (e) {
     if (process.env.UNTIL_CMD_VERBOSE) {
-      console.log(`err... retrying after ${INTER_ATTEMPT_WAIT_MS}`)
+      console.log(`err... retrying for ${i} time in ${INTER_ATTEMPT_WAIT_MS}ms`)
     }
     await sleep(INTER_ATTEMPT_WAIT_MS)
   }
