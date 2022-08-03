@@ -16,13 +16,13 @@ while (true) {
   i += 1
   try {
     let p = $`${cmd}`
-    if (!process.env.UNTIL_CMD_VERBOSE) {
+    if (process.argv.quiet) {
       p.quiet()
     }
     await p
     break
   } catch (e) {
-    if (process.env.UNTIL_CMD_LOG_ERRORS) {
+    if (process.argv.showErrors || process.env.UNTIL_CMD_LOG_ERRORS) {
       console.log(`err[${i}]... retrying in ${INTER_ATTEMPT_WAIT_MS}ms`)
     }
     await sleep(INTER_ATTEMPT_WAIT_MS)
