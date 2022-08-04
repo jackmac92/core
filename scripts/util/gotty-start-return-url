@@ -1,0 +1,15 @@
+#!/usr/bin/env zx
+
+const p = $`gotty -r bash -l`
+for await (const chunk of p.stdout) {
+  const lines = Buffer.from(chunk).toString('utf-8').split('\n')
+  for (let l of lines) {
+    if (l.includes("HTTP server is listening at: ")) {
+      const serverUrl = l.split(' ').at(-1)
+      const url = new URL(serverUrl)
+      echo(url.pathname)
+      break
+    }
+  }
+}
+echo("done")
