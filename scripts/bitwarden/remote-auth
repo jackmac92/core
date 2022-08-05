@@ -4,9 +4,9 @@ set -euo pipefail
 vpsname=$1
 
 bitwardenSignin() {
-    chronic ssh "$vpsname" "
+    ssh -t "$vpsname" "
 . /etc/profile # adds nix to path
-BW_CLIENTID=user.fc84d6d5-9ada-4210-a68f-a9f4003df894 BW_CLIENTSECRET=${BW_CLIENTSECRET:-$(secret-tool lookup password bitwarden-client-secret)} bw login jackmac92@protonmail.com --apikey
+bw login jackmac92@protonmail.com
 export BW_SESSION=\"\$(bw unlock --raw ${BW_PASSWORD:-$(secret-tool lookup password bitwarden-primary)})\"
 touch /tmp/bw-auth
 echo
