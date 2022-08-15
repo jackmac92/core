@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-tgt=$1
+tgt=${PWD##*/}
 
-raco exe $tgt.rkt
+raco exe -o $tgt ${RACKET_ENTRYPOINT:-main.rkt}
 exefile=$PWD/$tgt
 cd $(mktemp -d)
 mv -f $exefile app
