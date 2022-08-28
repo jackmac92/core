@@ -4,5 +4,5 @@ set -euo pipefail
 cd ~/.config/nixpkgs
 nix flake update
 chezmoi add flake.lock
-trap "git -C ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs checkout -- /private_dot_config/exact_nixpkgs/flake.lock; exit 1" ERR
+trap "git -C ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs checkout -- private_dot_config/exact_nixpkgs/flake.lock; exit 1" ERR
 s util niv-try-upgrade
