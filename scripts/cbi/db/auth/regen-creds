@@ -11,7 +11,7 @@ fi
 if [ $targetDb = "table" ]; then
 	vault_targetDb="table-service"
 fi
-cbi vault -s "db_$vault_targetDb-full" -e "$cbienv" | tee $tmpfile
+cbi vault -s "db_$vault_targetDb-full" -e "$cbienv" | tee | rg ":" >$tmpfile
 echo "New creds stored in $tmpfile"
 NEW_CREDS=$(cat "$tmpfile")
 
@@ -24,4 +24,4 @@ echo "$NEW_CREDS" | s cbi db auth write-creds-to-mycnf "$cbienv" "$targetDb"
 echo "$NEW_CREDS" | s cbi db auth store-creds "$cbienv" "$targetDb"
 echo "$NEW_CREDS" | s cbi db auth update-dbeaver-creds-via-stdin "$cbienv" "$targetDb"
 
-echo "s cbi db auth regen-creds $cbienv $targetDb" | at $(gdate -d "$(jq -r .EXPIRY <<<"$NEW_CREDS")")
+echo "s cbi db auth regen-creds $cbienv $targetDb" | at $(gdate -d "$(yq -r .EXPIRY <<<"$NEW_CREDS")")
