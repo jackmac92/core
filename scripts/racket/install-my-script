@@ -8,7 +8,8 @@ exefile=$PWD/$tgt
 cd $(mktemp -d)
 mv -f $exefile app
 raco dist $tgt app
-mkdir -p ~/.local/racket-apps/
-mv $tgt ~/.local/racket-apps/
+mkdir -p ~/.local/racket-scripts/
+rm -rf ~/.local/racket-scripts/$tgt
+mv $tgt ~/.local/racket-scripts/
 rm -f ~/.local/bin/$tgt
-ln -s ~/.local/racket-apps/$tgt/bin/app ~/.local/bin/$tgt
+ln -s ~/.local/racket-scripts/$tgt/bin/app ~/.local/bin/$tgt
