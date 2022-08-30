@@ -2,7 +2,7 @@
 set -uo pipefail
 
 for i in dev stg prd; do
-    for j in main table; do
+    for j in main auth table; do
         echo "Checking db creds for $i $j"
         s cbi db auth regen-if-expired "$i" "$j"
     done
