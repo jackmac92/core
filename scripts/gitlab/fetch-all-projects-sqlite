@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_LIST=()
+collecting_prjs=1
+
+while [[ $collecting_prjs -eq 1 ]]; do
+	most_recent_id=$(sqlite3 ~/.local/gitlab-repos.db '.mode json' 'SELECT id FROM repositories LIMIT 1')
+	collecting_prjs=0
+	for prj_info in $(s gitlab request "projects" sort==asc order_by==id min_access_level==30 archived==false id_after==$most_recent_id ${GITLAB_PROJECTS_REQUEST_PARAMS:-""} | jq -c); do
+		collecting_prjs=1
+		PROJECT_LIST+=("$prj_info")
+		echo "$prj_info" | sqlite-utils insert ~/.local/gitlab-repos.db repositories -
+	done
+done
