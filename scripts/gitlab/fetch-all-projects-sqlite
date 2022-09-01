@@ -10,6 +10,6 @@ while [[ $collecting_prjs -eq 1 ]]; do
 	for prj_info in $(s gitlab request "projects" sort==asc order_by==id min_access_level==30 archived==false id_after==$most_recent_id ${GITLAB_PROJECTS_REQUEST_PARAMS:-""} | jq -c); do
 		collecting_prjs=1
 		PROJECT_LIST+=("$prj_info")
-		echo "$prj_info" | sqlite-utils insert ~/.local/gitlab-repos.db repositories -
+		echo "$prj_info" | pipx run sqlite-utils insert ~/.local/gitlab-repos.db repositories -
 	done
 done
