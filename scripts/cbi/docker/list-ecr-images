@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+aws ecr list-images --registry-id=496584544324 --repository-name=$1
+
