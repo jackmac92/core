@@ -3,6 +3,12 @@ set -euo pipefail
 
 TARGET_DIR=${1:?"Required arg"}
 
-fd -t d --max-depth=1 . $TARGET_DIR | sort --numeric-sort -r | xargs -I_ bash -c "s goss run-in-order _ || exit 255"
-fd -t f -t l --max-depth=1 . $TARGET_DIR | sort --numeric-sort -r | xargs -I_ bash -c '>&2 echo -en "\r\033[Ktesting $(basename _)"; chronic goss -g _ validate --format=json --format-options=verbose || exit 255'
+fd --type directory \
+    --max-depth=1 . $TARGET_DIR |
+    sort --numeric-sort -r |
+    xargs -I_ bash -c "s goss run-in-order _ || exit 255"
 
+fd --type file --type symlink \
+    --max-depth=1 . $TARGET_DIR |
+    sort --numeric-sort -r |
+    xargs -I_ bash -c '>&2 echo -en "\r\033[Ktesting $(basename _)"; chronic goss -g _ validate --format=json --format-options=verbose || exit 255'
