@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+latestid=$(s gitlab pipelines get-latest-for-branch)
+
+existingRecord="$(sqlite3 ~/.local/gitlab-pipelines.db 'SELECT id FROM pipelines WHERE id='"$latestid"' LIMIT 1' || echo "")"
+
+if [[ -z ${existingRecord:-""} ]]; then
+    s gitlab this-project-request "pipelines/$latestid" | sqlite-utils insert --alter --pk id ~/.local/gitlab-pipelines.db pipelines -
+    s gitlab this-project-request "pipelines/$latestid/jobs" | sqlite-utils insert --alter --pk id ~/.local/gitlab-pipelines.db jobs -
+fi
+
+sqlite3 ~/.local/gitlab-pipelines.db '.mode json' 'SELECT * FROM pipelines WHERE id='"$latestid"' LIMIT 1' | jq '.[0]'
