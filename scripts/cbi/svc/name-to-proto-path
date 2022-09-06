@@ -2,4 +2,16 @@
 set -euo pipefail
 
 target_svc=${1:-"$(s cbi svc select-dwim)"}
-echo "$CBI_DEV_DIRECTORY/$target_svc/.__proto_dont_modify__/cbinsights/$(echo "$target_svc" | tr -d '-')/$(echo "$target_svc" | tr -d '-').proto"
+smushedname="$(echo "$target_svc" | tr -d '-')"
+
+protoindunder="$CBI_DEV_DIRECTORY/$target_svc/.__proto_dont_modify__/cbinsights/$smushedname/$smushedname.proto"
+protoinrepo="$CBI_DEV_DIRECTORY/$target_svc/proto/$smushedname.proto"
+
+if [ -f "$protoindunder" ]; then
+    echo "$protoindunder"
+elif [ -f "$protoinrepo" ]; then
+    echo "$protoinrepo"
+else
+    echo "No proto found for service!"
+    exit 1
+fi
