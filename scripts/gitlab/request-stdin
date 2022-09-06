@@ -9,4 +9,4 @@ shift
 
 full_url=$(s gitlab request-Url "$req_path")
 
-http --check-status --follow $* "$req_method" "$full_url" Private-Token:"$LAB_CORE_TOKEN"
+http -A creds --check-status --follow $* "$req_method" "$full_url"
