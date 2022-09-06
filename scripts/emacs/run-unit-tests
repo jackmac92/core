@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd ~/.doom.d
+emacs -batch -f package-initialize -L . -f buttercup-run-discover
