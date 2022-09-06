@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+goss validate --format=json --format-options=verbose
+
