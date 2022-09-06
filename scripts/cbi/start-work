@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-curr_ticket=$(s jira select-active-ticket-dwim)
-
-slack-helper set-online
-
-s cbi work-on "$curr_ticket"
