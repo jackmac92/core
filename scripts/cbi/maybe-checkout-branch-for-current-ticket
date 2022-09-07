@@ -23,5 +23,3 @@ else
 fi
 
 git switch "$ticketbranch"
-
-e -e "(setq current-prefix-arg '(13))" -e '(+workspaces-switch-to-project-h "'"$PWD"'")'
