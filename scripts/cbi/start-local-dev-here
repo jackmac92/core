@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -f go.mod ]]; then
+    echo "Starting go repo"
+    cd src
+    go run main.go
+fi
+
+if [[ -f src/live_reload.py ]]; then
+    echo "Starting python repo"
+    cd src
+    python live_reload.py
+fi
