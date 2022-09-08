@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+consul services register -http-addr=http://localhost:8500 -name $SVC_NAME -addr $(hostname -I | choose 0) -port 50051
+trap "consul services deregister -id=$SVC_NAME" SIGINT
+
 if [[ -f go.mod ]]; then
     echo "Starting go repo"
     fd -e go | entr -r go run main.go
