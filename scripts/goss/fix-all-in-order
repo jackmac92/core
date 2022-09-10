@@ -3,7 +3,7 @@ set -o pipefail
 
 tput sc
 printf "\n\n\n"
-errs=$(s goss run-in-order ~/.config/goss)
+errs=$(s goss run-in-order ~/.config/goss 2>/dev/null)
 o=$?
 if [[ $o -ne 0 ]]; then
     # TODO check if any of the errors have an autofix
