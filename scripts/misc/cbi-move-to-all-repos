@@ -1,0 +1,7 @@
+#!/usr/bin/env zx
+
+let remote = await $`git remote get-url origin`
+
+remote.split(':')[1]
+
+echo(remote)
