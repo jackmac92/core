@@ -1,3 +1,0 @@
-export JIRA_ACTIVE_TICKET_FILE="$HOME/cbinsights/active-jira-ticket"
-export JIRA_TICKET_REPO_REGISTRY_FILE="$HOME/cbinsights/ticket-repo-registry.json"
-export JIRA_TICKET_BRANCHNAME_REGISTRY_FILE="$HOME/cbinsights/ticket-branch-name-registry.json"
