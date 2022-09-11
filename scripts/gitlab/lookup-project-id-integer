@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+prjname="${1:-$(s gitlab get-gitlab-project-name-from-remote)}"
+
+existingRecord="$(sqlite3 ~/.local/gitlab-repos.db 'SELECT id FROM repositories WHERE path_with_namespace="'"$prjname"'" LIMIT 1')"
+
+if [[ -n "$existingRecord" ]]; then
+    echo $existingRecord
+else
+    exit 1
+fi
