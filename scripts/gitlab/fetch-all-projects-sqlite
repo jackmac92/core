@@ -7,5 +7,5 @@ while true; do
 	if [[ -z $(jq '.[].id' <<<"$next_set") ]]; then
 		break
 	fi
-	echo "$next_set" | pipx run sqlite-utils insert --pk id ~/.local/gitlab-repos.db repositories -
+	echo "$next_set" | sqlite-utils insert --alter --pk id ~/.local/gitlab-repos.db repositories -
 done

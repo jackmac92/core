@@ -11,3 +11,7 @@ if [[ -z ${existingRecord:-""} ]]; then
 fi
 
 sqlite3 ~/.local/gitlab-pipelines.db '.mode json' 'SELECT * FROM pipelines WHERE id='"$latestid"' LIMIT 1' | jq '.[0]'
+
+sqlite3 ~/.local/gitlab-pipelines.db '.mode json' '
+SELECT * FROM jobs
+WHERE JSON_EXTRACT(pipeline, "$.id")='"$latestid" | jq -c
