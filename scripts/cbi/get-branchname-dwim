@@ -3,11 +3,11 @@ set -euo pipefail
 
 jiraticket=${1:-"$(s jira select-active-ticket-dwim)"}
 
-knownName=$(sqlite3 $JIRA_HELPER_DB "SELECT name FROM ticket-branch-name WHERE ticket=\"$jiraticket\"")
+knownName=$(sqlite3 $JIRA_HELPER_DB "SELECT name FROM ticket_branch_name WHERE ticket=\"$jiraticket\"")
 
 if [[ -z "$knownName" ]]; then
     newname=$(s cbi make-branchname "$jiraticket")
-    jo ticket=$jiraticket name=$newname | sqlite-utils insert "$JIRA_HELPER_DB" ticket-branch-name -
+    jo ticket=$jiraticket name=$newname | sqlite-utils insert --pk ticket "$JIRA_HELPER_DB" ticket_branch_name -
     echo "$newname"
 else
     echo "$knownName"
