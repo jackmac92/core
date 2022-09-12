@@ -6,12 +6,16 @@ jiraticket=$(s jira select-active-ticket-dwim "${1:-""}")
 # ensure branchname has been setup
 s cbi get-branchname-dwim "$jiraticket" >/dev/null
 
-knownReposCMD="sqlite3 $JIRA_HELPER_DB 'SELECT repo FROM ticket-repos WHERE ticket=\"$jiraticket\"'"
+jiraLookupKnownReposFn() {
+    sqlite3 "$JIRA_HELPER_DB" "SELECT repo FROM ticket_repos WHERE ticket=\"$jiraticket\""
+}
 
-if [[ -z "$(bash -c "$knownReposCMD")" ]]; then
+export -f jiraLookupKnownReposFn
+
+if [[ -z "$(jiraLookupKnownReposFn)" ]]; then
     for r in $(s cbi svc select-many); do
-        jo ticket=$jiraticket repo=$r | sqlite-utils insert "$JIRA_HELPER_DB" ticket-repos -
+        jo ticket="$jiraticket" repo="$r" | sqlite-utils insert "$JIRA_HELPER_DB" ticket_repos -
     done
 fi
 
-bash -c "$knownReposCMD" | jq -r '.[]' | tee | xargs -n1 s cbi start-service
+jiraLookupKnownReposFn | tee | xargs -n1 s cbi start-service
