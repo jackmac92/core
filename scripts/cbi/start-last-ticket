@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! s jira ticket-is-incomplete; then
+  s jira change-active-ticket
+fi
+
+currticket="$(s jira select-active-ticket-dwim)"
+if [[ -n "$currticket" ]]; then
+  s cbi work-on "$currticket"
+fi
