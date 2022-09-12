@@ -9,15 +9,19 @@ if [ -z $target_service_name ]; then
 fi
 
 if [ $target_service_name = cbi-site ]; then
-  tmuxinator start cbi-site $target_service
+  tmuxinator start cbi-site $target_service_name
   exit 0
 fi
 
 if [[ $# -gt 0 ]]; then shift; fi
 
-target_service=
 if [ -d $HOME/cbinsights/gitlab.cbinsights.com/engineering/services/$target_service_name ]; then
   target_service=$HOME/cbinsights/gitlab.cbinsights.com/engineering/services/$target_service_name
+fi
+
+if [[ -z $target_service ]]; then
+  echo "Unknown service type or something"
+  exit 1
 fi
 
 target_service=$(realpath --relative-base $HOME/cbinsights "$target_service")
