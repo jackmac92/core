@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s jira select-ticket "${1:-""}" | jq -r '.key | select(. != null)' | xargs >"$JIRA_ACTIVE_TICKET_FILE"
+activeticket=$(s jira select-ticket "${1:-""}" | jq -r '.key | select(. != null)' | xargs)
+
+s jira set-current-ticket "$activeticket"
+
+echo $activeticket

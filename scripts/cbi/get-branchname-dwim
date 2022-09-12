@@ -1,18 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REGISTRY_FILE="$JIRA_TICKET_BRANCHNAME_REGISTRY_FILE"
-
 jiraticket=${1:-"$(s jira select-active-ticket-dwim)"}
 
-# NOTE this should be a string JSON array
-knownBranchName=$(cat "$REGISTRY_FILE" | jq -r --arg ticket $jiraticket '.[$ticket] | select(. != null)')
+knownName=$(sqlite3 $JIRA_HELPER_DB "SELECT name FROM ticket-branch-name WHERE ticket=\"$jiraticket\"")
 
-if [[ -z "$knownBranchName" ]]; then
-    branchForTicket=$(s cbi make-branchname "$jiraticket")
-    cat "$REGISTRY_FILE" | jq --arg ticket $jiraticket --arg branchName "$branchForTicket" '.[($ticket)] = $branchName' | sponge "$REGISTRY_FILE"
+if [[ -z "$knownName" ]]; then
+    newname=$(s cbi make-branchname "$jiraticket")
+    jo ticket=$jiraticket name=$newname | sqlite-utils insert "$JIRA_HELPER_DB" ticket-branch-name -
+    echo "$newname"
 else
-    branchForTicket=$(echo "$knownBranchName")
+    echo "$knownName"
 fi
-
-echo "$branchForTicket" | xargs

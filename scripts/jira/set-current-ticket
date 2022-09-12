@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s jira clear-active-ticket
+jo id=$1 current=1 | sqlite-utils insert --pk id "$JIRA_HELPER_DB" tickets -

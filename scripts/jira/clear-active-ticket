@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-rm -f "$JIRA_ACTIVE_TICKET_FILE"
+sqlite3 "$JIRA_HELPER_DB" 'UPDATE tickets SET current=0'

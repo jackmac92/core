@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cat "$JIRA_ACTIVE_TICKET_FILE"
+sqlite3 "$JIRA_HELPER_DB" 'SELECT id FROM tickets WHERE current=1'

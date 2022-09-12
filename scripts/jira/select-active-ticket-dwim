@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-while ! [ -s "$JIRA_ACTIVE_TICKET_FILE" ] || [ -z $(cat "$JIRA_ACTIVE_TICKET_FILE") ]; do
+while [[ -z $(s jira get-active-ticket) ]]; do
    s jira change-active-ticket
 done
 
-cat "$JIRA_ACTIVE_TICKET_FILE"
+s jira get-active-ticket

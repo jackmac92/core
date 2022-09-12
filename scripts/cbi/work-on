@@ -2,21 +2,16 @@
 set -euo pipefail
 
 jiraticket=$(s jira select-active-ticket-dwim "${1:-""}")
-REGISTRY_FILE="$JIRA_TICKET_REPO_REGISTRY_FILE"
 
 # ensure branchname has been setup
 s cbi get-branchname-dwim "$jiraticket" >/dev/null
 
-# NOTE this should be a string JSON array
-knownRepos=$(cat "$REGISTRY_FILE" | jq -r --arg ticket $jiraticket '.[$ticket] | select(. != null)')
+knownReposCMD="sqlite3 $JIRA_HELPER_DB 'SELECT repo FROM ticket-repos WHERE ticket=\"$jiraticket\"'"
 
-if [[ -z "$knownRepos" ]]; then
-    reposForTicket=$(s cbi svc select-many | jo -a | jq -c)
-    cat "$REGISTRY_FILE" | jq --arg ticket $jiraticket --argjson repolist "$reposForTicket" '.[($ticket)] = $repolist' | sponge "$REGISTRY_FILE"
-else
-    reposForTicket=$(echo "$knownRepos" | jq -c)
+if [[ -z "$($knownReposCMD)" ]]; then
+    for r in $(s cbi svc select-many); do
+        jo ticket=$jiraticket repo=$r | sqlite-utils insert "$JIRA_HELPER_DB" ticket-repos -
+    done
 fi
 
-export CBI_SERVICE_TMUX_SESSION_TICKET="$jiraticket"
-echo "Starting services"
-echo "$reposForTicket" | jq -r '.[]' | tee | xargs -n1 s cbi start-service
+bash -c "$knownReposCMD" | jq -r '.[]' | tee | xargs -n1 s cbi start-service
