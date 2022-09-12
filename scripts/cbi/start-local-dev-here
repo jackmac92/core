@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+echo "BYPASSING RUN ON HOST TO RUN IN DOCKER"
+make
+exit 0
+
 echo "auto gen envrc"
 echo '
 source_up
