@@ -8,7 +8,7 @@ s cbi get-branchname-dwim "$jiraticket" >/dev/null
 
 knownReposCMD="sqlite3 $JIRA_HELPER_DB 'SELECT repo FROM ticket-repos WHERE ticket=\"$jiraticket\"'"
 
-if [[ -z "$($knownReposCMD)" ]]; then
+if [[ -z "$(bash -c "$knownReposCMD")" ]]; then
     for r in $(s cbi svc select-many); do
         jo ticket=$jiraticket repo=$r | sqlite-utils insert "$JIRA_HELPER_DB" ticket-repos -
     done
