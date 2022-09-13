@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+procs $(s shell tty get-active-pid $(s tmux get-tty-of-sibling))
+
