@@ -19,3 +19,5 @@ if [[ -z "$(jiraLookupKnownReposFn)" ]]; then
 fi
 
 jiraLookupKnownReposFn | tee | xargs -n1 s cbi start-service
+
+e -e '(jira2capture)'
