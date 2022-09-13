@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tmux list-panes -F '#{pane_active} #{pane_tty}' | rg '^'"$(s tmux get-sibling-pane)" | choose 1
+
