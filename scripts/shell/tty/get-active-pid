@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ps -o pid= -t $1 | tail -n 1
+
