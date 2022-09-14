@@ -3,9 +3,10 @@ set -euo pipefail
 
 target_svc=${1:-"$(s cbi svc select-dwim)"}
 smushedname="$(echo "$target_svc" | tr -d '-')"
+repodir="$(s cbi svc name-to-directory "$target_svc")"
 
-protoindunder="$CBI_DEV_DIRECTORY/$target_svc/.__proto_dont_modify__/cbinsights/$smushedname/$smushedname.proto"
-protoinrepo="$CBI_DEV_DIRECTORY/$target_svc/proto/$smushedname.proto"
+protoindunder="$repodir/.__proto_dont_modify__/cbinsights/$smushedname/$smushedname.proto"
+protoinrepo="$repodir/proto/$smushedname.proto"
 
 if [ -f "$protoindunder" ]; then
     echo "$protoindunder"
