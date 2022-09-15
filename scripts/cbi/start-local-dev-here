@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "BYPASSING RUN ON HOST TO RUN IN DOCKER"
-make
-exit 0
+# echo "BYPASSING RUN ON HOST TO RUN IN DOCKER"
+# make
+# exit 0
 
 echo "auto gen envrc"
 echo '
@@ -12,7 +12,7 @@ use cbirepovars
 ' >.envrc
 direnv allow
 
-consul services register -http-addr=http://localhost:8500 -name $SVC_NAME -address $(hostname) -port 50051
+consul services register -http-addr=http://localhost:8500 -name $SVC_NAME -address $MY_LAN_IP -port 50051
 trap "consul services deregister -id=$SVC_NAME" SIGINT
 
 if [[ -f go.mod ]]; then
