@@ -15,23 +15,23 @@ fi
 
 if [[ $# -gt 0 ]]; then shift; fi
 
-if [ -d $HOME/cbinsights/gitlab.cbinsights.com/engineering/services/$target_service_name ]; then
-  target_service=$HOME/cbinsights/gitlab.cbinsights.com/engineering/services/$target_service_name
+if [ -d $HOME/cbinsights/gitlab.cbinsights.com/$target_service_name ]; then
+  target_service=$HOME/cbinsights/gitlab.cbinsights.com/$target_service_name
 fi
 
-if [[ -z $target_service ]]; then
-  echo "Unknown service type or something"
+if [[ -z ${target_service:-""} ]]; then
+  echo "Unknown service type or something: $target_service_name"
   exit 1
 fi
 
 target_service=$(realpath --relative-base $HOME/cbinsights "$target_service")
 
-if [ -f ~/cbinsights/$target_service/go.mod ]; then
+if [ -f ~/cbinsights/${target_service:-""}/go.mod ]; then
   tmuxinator start cbi-golang-service $target_service_name
   exit 0
 fi
 
-if [ -f ~/cbinsights/$target_service/src/setup.cfg ]; then
+if [ -f ~/cbinsights/${target_service:-""}/src/setup.cfg ]; then
   tmuxinator start cbi-python-service $target_service_name
   exit 0
 fi
