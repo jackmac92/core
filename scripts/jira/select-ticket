@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-jira my-tickets | jq '.issues | map(select(.key | contains("'"${1:-""}"'"))) | map(select(.fields.status.name != "Done" )) | map({key: .key, description: .fields.summary, reporter: .fields.reporter.displayName })' | s fzf select-by-json-key "key" "description"
+jira sprint-tickets | jq '.issues | map(select(.key | contains("'"${1:-""}"'"))) | map(select(.fields.status.name != "Done" )) | map({key: .key, description: .fields.summary, reporter: .fields.reporter.displayName })' | s fzf select-by-json-key "key" "description"
