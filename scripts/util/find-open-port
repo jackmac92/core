@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CHECK="do while"
+IP=127.0.0.1
+first_port=2000
+last_port=65000
 
-while [[ ! -z $CHECK ]]; do
-    PORT=$(((RANDOM % 60000) + 1025))
-    CHECK=$(sudo netstat -ap | grep $PORT)
+for ((port = $first_port; port <= $last_port; port++)); do
+    if (echo >/dev/tcp/$IP/$port) >/dev/null 2>&1; then
+        echo $port
+        break
+    fi
 done
-
-echo $PORT

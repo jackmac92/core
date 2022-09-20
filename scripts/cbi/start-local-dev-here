@@ -6,13 +6,14 @@ set -euo pipefail
 # exit 0
 
 echo "auto gen envrc"
-echo '
+echo "
 source_up
 use cbirepovars
-' >.envrc
+export GRPC_PORT=$(s util find-open-port)
+" >.envrc
 direnv allow
 
-consul services register -http-addr=http://localhost:8500 -name $SVC_NAME -address $MY_LAN_IP -port 50051
+consul services register -http-addr=http://localhost:8500 -name $SVC_NAME -address $MY_LAN_IP -port $GRPC_PORT
 trap "consul services deregister -id=$SVC_NAME" SIGINT
 
 if [[ -f go.mod ]]; then
