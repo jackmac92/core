@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-https -A creds --body $PUSHCUT_API_URL/$1
+path=$1
+shift
+
+https -A creds --body $PUSHCUT_API_URL/$path API-Key:"$PUSHCUT_API_KEY" ${*:-""}
