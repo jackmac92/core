@@ -6,21 +6,21 @@ notitext="$2"
 notitype="${3:-blank}"
 jo "title=$notititle" "text=$notitext" \
    "devices=$(jo -a "jacks iphone")" \
-   actions=$(
-      jo -a $(jo \
-         url="http://$(tailscale status | rg $(hostname) | choose 0):8080" \
-         name="Yes" \
-         urlBackgroundOptions=$(jo \
-            httpContentType="application/json" \
-            httpBody=$(jo data=$(jo result=true) | jq 'tostring') \
-            httpHeader=$(jo -a $(jo key="MY-SECRET-HEADER" value="$RANDOM-VALUE")) \
-            httpMethod="POST"))
-      $(jo url="http://$(tailscale status | rg $(hostname) | choose 0):8080" \
-         name="No" \
-         urlBackgroundOptions=$(jo \
-            httpContentType="application/json" \
-            httpBody=$(jo data=$(jo result=false) | jq 'tostring') \
-            httpHeader=$(jo -a $(jo key="MY-SECRET-HEADER" value="$RANDOM-VALUE")) \
-            httpMethod="POST"))
-   ) |
+   actions="$(
+      jo -a \
+         $(jo url="http://$(s tailscale this-device-ip):8080" \
+            name="Yes" \
+            urlBackgroundOptions=$(jo \
+               httpContentType="application/json" \
+               httpBody=$(jo data=$(jo result=true) | jq 'tostring') \
+               httpHeader=$(jo -a $(jo key="MY-SECRET-HEADER" value="$RANDOM-VALUE")) \
+               httpMethod="POST")) \
+         $(jo url="http://$(s tailscale this-device-ip):8080" \
+            name="No" \
+            urlBackgroundOptions=$(jo \
+               httpContentType="application/json" \
+               httpBody=$(jo data=$(jo result=false) | jq 'tostring') \
+               httpHeader=$(jo -a $(jo key="MY-SECRET-HEADER" value="$RANDOM-VALUE")) \
+               httpMethod="POST"))
+   )" |
    http -A creds POST "$PUSHCUT_API_URL/notifications/$notitype"
