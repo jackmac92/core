@@ -4,4 +4,4 @@ set -euo pipefail
 path=$1
 shift
 
-https -A creds --body $PUSHCUT_API_URL/$path API-Key:"$PUSHCUT_API_KEY" ${*:-""}
+https --print= $PUSHCUT_API_URL/$path API-Key:"$PUSHCUT_API_KEY" ${*:-}

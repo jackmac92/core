@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s pushcut-ios payload-helper "$1" | s pushcut-ios helper "notifications/$2"
