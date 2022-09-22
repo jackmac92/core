@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-youtube3 playlist-items list 'snippet,contentDetails' -p playlist-id=$1
-
