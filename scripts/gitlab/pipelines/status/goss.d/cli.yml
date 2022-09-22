@@ -1,3 +1,5 @@
 file:
+  {{ .Env.SCRIPTS_LOCAL_DIR }}/gitlab-repos.db:
+    exists: true
   {{ .Env.SCRIPTS_LOCAL_DIR }}/gitlab-pipelines.db:
     exists: true
