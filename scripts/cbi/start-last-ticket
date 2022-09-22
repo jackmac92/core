@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+s work ensure-local-ticket-matches-jira-board
+
 if ! s jira ticket-is-incomplete; then
   s jira change-active-ticket
 fi
