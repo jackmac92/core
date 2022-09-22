@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-sqlite3 ~/.local/gitlab-repos.db '.mode json' 'SELECT * FROM repositories' | jq '.[]'
+sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-repos.db '.mode json' 'SELECT * FROM repositories' | jq '.[] | pretty_print_gitlab_repo'

@@ -2,10 +2,10 @@
 set -euo pipefail
 
 while true; do
-	most_recent_id=$(sqlite3 ~/.local/gitlab-repos.db 'SELECT id FROM repositories ORDER BY id desc LIMIT 1' || echo "")
+	most_recent_id=$(sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-repos.db 'SELECT id FROM repositories ORDER BY id desc LIMIT 1' || echo "")
 	next_set="$(s gitlab request "projects" sort==asc order_by==id min_access_level==30 archived==false id_after==$most_recent_id | jq -c)"
 	if [[ -z $(jq '.[].id' <<<"$next_set") ]]; then
 		break
 	fi
-	echo "$next_set" | sqlite-utils insert --alter --pk id ~/.local/gitlab-repos.db repositories -
+	echo "$next_set" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/gitlab-repos.db repositories -
 done
