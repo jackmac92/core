@@ -1,6 +1,6 @@
 #compdef s
 
-S_SCRIPT_PASSTHRU_CMDS=(cat which whicha mkhelp new edit delete rename duplicate)
+S_SCRIPT_PASSTHRU_CMDS=(cat which whicha mkhelp new edit delete debug rename duplicate)
 S_SCRIPT_IGNORED_DIRNAMES=(goss.d)
 
 function __list_commands {

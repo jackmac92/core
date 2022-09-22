@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -xeuo pipefail
+
+argument=""
+if [[ -z ${@:-""} ]]; then
+    argument="$(s meta last-invoked '(debug)')"
+else
+    argument="$@"
+fi
+
+scriptpath=$(s which "$argument")
+
+scriptpathparent=$(dirname $scriptpath)
+
+fd -0 goss.d $scriptpathparent | xargs -0 fd . -0 -t f -e yml | xargs -0 -I_ goss -g _ v
