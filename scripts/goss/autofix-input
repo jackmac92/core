@@ -29,4 +29,5 @@ if [[ -z "$cmdz" ]]; then
 fi
 
 echo "Running..."
-bash -x <(echo "$cmdz")
+echo $cmdz
+bash -l <(echo "$cmdz")
