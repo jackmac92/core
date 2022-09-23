@@ -10,19 +10,19 @@ fi
 
 echo "Starting service $target_service_name"
 
-if [ $target_service_name = engineering/legacy/cbi-site ]; then
+if [[ $target_service_name =~ engineering/legacy/cbi-site ]]; then
   tmuxinator start cbi-site $target_service_name
   exit 0
 fi
 
 if [[ $# -gt 0 ]]; then shift; fi
 
-if [ -f ~/cbinsights/${target_service:-""}/go.mod ]; then
+if [ -f ~/cbinsights/gitlab.cbinsights.com/${target_service:-""}/go.mod ]; then
   tmuxinator start cbi-golang-service $target_service_name
   exit 0
 fi
 
-if [ -f ~/cbinsights/${target_service:-""}/src/setup.cfg ]; then
+if [ -f ~/cbinsights/gitlab.cbinsights.com/${target_service:-""}/src/setup.cfg ]; then
   tmuxinator start cbi-python-service $target_service_name
   exit 0
 fi
