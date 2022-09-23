@@ -8,7 +8,7 @@ if [ -z $target_service_name ]; then
   exit 1
 fi
 
-if [ $target_service_name = cbi-site ]; then
+if [ $target_service_name = engineering/legacy/cbi-site ]; then
   tmuxinator start cbi-site $target_service_name
   exit 0
 fi
