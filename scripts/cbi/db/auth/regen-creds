@@ -15,7 +15,7 @@ fi
 if [ $targetDb = "table" ]; then
 	vault_targetDb="table-service"
 fi
-cbi vault -s "db_$vault_targetDb-$vault_targetDb_suffix" -e "$cbienv" | tee | rg ":" >$tmpfile
+timeout 3 cbi vault -s "db_$vault_targetDb-$vault_targetDb_suffix" -e "$cbienv" | tee | rg ":" >$tmpfile
 echo "New creds stored in $tmpfile"
 NEW_CREDS=$(cat "$tmpfile")
 

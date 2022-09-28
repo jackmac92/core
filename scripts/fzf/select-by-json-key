@@ -33,7 +33,7 @@ ___EOF
 
 chmod +x "$tmpscript"
 # TODO add fzf bindings to scroll, and to modify command e.g to just show json keys
-selection=$(for x in "${!choiceDict[@]}"; do echo "$x"; done | fzf --print0 ${JM_FZF_JSON_OPTS:-} --preview="$tmpscript "'{}')
+selection=$(for x in "${!choiceDict[@]}"; do echo "$x"; done | fzf ${JM_FZF_JSON_OPTS:-} --preview="$tmpscript "'{}')
 
 if [[ -z $selection ]]; then
   echo "No selection" >/dev/stderr
