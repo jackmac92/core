@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ -n ${CBI_NOMAD_USE_PROD:-""} ]]; then
+  NOMAD_ADDR="http://nomad-prd.cbinsights.com:4646" nomad $*
+  exit 0
+fi
+
 currenv=$(s cbi env-select-dwim)
 currbranch=$(git rev-parse --abbrev-ref HEAD)
 
