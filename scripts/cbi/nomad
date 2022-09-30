@@ -4,28 +4,16 @@ set -euo pipefail
 currenv=$(s cbi env-select-dwim)
 currbranch=$(git rev-parse --abbrev-ref HEAD)
 
-XNOMAD_ADDR=""
-
 if [[ $currenv = "dev" ]]; then
   if [[ $currbranch = "staging" ]]; then
     echo "Warning branch env mismatch! Maybe you want to connect to staging?" >>/dev/stderr
   fi
-  XNOMAD_ADDR=$NOMAD_ADDR_DEV
 fi
 
 if [[ $currenv = "stg" ]]; then
   if [[ $currbranch = "develop" ]]; then
     echo "Warning branch env mismatch! Maybe you want to connect to develop?" >>/dev/stderr
   fi
-  XNOMAD_ADDR=$NOMAD_ADDR_STG
 fi
 
-if [[ $currenv = "prd" ]]; then
-  if [[ $CBI_ALLOW_NOMAD_PRD = "1" ]]; then
-    XNOMAD_ADDR=$NOMAD_ADDR_PRD
-  else
-    echo "set \$CBI_ALLOW_NOMAD_PRD to allow prod connections"
-  fi
-fi
-
-NOMAD_ADDR=$XNOMAD_ADDR nomad $*
+nomad $*
