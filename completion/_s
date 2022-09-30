@@ -20,9 +20,11 @@ function __list_commands {
     if [[ -f "$helpfile" ]]; then
       # Show first line of helpfile in completion
       help=$(head -n1 "$helpfile")
-    elif [[ -d "$file" ]] && ! (($S_SCRIPT_IGNORED_DIRNAMES[(Ie)$command])) ; then
-      # Show dir name + 'commands' in completion
-      help="$command commands"
+    elif [[ -d "$file" ]] ; then
+      if ! (($S_SCRIPT_IGNORED_DIRNAMES[(Ie)$command])); then
+        # Show dir name + 'commands' in completion
+        help="$command commands"
+      fi
     else
       help=$(sed -nE -e '/^#!/d' -e '/^#/{s/^# *//; p; q;}' "$file" || echo "completion err'd")
     fi
