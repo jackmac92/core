@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+latestPipelineId=$(s gitlab pipelines get-latest-for-branch)
+
+s gitlab this-project-request "pipelines/$latestPipelineId/jobs" | sqlite-utils insert --alter --pk id --replace $SCRIPTS_LOCAL_DIR/gitlab-stuff.db jobs -
+
+sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db '.mode json' '
+SELECT * FROM jobs
+WHERE JSON_EXTRACT(pipeline, "$.id")='"$latestPipelineId" | jq -c

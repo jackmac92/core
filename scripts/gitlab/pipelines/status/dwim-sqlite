@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-latestid=$(s gitlab pipelines get-latest-for-branch)
+latestPipelineId=$(s gitlab pipelines get-latest-for-branch)
 prjid=$(s gitlab lookup-project-id-integer)
 
-existingRecord="$(sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db 'SELECT id FROM pipelines WHERE project_id='"$prjid"' id='"$latestid"' LIMIT 1' || echo "")"
+existingRecord="$(sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db 'SELECT id FROM pipelines WHERE project_id='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1' || echo "")"
 
 if [[ -z ${existingRecord:-""} ]]; then
-    s gitlab this-project-request "pipelines/$latestid" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/gitlab-stuff.db pipelines -
-    s gitlab this-project-request "pipelines/$latestid/jobs" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/gitlab-stuff.db jobs -
+    s gitlab this-project-request "pipelines/$latestPipelineId" | sqlite-utils insert --alter --pk id --replace $SCRIPTS_LOCAL_DIR/gitlab-stuff.db pipelines -
 fi
 
-sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db '.mode json' 'SELECT * FROM pipelines WHERE id='"$latestid"' LIMIT 1' | jq '.[0]'
+sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db '.mode json' 'SELECT * FROM pipelines WHERE id='"$latestPipelineId"' LIMIT 1' | jq '.[0]'
 
-sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db '.mode json' '
-SELECT * FROM jobs
-WHERE JSON_EXTRACT(pipeline, "$.id")='"$latestid" | jq -c
+# s gitlab pipelines stats job-details-dwim
