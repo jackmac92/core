@@ -5,7 +5,7 @@ cd ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs
 
 niv update
 
-trap "git -C ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs checkout -- private_dot_config/exact_nixpkgs/nix/sources.json; exit 1" ERR
+trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/exact_nixpkgs/nix/sources.json; exit 1" ERR
 chezmoi apply -i files ~/.config/nixpkgs/nix/sources.json
 s dot run-script home_manager_update
 git add nix flake*
