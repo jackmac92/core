@@ -14,4 +14,4 @@ print(cistatus)
 
 ___EOF
 
-# echo "$next_set" | sqlite-utils insert --pk id ~/.local/gitlab-stuff.db repositories -
+# echo "$next_set" | sqlite-utils insert --pk id $SCRIPTS_LOCAL_DIR/gitlab-stuff.db repositories -
