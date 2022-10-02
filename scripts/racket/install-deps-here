@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+raco pkg install --no-docs --batch --auto
+raco setup --fail-fast

@@ -3,6 +3,7 @@ set -euo pipefail
 
 tgt=$1
 
+s racket install-deps-here
 raco exe $tgt.rkt
 exefile=$PWD/$tgt
 cd $(mktemp -d)
