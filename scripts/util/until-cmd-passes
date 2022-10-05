@@ -1,11 +1,15 @@
 #!/usr/bin/env zx
 
 const argsAll = process.argv
-const argsScriptIdx = argsAll.findIndex(s => s.endsWith(__filename))
-const cmd = argsAll.slice(argsScriptIdx + 1)
+const lastFlagIdx = argsAll.findLastIndex(s => s.startsWith("--"))
+const argsStartIdx = argsAll.findIndex(s => s.endsWith(__filename))
+const cmd = argsAll.slice(Math.max(argsStarIdx, lastFlagIdx) + 1)
 
 const MAX_TRIES_N = 10000
 const INTER_ATTEMPT_WAIT_MS = 1500
+
+
+const numTries = process.argv["max-times"] || MAX_TRIES_N
 
 let final
 let i = 0
@@ -36,3 +40,7 @@ try {
 } catch (e2) {
     // echo`ignored error printing the final output`
 }
+
+# Local Variables:
+# mode: js2
+# End:
