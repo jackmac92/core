@@ -21,7 +21,7 @@ else
 fi
 
 api_path="${1:-""}"
-if [[ $# -gt 1 ]]; then shift; fi
+if [[ $# -gt 0 ]]; then shift; fi
 
 req_path="projects/$(s util urlencode "$gitlab_project")/$api_path"
 

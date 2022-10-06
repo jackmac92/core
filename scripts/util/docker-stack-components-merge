@@ -31,7 +31,7 @@ for svcname in conf["services"]:
     distinctify(svc.get("deploy"), "labels")
 
     img = svc.get("image", "")
-    if not (img.startswith("jackzzz92") or img.startswith(f"""whales.{os.getenv("PRIMARY_PERSONAL_DOMAIN", "jackm.pizza")}""")):
+    if not (img.startswith("jackzzz92") or img.startswith(f"""whales.{os.getenv("PRIMARY_PERSONAL_DOMAIN", "jackdmc.com")}""")):
         continue
 
     imgcomponents = img.split(":")

@@ -8,5 +8,5 @@ existingRecord="$(sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db 'SELECT id FROM rep
 if [[ -n "$existingRecord" ]]; then
     echo $existingRecord
 else
-    exit 1
+    s gitlab get-gitlab-project-name-from-remote
 fi
