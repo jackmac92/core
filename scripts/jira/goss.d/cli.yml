@@ -1,7 +1,0 @@
-{{ if (eq (env "HOST") "homeframe") }}
-matching:
-  defined_env_vars:
-    content: "{{ .Env.JIRA_DB_HELPER }}"
-    matches:
-      match-regexp: "\w+"
-{{ end }}
