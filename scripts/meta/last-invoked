@@ -4,16 +4,21 @@ set -euo pipefail
 exclude=${1:-"____unmatchable____"}
 LIMIT=${2-1}
 
-fd --hidden 'invocations' ~/.local/scripts-dir-metrics -x bash -c 'echo {}/* | tr " " "\n"' |
-    rg -v '\*$' |
-    choose -o _z_ -f / 4: |
-    choose -o _z_ -f _z_ -- -1 :-2 |
-    sed -e 's/invocations$//g' |
-    rg -v "$exclude" |
-    rg -v 'meta last-(executed|invoked)$' |
-    sort -n |
-    tail -n $LIMIT |
-    while read -r; do
-        fullpath=$(echo "$REPLY" | choose -f _z_ -o / 2:-1 | xargs printf "/%s")
-        s meta script-path-to-name "$fullpath"
-    done
+query='SELECT command FROM invocations'
+# WHERE ='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1'
+
+sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db
+
+# fd --hidden 'invocations' ~/.local/scripts-dir-metrics -x bash -c 'echo {}/* | tr " " "\n"' |
+#     rg -v '\*$' |
+#     choose -o _z_ -f / 4: |
+#     choose -o _z_ -f _z_ -- -1 :-2 |
+#     sed -e 's/invocations$//g' |
+#     rg -v "$exclude" |
+#     rg -v 'meta last-(executed|invoked)$' |
+#     sort -n |
+#     tail -n $LIMIT |
+#     while read -r; do
+#         fullpath=$(echo "$REPLY" | choose -f _z_ -o / 2:-1 | xargs printf "/%s")
+#         s meta script-path-to-name "$fullpath"
+#     done
