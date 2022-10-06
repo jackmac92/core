@@ -41,8 +41,8 @@ checkScriptDir() {
 
                 if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
                     set +e
-                    # TODO get the id back here to tie it to executions
-                    jo ts="$(date)" id="$runid" ts="$(date)" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/s-scripts-meta.db invocations -
+                    # TODO configure trigger for timestamps
+                    jo id="$runid" ts="$(date)" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/s-scripts-meta.db invocations -
                     set -e
                 fi
                 if [[ -f "$dir/$command.inproc" ]]; then
@@ -56,7 +56,7 @@ checkScriptDir() {
                 fi
                 if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
                     set +e
-                    jo ts="$(date)" id="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/s-scripts-meta.db executions -
+                    jo id="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/s-scripts-meta.db executions -
                     set -e
                 fi
                 exit 0
