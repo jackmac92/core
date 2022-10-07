@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
+set -u
 cbienv=${1:-$(s cbi env-select-dwim)}
 targetDb=${2:-"main"}
+set +u
 
-curr_creds=$(s cbi db auth latest-creds-json "$cbienv" "$targetDb" || echo "")
-expiry=$(jq -r '.EXPIRY' <<<"$curr_creds")
-expire_ts=$(gdate -d "$expiry" +%s)
+curr_creds=$(s cbi db auth latest-creds-json "$cbienv" "$targetDb")
+expire_ts=$(gdate -d "$(jq -r '.EXPIRY' <<<"$curr_creds")" +%s)
 now=$(gdate +%s)
-if [ $expire_ts -lt $now ]; then
-    s cbi db auth regen-creds "$cbienv" "$targetDb"
+if [ -z $expire_ts ] && [ $expire_ts -lt $now ]; then
+    echo "No need to regenerate $cbienv $targetDb"
+    exit 0
 fi
+echo "Regenerating creds for $cbienv $targetDb"
+
+s cbi db auth regen-creds "$cbienv" "$targetDb"

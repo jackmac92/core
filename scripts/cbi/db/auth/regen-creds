@@ -28,6 +28,4 @@ echo "$NEW_CREDS" | s cbi db auth store-creds "$cbienv" "$targetDb"
 echo "$NEW_CREDS" | s cbi db auth write-creds-to-mycnf "$cbienv" "$targetDb"
 echo "$NEW_CREDS" | s cbi db auth update-dbeaver-creds-via-stdin "$cbienv" "$targetDb"
 
-echo "$NEW_CREDS" >/tmp/example-creds-$cbienv-$targetdb
-
-# echo "s cbi db auth regen-creds $cbienv $targetDb" | at "$(gdate -d "$(yq -r .EXPIRY <<<"$NEW_CREDS")")"
+echo "s cbi db auth regen-creds $cbienv $targetDb" | at "$(gdate -d "$(yq -r .EXPIRY <<<"$NEW_CREDS")")"
