@@ -1,0 +1,26 @@
+#!/usr/bin/env zx
+
+const argsAll = process.argv;
+const flagArgs = argsAll.filter((s) => s.startsWith("--"));
+const firstFlagIdx = argsAll.findIndex((s) => s.startsWith("--"));
+const lastFlagIdx = argsAll.findLastIndex((s) => s.startsWith("--"));
+const argsStartIdx = argsAll.findIndex((s) => s.endsWith(__filename));
+const urlPath = argsAll.slice(Math.max(argsStartIdx, lastFlagIdx) + 1);
+
+const method = argsAll
+  .slice(0, firstFlagIdx)
+  .find((s) =>
+    ["get", "post", "put", "delete", "head"]
+      .map((x) => x.toUpperCase())
+      .includes(s)
+  );
+
+const fullUrl = new URL(`${process.env.GITLAB_INSTANCE_URL}/api/v4`);
+fullUrl.pathname = urlPath;
+
+fetch(fullUrl, {
+  method,
+  headers: {
+    "X-Private-Token": process.env.GITLAB_API_TOKEN,
+  },
+});
