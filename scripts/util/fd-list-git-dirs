@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd --hidden -t d '^.git$' . -x echo {//}
