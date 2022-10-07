@@ -4,6 +4,14 @@ cbienv=${1:-$(s cbi env-select-dwim)}
 targetDb=${2:-"main"}
 set +u
 
+for i in $(seq 10); do
+    echo "next"
+done
+
+for i in $(seq 20); do echo; done
+
+echo "Checking for $cbienv $targetDb"
+
 curr_creds="$(s cbi db auth latest-creds-json "$cbienv" "$targetDb")"
 expire_ts="$(gdate -d "$(jq -r '.EXPIRY' <<<"$curr_creds")" +%s)"
 now="$(gdate +%s)"

@@ -24,8 +24,12 @@ if [[ $(echo "$NEW_CREDS" | rg ":" | wc -l) -lt 3 ]]; then
 	exit 1
 fi
 
+for i in $(seq 3); do echo; done
+echo "Post generation stuff"
 echo "$NEW_CREDS" | s cbi db auth store-creds "$cbienv" "$targetDb"
 echo "$NEW_CREDS" | s cbi db auth write-creds-to-mycnf "$cbienv" "$targetDb"
 echo "$NEW_CREDS" | s cbi db auth update-dbeaver-creds-via-stdin "$cbienv" "$targetDb"
 
+for i in $(seq 3); do echo; done
+echo "Registering refresh"
 echo "s cbi db auth regen-creds $cbienv $targetDb" | at $(gdate -d "$(yq -r .EXPIRY <<<"$NEW_CREDS")")
