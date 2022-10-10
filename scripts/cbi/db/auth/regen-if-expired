@@ -9,7 +9,7 @@ echo "Checking db creds for $cbienv $targetDb"
 curr_creds="$(s cbi db auth latest-creds-json "$cbienv" "$targetDb")"
 expire_ts="$(gdate -d "$(jq -r '.EXPIRY' <<<"$curr_creds")" +%s)"
 now="$(gdate +%s)"
-if [ -z $expire_ts ] && [ $expire_ts -lt $now ]; then
+if [[ -n $expire_ts ]] && [ $expire_ts -lt $now ]; then
     echo "No need to regenerate $cbienv $targetDb"
     exit 0
 fi
