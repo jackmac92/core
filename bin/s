@@ -35,16 +35,13 @@ checkScriptDir() {
             dir="$dir/$command"
         elif [[ -f "$dir/$command" ]]; then
             if [[ -x "$dir/$command" ]]; then
-                # recording metrics on how often they are used
-                mkdir -p "$metrics_dir_path/"{executions,invocations}
-                runid=$(uuidgen)
-
-                if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
-                    set +e
-                    # TODO configure trigger for timestamps
-                    jo id="$runid" ts="$(date)" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/s-scripts-meta.db invocations -
-                    set -e
-                fi
+                # runid=$(uuidgen)
+                # if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
+                #     set +e
+                #     # TODO configure trigger for timestamps
+                #     jo id="$runid" ts="$(date)" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/s-scripts-meta.db invocations -
+                #     set -e
+                # fi
                 if [[ -f "$dir/$command.inproc" ]]; then
                     source "$dir/$command" "$@"
                 elif [[ -f "$dir/$command.direnv" ]]; then
@@ -54,11 +51,11 @@ checkScriptDir() {
                 else
                     "$dir/$command" "$@"
                 fi
-                if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
-                    set +e
-                    jo id="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/s-scripts-meta.db executions -
-                    set -e
-                fi
+                # if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
+                #     set +e
+                #     jo id="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --alter --pk id $SCRIPTS_LOCAL_DIR/s-scripts-meta.db executions -
+                #     set -e
+                # fi
                 exit 0
             fi
         fi
