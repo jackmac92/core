@@ -29,7 +29,7 @@ if [[ -f src/live_reload.py ]]; then
     pip install -r requirements.txt
     pip install --index-url https://__token__:$PYPI_TOKEN@gitlab.cbinsights.com/api/v4/projects/611/packages/pypi/simple -r internal_requirements.txt
 
-    echo "Compiling protos"
+    # s cbi python proto-compile
     python -c "from cbi.grpc import proto_find_and_compile; proto_find_and_compile('$PROTO_NAME');" && grep -rE "^[^#]*GRPC.get_service_client\(.+\n*\)" "$CBI_PY_SRC_ROOT" | grep -owE 'cbinsights\.[a-z0-9]+\.[a-z0-9]+' | while read -r line; do python -c "from cbi.grpc import proto_find_and_compile; proto_find_and_compile('$line');"; done
 
     cd src
