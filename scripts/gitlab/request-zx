@@ -24,3 +24,7 @@ fetch(fullUrl, {
     "X-Private-Token": process.env.GITLAB_API_TOKEN,
   },
 });
+
+// Local Variables:
+// mode: js2
+// End:

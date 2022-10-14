@@ -2,8 +2,8 @@
 set -euo pipefail
 
 if [[ -n "${CBI_REMOTE_LOCAL_SVC:-""}" ]]; then
-  ssh -t ${CBI_LOCAL_DEV_ENVOY_HOST:-""} cbi local $1
+  ssh -t ${CBI_LOCAL_DEV_ENVOY_HOST:-""} cbi local $CBI_ENV
   exit 0
 fi
 
-cbi local $1
+cbi local $CBI_ENV
