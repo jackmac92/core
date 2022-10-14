@@ -3,10 +3,9 @@ set -euo pipefail
 
 cbienv=${1:-$(s cbi env-select-dwim)}
 targetDb=${2:-"main"}
-credsPath="$(s cbi db auth latest-creds-path "$cbienv" "$targetDb")"
-credsInfo="$(cat "$credsPath")"
-conn_username="$(echo "$credsInfo" | rg USERNAME | yq -r .USERNAME)"
-conn_password="$(echo "$credsInfo" | rg PASSWORD | yq -r .PASSWORD)"
+credsInfo="$(s cbi db auth latest-creds-json "$cbienv" "$targetDb")"
+conn_username="$(echo "$credsInfo" | jq -r .USERNAME)"
+conn_password="$(echo "$credsInfo" | jq -r .PASSWORD)"
 conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
 
 DBEAVERCONFIGBASE=""
