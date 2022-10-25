@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python -c '
+python3 -c '
 import glob
 import yaml
 import sys
