@@ -9,4 +9,4 @@ trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/exact_nixpkg
 chezmoi apply -i files ~/.config/nixpkgs/nix/sources.json
 s dot run-script home_manager_update
 git add nix flake*
-git commit -m "niv update" && git push
+git commit -m "niv update" && git push --recurse-submodules=on-demand
