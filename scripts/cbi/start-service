@@ -10,7 +10,7 @@ fi
 
 echo "Starting service $target_service_name"
 
-if [[ $target_service_name =~ engineering/legacy/cbi-site ]]; then
+if [[ $target_service_name =~ engineering/legacy/cbi-site ]] || [[ $target_service_name =~ engineering/services/admin-frontend-service ]]; then
   tmuxinator start cbi-site $target_service_name
   exit 0
 fi
