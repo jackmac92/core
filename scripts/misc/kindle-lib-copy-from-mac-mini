@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+scp -r 'mac-mini:/Users/jmccown/Library/Containers/com.amazon.Kindle/Data/Library/Application\ Support/Kindle/My\ Kindle\ Content' mackindlelib
+
