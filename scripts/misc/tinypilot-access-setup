@@ -9,5 +9,4 @@ sudo rm -f ~gdm/.config/monitors.xml
 sudo cp ~/.config/monitors.xml ~gdm/.config/
 s misc makvm-shutdown
 echo "Rebooting in 7 sec..."
-sleep 7
-sudo reboot
+sudo shutdown -r +7
