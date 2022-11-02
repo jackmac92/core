@@ -9,4 +9,5 @@ sudo rm -f ~gdm/.config/monitors.xml
 sudo cp ~/.config/monitors.xml ~gdm/.config/
 
 echo "Rebooting in 7 sec..."
-sudo shutdown -r +7
+sleep 7
+sudo reboot
