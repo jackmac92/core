@@ -10,4 +10,4 @@ jo title="$notititle" \
    text="$notitext" \
    devices="$PUSHCUT_DEVICES" \
    defaultAction="$(jo url="$notiurl")" |
-   http -A creds POST "$PUSHCUT_API_URL/notifications/$notitype"
+   http POST "$PUSHCUT_API_URL/notifications/$notitype" API-Key:"${PUSHCUT_API_KEY:-$(s bitwarden get-field pushcut api-key)}"
