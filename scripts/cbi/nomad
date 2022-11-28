@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ -n ${CBI_NOMAD_USE_PROD:-""} ]]; then
-  NOMAD_ADDR="http://nomad-prd.cbinsights.com:4646" nomad $*
+  NOMAD_ADDR="https://nomad-prd.cbinsights.com" nomad $*
   exit 0
 fi
 
