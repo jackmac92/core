@@ -2,6 +2,9 @@
 set -euo pipefail
 
 tgt=${PWD##*/}
+if [[ $tgt = href-router-racket ]]; then
+    tgt=href-router
+fi
 
 s racket install-deps-here
 raco exe -o $tgt ${RACKET_ENTRYPOINT:-main.rkt}
