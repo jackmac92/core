@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd --hidden -t d '^.git$' . -x bash -c "echo -n {//}; git -C {//} branch"
+
