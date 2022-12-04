@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+goss -g $CBI_DEV_DIRECTORY/vpn-test.yml validate
