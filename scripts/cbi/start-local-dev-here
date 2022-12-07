@@ -22,24 +22,16 @@ pkgs.mkShell {
 EOF
 fi
 
-echo "auto gen envrc"
-echo "
-source_up
-use cbirepovars
-export GRPC_PORT=$(s util find-open-port)
-" >.envrc
-direnv allow
-
-consul services register -http-addr=http://localhost:8500 -name $SVC_NAME -address $MY_LAN_IP -port $GRPC_PORT
-trap "consul services deregister -id=$SVC_NAME" SIGINT
-
 if [[ -f go.mod ]]; then
     echo "Starting go repo"
+    s cbi auto-gen-envrc
     fd -e go | entr -r go run main.go
+    exit 0
 fi
 
 if [[ -f src/live_reload.py ]]; then
     echo "Starting python repo"
+    s cbi auto-gen-envrc
 
     echo "Installing deps"
     pip install grpcio==1.36.0 grpcio-tools==1.36.0 googleapis-common-protos==1.53.0
@@ -51,4 +43,7 @@ if [[ -f src/live_reload.py ]]; then
 
     cd src
     python live_reload.py
+    exit 0
 fi
+
+make local

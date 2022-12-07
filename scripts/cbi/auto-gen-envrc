@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "auto gen envrc"
+echo "
+source_up
+use cbirepovars
+export GRPC_PORT=$(s util find-open-port)
+" >.envrc
+direnv allow
+
+consul services register -http-addr=http://localhost:8500 -name $SVC_NAME -address $MY_LAN_IP -port $GRPC_PORT
+trap "consul services deregister -id=$SVC_NAME" SIGINT
