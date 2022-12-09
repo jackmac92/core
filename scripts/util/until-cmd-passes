@@ -1,9 +1,7 @@
 #!/usr/bin/env zx
+import getArgs from "/home/jmccown/.local/libs/zx/args.mjs";
 
-const argsAll = process.argv;
-const lastFlagIdx = argsAll.findLastIndex((s) => s.startsWith("--"));
-const argsStartIdx = argsAll.findIndex((s) => s.endsWith(__filename));
-const cmd = argsAll.slice(Math.max(argsStartIdx, lastFlagIdx) + 1);
+const cmd = getArgs(__filename);
 
 const MAX_TRIES_N = 10000;
 const INTER_ATTEMPT_WAIT_MS = 1500;
