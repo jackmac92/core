@@ -1,11 +1,13 @@
-#! /usr/bin/env bash
-set -uo pipefail
+#!/usr/bin/env zx
 
-for i in dev stg prd; do
-    for j in main auth table; do
-        echo "Checking db creds for $i $j"
-        s cbi db auth regen-if-expired "$i" "$j"
-    done
-done
-
-# s cbi db auth write-creds-to-mycnf
+await Promise.all(
+  ["dev", "stg", "prd"].reduce(
+    (acc, env) =>
+      acc.concat(
+        ["main", "auth", "table"].map(
+          (db) => $`s cbi db auth regen-if-expired "${env}" "${db}"`
+        )
+      ),
+    []
+  )
+);
