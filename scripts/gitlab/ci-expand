@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SECRET="$GITLAB_API_TOKEN" # export gitlab api key as GITLAB_API_TOKEN env variable
+readonly GITLAB_HOST=https://gitlab.cbinsights.com
+readonly SCRIPT_NAME=$(basename $0)
+readonly SCRIPT_TMP_DIR="/tmp/$SCRIPT_NAME-tmp"
+
+readonly PROJECT=$1 # First argument to accept project name
+[[ -n "$PROJECT" ]] || {
+    exit 1
+    echo 'missing project arg...'
+}                                                                         # Exit if we have no project
+[[ $# -eq 2 ]] && readonly BRANCH=$2 || echo 'branch arg not provided...' # Second optional argument to accept a project branch; use the default branch by default
+
+function search_for_proj {
+    curl -s -XGET \
+        --header "PRIVATE-TOKEN: $SECRET" \
+        "$GITLAB_HOST/api/v4/projects?search=$PROJECT"
+}
+
+function get_proj_by_id {
+    curl -s -XGET \
+        --header "PRIVATE-TOKEN: $SECRET" \
+        "$GITLAB_HOST/api/v4/projects/$ID"
+}
+
+function get_def_branch_ci_lint {
+    curl -s -XGET \
+        --header "PRIVATE-TOKEN: $SECRET" \
+        "$GITLAB_HOST/api/v4/projects/$ID/ci/lint?include_merged_yaml=true"
+}
+
+function get_branch_ci_lint {
+    curl -s -XPOST \
+        --header "PRIVATE-TOKEN: $SECRET" \
+        --header 'Content-Type: application/json' \
+        "$GITLAB_HOST/api/v4/ci/lint?include_merged_yaml=true" -d @$1
+}
+
+PROJECT_SEARCH=$(search_for_proj)
+
+[[ $(jq '.[].id' <<<"$PROJECT_SEARCH" | wc -l | sed 's/ //g') -eq 1 ]] && { # if PROJECT_SEARCH -eq 1
+
+    readonly ID=$(jq '.[].id' <<<"$PROJECT_SEARCH")
+    readonly NAME=$(jq '.[].name' <<<"$PROJECT_SEARCH")
+    readonly RESPONSE=$(get_proj_by_id)
+    readonly REPO_SSH_URL=$(jq -r '.[].ssh_url_to_repo' <<<"$PROJECT_SEARCH")
+
+    [[ -n "$BRANCH" ]] && { # if BRANCH
+
+        git clone --branch "$BRANCH" --depth 1 "$REPO_SSH_URL" "$SCRIPT_TMP_DIR" # clone the repo to obtain gitlab-ci.yml file
+        [[ -d "$SCRIPT_TMP_DIR" ]] && trap "rm -rf $SCRIPT_TMP_DIR" EXIT
+        [[ -f "$SCRIPT_TMP_DIR/.gitlab-ci.yml" ]] || {
+            echo "project does not contain a .gitlab-ci.yml file"
+            exit 1
+        }
+
+        readonly GITLAB_CICD=$(jq --raw-input --slurp <"$SCRIPT_TMP_DIR/.gitlab-ci.yml")
+        jo "content=$GITLAB_CICD" | tee "$SCRIPT_TMP_DIR/cicd.json"
+
+        get_branch_ci_lint "$SCRIPT_TMP_DIR/cicd.json"
+        # | jq -r .merged_yaml \
+        # | sed 's/\n/\n/g' \
+        # | sed 's/^://' \
+        # | yq . --yaml-output
+
+    } || { # elif no BRANCH
+
+        get_def_branch_ci_lint |
+            jq -r .merged_yaml |
+            sed 's/\n/\n/g' |
+            sed 's/^://' |
+            yq . --yaml-output
+
+    } # endif BRANCH
+
+} || { # elif PROJECT_SEARCH > 1 PROJECT
+
+    NAMES=$(jq '.[]|.name' <<<"$PROJECT_SEARCH")
+    echo -e "\nthe search failed to produce 1 uniq object:\n\n$NAMES\n\nretry again with a more specific search..."
+
+} # endif PROJECT_SEARCH
