@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l ~/.doom.d/emacs-config-tests.el
+fd --type file --exclude=init.el --max-depth=1 . ~/.doom.d/emacs-config-tests.d |
+    xargs -P1 -I_ bash -c "echo 'Running _'; emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l ~/.doom.d/emacs-config-tests.d/init.el -l _ || exit 255"
