@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SINGLE_TEST_TIMEOUT_SECS=60
+
 fd --type file -e spec.el --max-depth=1 . ~/.doom.d/emacs-config-tests.d |
-    xargs -P1 -I_ bash -c "echo 'Running _'; emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l ~/.doom.d/emacs-config-tests.d/init.el -l _ || exit 255"
+    xargs -P1 -I_ bash -c "echo 'Running _';timeout $SINGLE_TEST_TIMEOUT_SECS emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l ~/.doom.d/emacs-config-tests.d/init.el -l _ || exit 255"
