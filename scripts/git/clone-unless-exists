@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+url=$1
+tgt=$2
+
+if [ -d "$tgt" ]; then
+    exit 0
+fi
+
+git clone

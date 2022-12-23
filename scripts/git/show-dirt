@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+TGT=${1:-$(pwd)}
+
+git branch -a 2>/dev/null |
+  cut -c 3- |
+  perl -p -e 's#remotes/origin/##' |
+  awk '{ print $1; }' |
+  grep -v "remotes" |
+  sort |
+  uniq -c |
+  awk '{ if($1=="2") { print $2; } ; }' |
+  while read b; do {
+    [ ! -z "$(git cherry remotes/origin/$b $b 2>/dev/null)" ] &&
+      echo "$(basename $TGT): branch ${b} has unpushed commits"
+  }; done
+
+git branch -a 2>/dev/null |
+  cut -c 3- |
+  perl -p -e 's#remotes/origin/##' |
+  awk '{ print $1; }' |
+  grep -v "remotes" |
+  sort |
+  uniq -c |
+  awk '{ if($1=="1") { print $2; } ; }' |
+  while read b; do {
+    [ -z "$(git branch -a | cut -c 3- | awk -v branch="remotes/origin/${b}" '{ if($1==branch) { print $1; } ; }')" ] &&
+      echo "$(basename $TGT): branch ${b} does not exist on remote origin"
+  }; done
+
+if [ ! -z "$(git status --porcelain -uno 2>/dev/null)" ]; then
+  echo "$(basename $TGT): working directory is dirty"
+fi
+if [ ! -z "$(git status --porcelain -uall 2>/dev/null | perl -n -e 'm/^\?\?/ && print')" ]; then
+  echo "$(basename $TGT): working directory contains untracked files"
+fi
+if [ ! -z "$(git stash list 2>/dev/null)" ]; then
+  echo "$(basename $TGT): there are existing stashes"
+fi
+
+if ! git status 1>/dev/null 2>&1; then
+  echo "$(basename $TGT): WARNING: not a git repository"
+fi
+if [ -z "$(git remote -v 2>/dev/null | grep '^origin')" ]; then
+  echo "$(basename $TGT): WARNING: there's no remote called origin"
+fi

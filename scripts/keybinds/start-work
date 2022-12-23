@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v sysctl >/dev/null 2>&1; then
+    sudo sysctl -w net.ipv4.ip_forward=1
+fi
+
+alacritty --config-file $HOME/.config/alacritty/work.yml

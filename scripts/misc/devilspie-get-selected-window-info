@@ -3,6 +3,4 @@ set -euo pipefail
 
 winid=$(xdotool selectwindow)
 
-xdotool getwindowgeometry $winid
-xdotool getwindowname $winid
-xdotool getwindowclassname $winid
+jo geo="$(xdotool getwindowgeometry $winid)" name="$(xdotool getwindowname $winid)" classname="$(xdotool getwindowclassname $winid)" | jq

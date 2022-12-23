@@ -1,0 +1,36 @@
+#!/usr/bin/env zx
+
+orig_args=("$@")
+
+export S_INNER_CALL=1
+
+function checkScriptDir(inputDir, ...commands) {
+    let dir=inputDir
+    commands.forEach((el => {
+        const maybenewdir= path.join(dir, el)
+        const lstatInfo =fs.lstatSync(maybenewdir)
+        if (lstatInfo.isDirectory()) {
+               dir=maybenewdir
+           } else if (lstatInfo.isFile()) {
+               if (lstatInfo.isExecutable()) {
+
+                if [[ -f "$dir/$command.inproc" ]]; then
+                    source "$dir/$command" "$@"
+                elif [[ -f "$dir/$command.direnv" ]]; then
+                    direnv exec $dir "$dir/$command" "$@"
+                elif [ -n "$use_debug_mode" ]; then
+                    bash -x "$dir/$command" "$@"
+                else
+                    "$dir/$command" "$@"
+                fi
+                exit 0
+                  }
+           }
+
+    }))
+}
+
+process.env.SCRIPTS_PATH.split(':').forEach(p => { checkScriptDir(p) })
+
+echo "(no subcommands found)"
+exit 1

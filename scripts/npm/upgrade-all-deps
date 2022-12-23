@@ -9,4 +9,4 @@ elif [ -f pnpm-lock.yaml ]; then
     npminstallcmd="pnpm add"
 fi
 
-jq '.dependencies + .devDependencies | keys | .[]' -r package.json | xargs $npminstallcmd
+$npminstallcmd $(jq '.dependencies + .devDependencies | keys | .[]' -r package.json)
