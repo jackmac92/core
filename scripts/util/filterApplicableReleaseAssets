@@ -4,6 +4,12 @@ python -c '
 import sys
 import json
 ostype=sys.platform
+def seems_to_reference_linux(name):
+    if "linux" in name:
+        return True
+    if name.endswith(".deb"):
+        return True
+    return False
 def seems_to_reference_osx(name):
     if "macos" in name:
         return True
@@ -38,6 +44,8 @@ for jsonstr in sys.stdin.readlines():
     if size < 500:
         continue
     if ostype == "linux" and (seems_to_reference_osx(name) or seems_to_reference_windows(name)):
+        continue
+    if ostype == "darwin" and (seems_to_reference_linux(name) or seems_to_reference_windows(name)):
         continue
     print(jsonstr)
 '
