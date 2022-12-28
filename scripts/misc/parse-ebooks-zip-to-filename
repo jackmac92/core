@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+import re, sys, argparse
+
+parser = argparse.ArgumentParser(description='na')
+parser.add_argument('filename')
+
+args = parser.parse_args()
+
+m = re.search(r'SearchBot_results_for_(\w+)', args.filename)
+print(m.replace("_", " "))
