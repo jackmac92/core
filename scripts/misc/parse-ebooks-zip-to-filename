@@ -2,10 +2,11 @@
 
 import re, sys, argparse
 
-parser = argparse.ArgumentParser(description='na')
-parser.add_argument('filename')
+parser = argparse.ArgumentParser(description="na")
+parser.add_argument("filename")
 
 args = parser.parse_args()
 
-m = re.search(r'SearchBot_results_for_(\w+)', args.filename)
-print(m.replace("_", " "))
+m = re.search(r"SearchBot_results_for_(\w+)", args.filename)
+newname = m[1].replace("_", " ")
+print(f"SearchBot_results_for_{newname}.txt")
