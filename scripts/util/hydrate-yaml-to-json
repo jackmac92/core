@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python -c '
+import sys
+import json
+import yaml
+
+x = yaml.safe_load(sys.stdin)
+print(json.dumps(x))
+'
