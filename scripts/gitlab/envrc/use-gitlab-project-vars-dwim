@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab get-gitlab-project-vars >$(git root-directory)/.env.gitlab-mirror
