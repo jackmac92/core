@@ -1,0 +1,4 @@
+command:
+  has rq to reformatting data:
+    exec: which rq
+    exit-status: 0
