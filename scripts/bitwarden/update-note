@@ -7,4 +7,3 @@ bw get item "$tgt_item_id" |
     jq --arg noteval "$2" '. + {notes: $noteval}' |
     bw encode |
     bw edit item "$tgt_item_id"
-bw sync

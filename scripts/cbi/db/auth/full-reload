@@ -11,3 +11,5 @@ await Promise.all(
     []
   )
 );
+
+await $`bw sync`
