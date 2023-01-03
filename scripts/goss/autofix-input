@@ -2,6 +2,7 @@
 set -uo pipefail
 
 testresults=$(cat /dev/stdin)
+# NOTE how do I fix files? since the exists check fails first, I don't know if I can just make a symlink here
 cmdz=$(
 	(
 		jq -r '.results

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab list-all-projects | jq 'select(.ssh_url_to_repo | contains("gitlab.cbinsights.com") | not)'
