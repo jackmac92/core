@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+deno run -A -r https://fresh.deno.dev "${1:-$(gum input --placeholder "Deno Fresh App Repo Name")}"
