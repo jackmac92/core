@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-procid="$DTACH_SOCKETS_MAIN/${DTACH_TOPIC:-"dtach-default-s-script"}_$(date +%s)"
+procid="$DTACH_SOCKETS_MAIN/${DTACH_TOPIC:-"dtach-default-s-script"}_$(date +%s%N)"
 dtach -n "$procid" $*
