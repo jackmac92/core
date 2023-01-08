@@ -46,6 +46,8 @@ checkScriptDir() {
                     source "$dir/$command" "$@"
                 elif [[ -f "$dir/$command.direnv" ]]; then
                     direnv exec $dir "$dir/$command" "$@"
+                elif [[ -f "$dir/.envrc" ]]; then
+                    direnv exec $dir "$dir/$command" "$@"
                 elif [ -n "$use_debug_mode" ]; then
                     bash -x "$dir/$command" "$@"
                 else
