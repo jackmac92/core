@@ -12,4 +12,4 @@ fi
 repo="$1"
 shift
 
-deno run $DENO_FLAGS https://gitlab.com/jackmac92/$repo/-/raw/master/${DENO_ENTRY:-mod.ts}?private_token=$LAB_CORE_TOKEN $*
+deno run $DENO_FLAGS https://gitlab.com/jackmac92/$repo/-/raw/master/${DENO_ENTRY:-mod.ts}?private_token=${GITLAB_API_PRIVATE_TOKEN:-$(s bitwarden get-field "gitlab.com" "cli-api-token")} $*
