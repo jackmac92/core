@@ -2,6 +2,7 @@
 set -euo pipefail
 
 target_svc=${1:-"$(s cbi svc select-dwim)"}
+target_svc=$(choose --field-separator="/" -1 <<<"$target_svc")
 smushedname="$(echo "$target_svc" | tr -d '-')"
 repodir="$(s cbi svc name-to-directory "$target_svc")"
 

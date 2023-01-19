@@ -3,6 +3,8 @@ set -euo pipefail
 
 ### parse args to relevant variables
 SERVICE_NAME=${3:-$(s cbi svc select-dwim)}
+SERVICE_NAME=$(choose --field-separator="/" -1 <<<"$SERVICE_NAME")
+
 proto_path=$(s cbi svc name-to-proto-path "$SERVICE_NAME")
 proto_path=$(realpath $proto_path)
 pkg_name=$(cat "$proto_path" | s cbi proto get-pkg-name-from-file)
@@ -10,10 +12,8 @@ ENDPOINT=${2:-$(s cbi proto pick-rpc "$proto_path")}
 
 SVCNAMEONLYALPHA=$(echo "$SERVICE_NAME" | tr -d '-')
 
-SRC_PROTO_DIR=$(if test -d "$CBI_DEV_DIRECTORY/$SERVICE_NAME/.__proto_dont_modify__"; then echo "$CBI_DEV_DIRECTORY/$SERVICE_NAME/.__proto_dont_modify__"; else
-    echo "Warning! falling back to cbi-site folder for __proto_dont_modify__" >/dev/stderr
-    echo "$CBI_DEV_DIRECTORY/cbi-site/.__proto_dont_modify__"
-fi)
+SRC_PROTO_DIR=$(dirname $(dirname $(dirname $proto_path)))
+
 SVC_CAMELCASE_NAME=$(echo "$SERVICE_NAME" | awk -F"-" '{for(i=1;i<=NF;i++){$i=toupper(substr($i,1,1)) substr($i,2)}} 1' OFS="")
 
 generateRequestBody() {
