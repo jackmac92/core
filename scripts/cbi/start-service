@@ -10,13 +10,18 @@ fi
 
 echo "Starting service $target_service_name"
 
-if [[ $target_service_name =~ engineering/legacy/cbi-site ]] || [[ $target_service_name =~ engineering/services/admin-frontend-service ]]; then
+if [[ $target_service_name =~ engineering/legacy/cbi-site ]]; then
   tmuxinator start cbi-site $target_service_name
   exit 0
 fi
 
 if [[ $target_service_name =~ engineering/libs/python-service-utils ]]; then
   tmuxinator start cbi-python-lib $target_service_name
+  exit 0
+fi
+
+if [[ $target_service_name =~ engineering/services/admin-frontend-service ]]; then
+  tmuxinator start cbi-afs $target_service_name
   exit 0
 fi
 
