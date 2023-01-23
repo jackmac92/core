@@ -14,13 +14,15 @@ $.log = (entry) => {
       log(entry);
   }
 };
-
+$.prefix = "set -euo pipefail; direnv exec /home/jmccown ";
 try {
-  const p = await spinner(
-    "Running tests",
-    () => $`s goss run-in-order-vanilla ~/.config/goss`
-  );
-  await spinner("Running fixes", () => p.pipe($`s goss autofix-input`));
+  let p;
+  await spinner("Running tests", () => {
+    p = $`s goss run-in-order-vanilla ~/.config/goss`;
+    return p;
+  });
+  // TODO need to parse output to determine if fixes needed
+  // await spinner("Running fixes", () => p.pipe($`s goss autofix-input`));
 } catch (err) {
   echo(`Got error: ${err}`);
   $`s goss fixr.mjs`;
