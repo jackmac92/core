@@ -4,5 +4,5 @@ set -euo pipefail
 cd ~/cbinsights/gitlab.cbinsights.com
 
 s gitlab list-all-projects |
-    jq 'select(.web_url | contains("cbinsights")) | "git clone \(.ssh_url_to_repo) \(.path_with_namespace)"' |
+    jq 'select(.web_url | contains("cbinsights")) | "if [ ! -d \(.path_with_namespace) ]; git clone \(.ssh_url_to_repo) \(.path_with_namespace) ; fi"' |
     xargs -n 1 bash -c
