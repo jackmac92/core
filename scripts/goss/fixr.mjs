@@ -1,28 +1,31 @@
 #!/usr/bin/env zx
-import { retry, expBackoff } from "zx/experimental";
+import { spinner } from "zx/experimental";
+import { log } from "zx/core";
 
-const p = $`s goss run-in-order ~/.config/goss`;
+let cmdCount = 0;
 
-const gossAutoFix = (resultSet) => {};
+$.log = (entry) => {
+  switch (entry.kind) {
+    case "cmd":
+      // for example, apply custom data masker for cmd printing
+      cmdCount += 1;
+      break;
+    default:
+      log(entry);
+  }
+};
 
-p.catch((errs) => {
-  echo("Found some problems");
-  $`s goss autofix-input <<<${errs}`;
-});
+try {
+  const p = await spinner(
+    "Running tests",
+    () => $`s goss run-in-order-vanilla ~/.config/goss`
+  );
+  await spinner("Running fixes", () => p.pipe($`s goss autofix-input`));
+} catch (err) {
+  echo(`Got error: ${err}`);
+  $`s goss fixr.mjs`;
+}
 
-// await spinner('working...', () => $`sleep 99`)
-
-// if [[ $o -ne 0 ]]; then
-//     # TODO check if any of the errors have an autofix
-//     # if none do then exit non 0
-//     echo "Something borked, trying to fix and then rerunning goss fixer (unless fixing fails)"
-//     s goss autofix-input <<<"$errs" && s goss fix-all-in-order
-//     sleep 1
-//     tput rc
-//     tput ed
-// fi
-
-const testResults = await stdin();
 // testresults=$(cat /dev/stdin)
 // # NOTE how do I fix files? since the exists check fails first, I don't know if I can just make a symlink here
 // cmdz=$(
