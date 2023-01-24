@@ -5,4 +5,9 @@ if command -v sysctl >/dev/null 2>&1; then
     sudo sysctl -w net.ipv4.ip_forward=1
 fi
 
+if ! s cbi test-vpn-is-active; then
+    zenity --warning --text "CBI VPN not active, refusing to start"
+    exit 1
+fi
+
 alacritty --config-file $HOME/.config/alacritty/work.yml
