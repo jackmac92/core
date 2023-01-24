@@ -8,17 +8,6 @@ conn_username="$(echo "$credsInfo" | jq -r .USERNAME)"
 conn_password="$(echo "$credsInfo" | jq -r .PASSWORD)"
 conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
 
-DBEAVERCONFIGBASE=""
-
-if [[ $(uname) = "Linux" ]]; then
-    DBEAVERCONFIGBASE="$HOME/.local/share/DBeaverData"
-elif [[ $(uname) = "Darwin" ]]; then
-    DBEAVERCONFIGBASE="$HOME/Library/DBeaverData"
-else
-    echo "Unsupported OS"
-    exit 1
-fi
-
 DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sources.json"
 cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(gdate +%s)"
 TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq ".connections | to_entries | map(select(.value.name == \"CBI $cbienv $targetDb\")) | first | .key" -r)
