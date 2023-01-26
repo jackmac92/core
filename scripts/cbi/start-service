@@ -37,5 +37,4 @@ if [ -f ~/cbinsights/gitlab.cbinsights.com/${target_service_name:-""}/src/setup.
   exit 0
 fi
 
-echo "Unsupported service type? '$target_service'"
-exit 1
+tmuxinator start cbi-catchall $target_service_name
