@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cbienv=${1:-$(s cbi env-select-dwim)}
+cbienv=${1:-$(s cbi local curr-env-dwim)}
 targetDb=${2:-"main"}
 jo username=$(s cbi db auth latest-creds-field USERNAME "$cbienv" "$targetDb") password=$(s cbi db auth latest-creds-field PASSWORD "$cbienv" "$targetDb") port=3306 default_db=cbi_data host=$(s cbi db get-hostname "$cbienv" "$targetDb") #| yq - r -P

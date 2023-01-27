@@ -6,7 +6,7 @@ if ! [ -z $CBI_ENV_OVERRIDE ]; then
   exit 0
 fi
 
-s cbi local-env || echo stg
+s cbi local get-env || echo stg
 
 #   || echo 'dev
 # stg

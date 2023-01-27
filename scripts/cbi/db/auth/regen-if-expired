@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -u
-cbienv=${1:-$(s cbi env-select-dwim)}
+cbienv=${1:-$(s cbi local curr-env-dwim)}
 targetDb=${2:-"main"}
 set +u
 
