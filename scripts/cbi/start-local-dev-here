@@ -25,6 +25,7 @@ fi
 if [[ -f go.mod ]]; then
     echo "Starting go repo"
     s cbi auto-gen-envrc
+    go mod vendor
     fd -e go | entr -r go run main.go
     exit 0
 fi
