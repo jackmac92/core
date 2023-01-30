@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd ~/Projects/gitlab.com/
+
+s gitlab list-all-projects |
+    jq 'select(.path_with_namespace | startswith("jackmac92")) | "if [ ! -d \(.path_with_namespace) ]; then git clone \(.ssh_url_to_repo) \(.path_with_namespace) ; fi"' |
+    xargs --no-run-if-empty -n 1 bash -c

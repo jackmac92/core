@@ -3,7 +3,7 @@ set -euo pipefail
 
 metadatatype=${1:-"user"}
 
-currenv=$(s cbi env-select-dwim)
+currenv=$(s cbi local curr-env-dwim)
 metadatadir="$HOME/.local/cbinsights/grpc-metadata/$currenv"
 mkdir -p "$metadatadir"
 

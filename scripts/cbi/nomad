@@ -6,7 +6,7 @@ if [[ -n ${CBI_NOMAD_USE_PROD:-""} ]]; then
   exit 0
 fi
 
-currenv=$(s cbi env-select-dwim)
+currenv=$(s cbi local curr-env-dwim)
 currbranch=$(git rev-parse --abbrev-ref HEAD)
 
 if [[ $currenv = "dev" ]]; then

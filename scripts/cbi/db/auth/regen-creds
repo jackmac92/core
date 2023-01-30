@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -euo pipefail
 
-cbienv=${1:-$(s cbi env-select-dwim)}
+cbienv=${1:-$(s cbi local curr-env-dwim)}
 targetDb=${2:-"main"}
 tmpfile=$(mktemp)
 vault_targetDb=$targetDb

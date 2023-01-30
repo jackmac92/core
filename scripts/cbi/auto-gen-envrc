@@ -6,6 +6,7 @@ echo "
 source_up
 use cbirepovars
 export GRPC_PORT=$(s util find-open-port)
+export CBI_SERVICE_PROTO_ROOT=$PWD/.__proto_dont_modify__/
 " >.envrc
 direnv allow
 

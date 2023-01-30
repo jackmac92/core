@@ -2,4 +2,4 @@
 set -euo pipefail
 
 s jira clear-active-ticket
-jo id=$1 current=1 | sqlite-utils insert --pk id "$JIRA_HELPER_DB" tickets -
+jo id=$1 current=1 | sqlite-utils insert --replace --pk id "$JIRA_HELPER_DB" tickets -

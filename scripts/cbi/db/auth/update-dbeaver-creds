@@ -1,23 +1,12 @@
 #! /usr/bin/env bash
 set -euo pipefail
 
-cbienv=${1:-$(s cbi env-select-dwim)}
+cbienv=${1:-$(s cbi local curr-env-dwim)}
 targetDb=${2:-"main"}
 credsInfo="$(s cbi db auth latest-creds-json "$cbienv" "$targetDb")"
 conn_username="$(echo "$credsInfo" | jq -r .USERNAME)"
 conn_password="$(echo "$credsInfo" | jq -r .PASSWORD)"
 conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
-
-DBEAVERCONFIGBASE=""
-
-if [[ $(uname) = "Linux" ]]; then
-    DBEAVERCONFIGBASE="$HOME/.local/share/DBeaverData"
-elif [[ $(uname) = "Darwin" ]]; then
-    DBEAVERCONFIGBASE="$HOME/Library/DBeaverData"
-else
-    echo "Unsupported OS"
-    exit 1
-fi
 
 DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sources.json"
 cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(gdate +%s)"
