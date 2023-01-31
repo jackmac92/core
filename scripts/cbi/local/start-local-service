@@ -10,6 +10,6 @@ if [[ -n "${CBI_REMOTE_LOCAL_SVC:-""}" ]]; then
   exit 0
 fi
 
-direnv exec ~/cbinsights cbi local $CBI_ENV
+flock $HOME/.local/cbi-lcl-svc-start.lock --command "direnv exec ~/cbinsights cbi local $CBI_ENV"
 
 ln -s $HOME/cbinsights/.envrc $HOME/.cbi/.envrc
