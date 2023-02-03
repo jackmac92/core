@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# window.location.href.replace(`${window.location.protocol}//`, "")
+repo_to_clone=${1:-$(xclip -selection clipboard -o)}
+repo_to_clone=$(s git convert-ssh-url-to-http "$repo_to_clone")
 
-# get repo name from tabfs
-# execute above script via tabfs
-cd ~/git-repos
+cd $GIT_CLONES_DIR
+git clone $repo_to_clone $(s git convert-http-remote-to-clone-path <<<"$repo_to_clone")
