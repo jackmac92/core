@@ -12,4 +12,4 @@ fi
 
 flock $HOME/.local/cbi-lcl-svc-start.lock --command "direnv exec ~/cbinsights cbi local $CBI_ENV"
 
-ln -s $HOME/cbinsights/.envrc $HOME/.cbi/.envrc
+ln -sf $HOME/cbinsights/.envrc $HOME/.cbi/.envrc
