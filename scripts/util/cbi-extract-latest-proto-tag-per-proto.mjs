@@ -22,7 +22,7 @@ Object.keys(x).forEach((k) => {
 
 const latestProtos = Object.keys(x).map((k) => `${k}/${x[k]}`);
 
-latestProtos.slice(0, 2).map((t) => {
+latestProtos.map((t) => {
   $`lab ci create ${t}`;
 });
 
