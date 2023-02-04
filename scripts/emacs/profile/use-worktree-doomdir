@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-git -C $HOME/.doom.d add $DOOMDIR $EMACS_SOCKET_NAME
+rm -f $DOOMDIR
+
+if ! git -C $HOME/.doom.d rev-parse --verify $EMACS_SOCKET_NAME; then
+    git -C $HOME/.doom.d branch $EMACS_SOCKET_NAME default
+fi
+
+git -C $HOME/.doom.d worktree add $DOOMDIR $EMACS_SOCKET_NAME
