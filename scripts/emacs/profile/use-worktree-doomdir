@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+git -C $HOME/.doom.d add $DOOMDIR $EMACS_SOCKET_NAME

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ln -s /home/jmccown/.local/share/chezmoi/chez-ignore/emacs-doom $PWD/doom
-
+ln -s $HOME/.doom.d $DOOMDIR
