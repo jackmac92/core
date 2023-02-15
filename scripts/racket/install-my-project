@@ -16,4 +16,9 @@ mkdir -p ~/.local/racket-apps/
 rm -rf ~/.local/racket-apps/$tgt
 mv $tgt ~/.local/racket-apps/
 rm -f ~/.local/bin/$tgt
-ln -s ~/.local/racket-apps/$tgt/bin/app ~/.local/bin/$tgt
+echo "
+#!/usr/bin/env sh
+
+~/.local/racket-apps/$tgt/bin/app \$*
+" >~/.local/bin/$tgt
+chmod +x ~/.local/bin/$tgt
