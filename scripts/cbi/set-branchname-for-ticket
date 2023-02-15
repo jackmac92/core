@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+newname="$1"
+jiraticket=${2:-"$(s jira select-active-ticket-dwim)"}
+
+sqlite3 $JIRA_HELPER_DB "UPDATE tickets SET branch_name=\"$newname\" WHERE id=\"$jiraticket\""
