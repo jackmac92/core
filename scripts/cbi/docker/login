@@ -3,4 +3,4 @@ set -euo pipefail
 
 REGION=${REGION:=us-east-1}
 
-docker login -u AWS -p "$(aws ecr get-login-password --region "$REGION")" "https://$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.${REGION}.amazonaws.com"
+aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin 496584544324.dkr.ecr.$REGION.amazonaws.com
