@@ -13,9 +13,7 @@ jiraLookupKnownReposFn() {
 export -f jiraLookupKnownReposFn
 
 if [[ -z "$(jiraLookupKnownReposFn)" ]]; then
-    for r in $(s cbi svc select-many); do
-        jo ticket="$jiraticket" repo="$r" | sqlite-utils insert "$JIRA_HELPER_DB" ticket_repos -
-    done
+    s cbi ticket add-related-repos "$jiraticket"
 fi
 
 jiraLookupKnownReposFn | tee | xargs -n1 s cbi start-service
