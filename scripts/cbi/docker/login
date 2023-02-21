@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REGION=${REGION:=us-east-1}
+REGION=us-east-1
 
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin 496584544324.dkr.ecr.$REGION.amazonaws.com
