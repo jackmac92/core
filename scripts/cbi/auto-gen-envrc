@@ -11,4 +11,4 @@ export CBI_SERVICE_PROTO_ROOT=$PWD/.__proto_dont_modify__/
 direnv allow
 
 consul services register -http-addr=http://localhost:8500 -name $SVC_NAME -address $MY_LAN_IP -port $GRPC_PORT
-trap "consul services deregister -id=$SVC_NAME" SIGINT
+trap "consul services deregister -http-addr=http://localhost:8500 -id=$SVC_NAME" SIGINT
