@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+tgt=$1
+
+rm -f ~/.local/bin/$tgt
+
+cat <<EOF  >~/.local/bin/$tgt
+#!/usr/bin/env sh
+
+$2 \$*
+
+EOF
+
+chmod +x ~/.local/bin/$tgt
