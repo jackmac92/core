@@ -15,4 +15,4 @@ raco dist $tgt app
 mkdir -p ~/.local/racket-apps/
 rm -rf ~/.local/racket-apps/$tgt
 mv $tgt ~/.local/racket-apps/
-s racket mk-local-bin-exe $tgt
+s racket mk-local-bin-exe $tgt racket-apps

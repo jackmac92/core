@@ -12,4 +12,4 @@ raco dist $tgt app
 mkdir -p ~/.local/racket-scripts/
 rm -rf ~/.local/racket-scripts/$tgt
 mv $tgt ~/.local/racket-scripts/
-s racket mk-local-bin-exe $tgt
+s racket mk-local-bin-exe $tgt racket-scripts
