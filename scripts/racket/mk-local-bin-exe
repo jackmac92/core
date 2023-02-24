@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+rm -f ~/.local/bin/$1
+
+cat <<EOF  >~/.local/bin/$1
+#!/usr/bin/env sh
+
+$HOME/.local/racket-scripts/$1/bin/app \$*
+
+EOF
+
+chmod +x ~/.local/bin/$1
