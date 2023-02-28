@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# echo "BYPASSING RUN ON HOST TO RUN IN DOCKER"
-# make
-# exit 0
 
 if [[ -f pyproject.toml ]]; then
     cat <<EOF >shell.nix
@@ -25,6 +22,10 @@ fi
 if [[ -f go.mod ]]; then
     echo "Starting go repo"
     s cbi auto-gen-envrc
+    echo "BYPASSING RUN ON HOST TO RUN IN DOCKER"
+    make
+    exit 0
+
     go mod vendor
     fd -e go | entr -r go run main.go
     exit 0
