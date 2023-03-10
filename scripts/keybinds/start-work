@@ -6,8 +6,7 @@ if command -v sysctl >/dev/null 2>&1; then
 fi
 
 if ! s cbi test-vpn-is-active; then
-    zenity --warning --text "CBI VPN not active, refusing to start"
-    exit 1
+    zenity --warning --text "CBI VPN not active, shit prolly wont work"
 fi
 
 alacritty --config-file $HOME/.config/alacritty/work.yml
