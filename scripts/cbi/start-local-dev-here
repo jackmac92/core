@@ -21,11 +21,11 @@ fi
 
 if [[ -f go.mod ]]; then
     echo "Starting go repo"
-    s cbi auto-gen-envrc
-    echo "BYPASSING RUN ON HOST TO RUN IN DOCKER"
-    make
-    exit 0
+    # echo "BYPASSING RUN ON HOST TO RUN IN DOCKER"
+    # make
+    # exit 0
 
+    s cbi auto-gen-envrc
     go mod vendor
     fd -e go | entr -r go run main.go
     exit 0
