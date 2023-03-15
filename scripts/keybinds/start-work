@@ -9,4 +9,6 @@ if ! s cbi test-vpn-is-active; then
     zenity --warning --text "CBI VPN not active, shit prolly wont work"
 fi
 
+bw sync
+
 alacritty --config-file $HOME/.config/alacritty/work.yml
