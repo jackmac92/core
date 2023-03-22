@@ -10,6 +10,9 @@ if ! s cbi test-vpn-is-active; then
 fi
 
 bw sync
-s cbi docker login
+
+if ! s cbi docker login; then
+    zenity --warning --text "CBI docker login failed"
+fi
 
 alacritty --config-file $HOME/.config/alacritty/work.yml
