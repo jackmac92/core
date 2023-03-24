@@ -11,8 +11,4 @@ fi
 
 bw sync
 
-if ! s cbi docker login; then
-    zenity --warning --text "CBI docker login failed"
-fi
-
 alacritty --config-file $HOME/.config/alacritty/work.yml
