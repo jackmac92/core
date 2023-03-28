@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 (
-	fd --hidden '^.git$' -x sh -c 'realpath --relative-base $HOME/cbinsights/gitlab.cbinsights.com/ {//}' -- $HOME/cbinsights/gitlab.cbinsights.com
+	fd -L --hidden '^.git$' -x sh -c 'realpath --relative-base $HOME/cbinsights/gitlab.cbinsights.com/ {//}' -- $HOME/cbinsights/gitlab.cbinsights.com
 ) | fzf --preview='mdcat $HOME/cbinsights/gitlab.cbinsights.com/{}/README.md' $*
