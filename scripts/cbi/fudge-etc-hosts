@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+vaultIp=$(direnv exec ~/cbinsights dig +short $VAULT_HOST | head -n 1)
+consulIp=$(direnv exec ~/cbinsights dig +short $VAULT_HOST | head -n 1)
+printf "%s\tvault.cbinsights.local" $vaultIp
+echo
+printf "%s\tconsul.cbinsights.local" $consulIp
+echo
