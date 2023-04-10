@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sqlite3 "$JIRA_HELPER_DB" "SELECT repo FROM ticket_repos WHERE ticket=\"$(s jira select-active-ticket-dwim "${1:-""}")\"" | tee | xargs -n1 s cbi start-service

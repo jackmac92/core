@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+s cbi wait-for-active-local-service
+
 jiraticket=$(s jira select-active-ticket-dwim "${1:-""}")
 
 # ensure branchname has been setup
@@ -16,4 +18,4 @@ if [[ -z "$(jiraLookupKnownReposFn)" ]]; then
     s cbi ticket add-related-repos "$jiraticket"
 fi
 
-jiraLookupKnownReposFn | tee | xargs -n1 s cbi start-service
+s cbi ticket start-relevant-services "$jiraticket"
