@@ -10,6 +10,5 @@ if ! s cbi test-vpn-is-active; then
 fi
 
 bw sync
-s cbi docker login
 
 alacritty --config-file $HOME/.config/alacritty/work.yml
