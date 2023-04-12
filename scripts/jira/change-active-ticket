@@ -4,6 +4,8 @@ set -euo pipefail
 activeticket=$(s jira select-ticket "${1:-""}" | jq -r '.key | select(. != null)' | xargs)
 
 s jira set-current-ticket "$activeticket"
+
+jira assign-to-me "$activeticket"
 jira move-to-in-progress "$activeticket"
 
 echo $activeticket
