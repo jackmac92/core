@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+mux start cbi-local-service
+
 s cbi wait-for-active-local-service
 
 jiraticket=$(s jira select-active-ticket-dwim "${1:-""}")
