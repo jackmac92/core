@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ -z "${CBI_ENV:-""}" ]]; then
-  export CBI_ENV="$1"
+  export CBI_ENV="${1:-$(s cbi local curr-env-dwim)}"
 fi
 
 if [[ -n "${CBI_REMOTE_LOCAL_SVC:-""}" ]]; then
