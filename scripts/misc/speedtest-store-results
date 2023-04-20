@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+speedtest --json |
+    sqlite-utils insert --alter --flatten --pk timestamp "$SCRIPTS_LOCAL_DIR/speedtest-history.db" "$(hostname)" -
