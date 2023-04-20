@@ -2,6 +2,5 @@
 set -euo pipefail
 
 fd --hidden -t d '^.git$' -x bash -c '
-alias git="git --git-dir={}"
+cd {//}
 '"$@"
-
