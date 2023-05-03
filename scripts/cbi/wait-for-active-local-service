@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s util until-cmd-passes.mjs goss -g $CBI_DEV_DIRECTORY/goss.yaml validate
+s util until-cmd-passes.mjs --max-times=30 --retry-delay=10000 goss -g $CBI_DEV_DIRECTORY/goss.yaml validate
