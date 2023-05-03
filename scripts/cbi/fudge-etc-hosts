@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
 
 printf "" >$CBI_HOSTALIASES
-vaultIp=$(direnv exec ~/cbinsights dig +short $VAULT_HOST | rg "^\d" | head -n 1)
-consulIp=$(direnv exec ~/cbinsights dig +short $CONSUL_HOST | rg "^\d" | head -n 1)
-printf "%s\tvault.cbinsights.local\n" $vaultIp >>$CBI_HOSTALIASES
-printf "%s\tconsul.cbinsights.local\n" $consulIp >>$CBI_HOSTALIASES
+printf "%s\tvault.cbinsights.local\n%s\tconsul.cbinsights.local\n" $(direnv exec ~/cbinsights s util resolve-first-ip $VAULT_HOST) $(direnv exec ~/cbinsights s util resolve-first-ip $CONSUL_HOST) >>$CBI_HOSTALIASES
