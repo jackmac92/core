@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+term=$1
+
+rg --files-with-matches "$term" | xargs sd '^.*'"$term"'.*$' ''

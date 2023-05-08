@@ -7,6 +7,7 @@ const MAX_TRIES_N = 10000;
 const INTER_ATTEMPT_WAIT_MS = 1500;
 
 const numTries = process.argv["max-times"] || MAX_TRIES_N;
+const delayMs = process.argv["retry-delay"] || INTER_ATTEMPT_WAIT_MS;
 
 let final;
 let i = 0;

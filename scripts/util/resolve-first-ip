@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+dig +short $1 | rg "^\d" | head -n 1
