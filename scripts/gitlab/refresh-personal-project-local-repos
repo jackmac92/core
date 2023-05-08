@@ -2,3 +2,5 @@
 set -euo pipefail
 
 s gitlab list-all-personal-projects | jq '"git clone \(.ssh_url_to_repo) ~/Projects/gitlab.com/\(.path_with_namespace) 2>/dev/null || true"' | xargs -n 1 bash -c
+cd ~/Projects/gitlab.com
+s git mirrorfleet 's git register-repo'
