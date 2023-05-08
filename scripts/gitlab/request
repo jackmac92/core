@@ -18,6 +18,7 @@ fi
 req_path="$1"
 shift
 full_url=$(s gitlab request-Url "$req_path")
+export full_url
 
 if [ -n ${GITLAB_REQUEST_DEBUG:-""} ]; then
 	set -x
