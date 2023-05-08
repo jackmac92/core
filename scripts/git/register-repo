@@ -5,4 +5,4 @@ repo=${1:-$PWD}
 repo=$(realpath $repo)
 
 zoxide add $PWD
-e -e $(printf "(projectile-add-known-project %q)" "$repo")
+emacsclient --no-wait --eval "$(printf "(projectile-add-known-project \"%s\")" "$repo")"
