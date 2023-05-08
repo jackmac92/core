@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if echo "$full_url" | grep -q "cbinsights"; then
+	s bitwarden get-field "CBI gitlab" general-use-token
+else
+	s bitwarden get-field "gitlab.com" cli-api-token
+fi
