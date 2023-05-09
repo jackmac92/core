@@ -30,6 +30,9 @@ if [[ -f go.mod ]]; then
     exit 0
 fi
 
+# TODO handle current python template setup
+# pip install mypy python-lsp-server pyright
+
 if [[ -f src/live_reload.py ]]; then
     echo "Starting python repo"
     s cbi auto-gen-envrc
