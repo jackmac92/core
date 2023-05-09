@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat /etc/docker/daemon.json | jq --arg lanip $MY_LAN_IP '.dns += [ $lanip ]' | sudo sponge /etc/docker/daemon.json
+
