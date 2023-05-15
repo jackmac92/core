@@ -8,7 +8,7 @@ raco exe $tgt.rkt
 exefile=$PWD/$tgt
 cd $(mktemp -d)
 mv -f $exefile app
-raco dist $tgt app
+s racket appexe-to-dist $tgt
 mkdir -p ~/.local/racket-scripts/
 rm -rf ~/.local/racket-scripts/$tgt
 mv $tgt ~/.local/racket-scripts/

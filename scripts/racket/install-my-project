@@ -11,7 +11,7 @@ raco exe -o $tgt ${RACKET_ENTRYPOINT:-main.rkt}
 exefile=$PWD/$tgt
 cd $(mktemp -d)
 mv -f $exefile app
-raco dist $tgt app
+s racket appexe-to-dist $tgt
 mkdir -p ~/.local/racket-apps/
 rm -rf ~/.local/racket-apps/$tgt
 mv $tgt ~/.local/racket-apps/
