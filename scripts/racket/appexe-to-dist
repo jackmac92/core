@@ -3,7 +3,7 @@ set -euo pipefail
 
 tgt=$1
 
-if [[ $JM_HM_IS_DARWIN ]]; then
+if [[ $JM_HM_IS_DARWIN = true ]]; then
     sudo raco dist $tgt app
     sudo chown -R $USER:staff $tgt
 else
