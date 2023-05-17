@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 printf "" >$CBI_HOSTALIASES
-printf "%s\tvault.cbinsights.local\n%s\tconsul.cbinsights.local\n%s\tconsul.service.consul\n" \
+printf "%s\tvault.cbinsights.local
+%s\tconsul.cbinsights.local
+%s\tconsul.service.consul
+" \
     "$(direnv exec ~/cbinsights bash -c 's util resolve-first-ip $VAULT_HOST')" \
     "$(direnv exec ~/cbinsights bash -c 's util resolve-first-ip $CONSUL_HOST')" \
     $MY_LAN_IP >>$CBI_HOSTALIASES
