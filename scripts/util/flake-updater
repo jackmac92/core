@@ -5,4 +5,13 @@ cd ~/.config/nixpkgs
 nix flake update
 chezmoi add flake.lock
 trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/exact_nixpkgs/flake.lock; exit 1" ERR
-s util niv-try-upgrade
+
+cd ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs
+
+s dot run-script home_manager_update
+
+git add flake*
+git commit -m "flake update" && {
+    git pull --no-edit
+    git push --recurse-submodules=on-demand
+}
