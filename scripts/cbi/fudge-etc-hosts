@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 
 printf "" >$CBI_HOSTALIASES
+target_consul_ip=""
+if s cbi local is-running-p; then
+    target_consul_ip=$MY_LAN_IP
+else
+    target_consul_ip="$(direnv exec ~/cbinsights bash -c 's util resolve-first-ip '"consul-$CBI_ENV.cbinsights.com")"
+fi
+
 printf "%s\tvault.cbinsights.local
 %s\tconsul.cbinsights.local
 %s\tconsul.service.consul
 " \
     "$(direnv exec ~/cbinsights bash -c 's util resolve-first-ip $VAULT_HOST')" \
     "$(direnv exec ~/cbinsights bash -c 's util resolve-first-ip $CONSUL_HOST')" \
-    $MY_LAN_IP >>$CBI_HOSTALIASES
+    "$target_consul_ip" >>$CBI_HOSTALIASES
