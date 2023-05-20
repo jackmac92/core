@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Check if the correct number of arguments are provided
+if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 <repository-path> <inner-script>"
+    exit 1
+fi
+
+# Assign command line arguments to variables
+repo_path=$1
+inner_script=$2
+
+# Navigate to the provided repository
+cd ${repo_path}
+
+# Run inner script
+bash "${inner_script}"
+
+# Check the current git repository for changes
+if git diff-index --quiet HEAD --; then
+    # No changes
+    echo "No changes in the repository after running script"
+else
+    # Changes exist, stage and commit them
+    git add -A
+    git commit -m "Auto-commit: changes made by script"
+    echo "Changes have been committed"
+fi
