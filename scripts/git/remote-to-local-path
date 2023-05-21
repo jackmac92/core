@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+remote=${1:-$(git remote get-url origin)}
+basepath=""
+
+if echo "$remote" | grep -q "cbinsights.com"; then
+    basepath="$HOME/cbinsights/gitlab.cbinsights.com"
+else
+    basepath="$HOME/Projects/gitlab.com"
+fi
+
+echo "$basepath/$(s git remote-to-http-url "$remote" | sd '.com/' '\t' | cut -f2 -d $'\t')"

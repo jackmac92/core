@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-gitmote=$(git remote get-url origin)
+gitmote=${1:-$(git remote get-url origin)}
 
 if [[ $gitmote = git@* ]]; then
   gitmote=$(s git convert-ssh-url-to-http "$gitmote")
