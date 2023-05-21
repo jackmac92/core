@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo ln -s $(which python3) $(dirname $(which python3))/python
