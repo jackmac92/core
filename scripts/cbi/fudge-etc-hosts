@@ -5,7 +5,7 @@ target_consul_ip=""
 if s cbi local is-running-p; then
     target_consul_ip=$MY_LAN_IP
 else
-    target_consul_ip="$(direnv exec ~/cbinsights bash -c 's util resolve-first-ip '"consul-$CBI_ENV.cbinsights.com")"
+    target_consul_ip="$(direnv exec ~/cbinsights bash -c 's util resolve-first-ip consul-$CBI_ENV.cbinsights.com')"
 fi
 
 printf "%s\tvault.cbinsights.local
