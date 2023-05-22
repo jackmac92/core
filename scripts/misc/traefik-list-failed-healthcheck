@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-https --auth $DROPLOOP_TRAEFIK_USER:${DROPLOOP_TRAEFIK_PASS:-$(bw get password traefik)} traefik.$PRIMARY_PERSONAL_DOMAIN/api/http/services |
+http --auth $DROPLOOP_TRAEFIK_USER:${DROPLOOP_TRAEFIK_PASS:-$(bw get password traefik)} jackdmc.com:7799/api/http/services |
     jq -c 'map(select(.serverStatus)) | map(select([ .serverStatus[] ] | any(contains("DOWN"))))[]'
+
