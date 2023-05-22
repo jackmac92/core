@@ -66,7 +66,7 @@ checkScriptDir() {
 }
 
 no_commands=1
-for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+for scriptdir in $(echo "${SCRIPTS_PATH:-"$HOME/.local/s-scripts/scripts:$HOME/.local/scripts/porcelain:$HOME/.local/scripts/wrappers:$HOME/.local/scripts/personal-apps:$HOME/.local/scripts/junk-drawer:$HOME/.local/sysspecific_scripts:$HOME/.local/chez-managed-s-scripts"}" | tr ':' '\n'); do
     checkScriptDir "$scriptdir" "${orig_args[@]}"
 done
 set +x
@@ -81,6 +81,7 @@ set +x
 #     echo "$command commands" > /dev/stderr
 #     echo
 # fi
+
 
 # # for file in $(find "$dir" -maxdepth 1 -mindepth 1 -exec test -x {} \; -print); do
 # #     command=$(basename "$file")
