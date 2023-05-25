@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-goss -g ${CBI_DEV_DIRECTORY:-$HOME/cbinsights}/vpn-test.yml validate >/dev/null 2>&1
+goss -g ${CBI_DEV_DIRECTORY:-$HOME/cbinsights}/vpn-test.yml validate --retry-timeout 15s >/dev/null 2>&1
