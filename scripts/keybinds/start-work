@@ -7,7 +7,7 @@ fi
 s cbi start-vpn
 
 
-if ! s cbi test-vpn-is-active; then
+if ! direnv exec ~/cbinsights s cbi test-vpn-is-active; then
     zenity --warning --text "CBI VPN not active, shit prolly wont work"
 fi
 
