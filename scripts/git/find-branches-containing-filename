@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtfile=$1
+
+for branch in $(git branch --all | grep -v HEAD); do
+    git checkout "$branch" &>/dev/null
+    if [ $(git ls-files | grep "$tgtfile" | wc -l) -gt 0 ]; then
+        echo "$branch"
+    fi
+done
