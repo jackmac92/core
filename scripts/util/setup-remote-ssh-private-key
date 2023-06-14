@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ssh "$1" bash -c "ssh-keygen -q -t ed25519 -b 4096 -N '' -f ~/.ssh/id_ed25519 -C jackmac79@gmail.com"
+SSH_KEY_TO_ADD="$(ssh "$1" bash -c "cat ~/.ssh/id_ed25519.pub")" SSH_KEY_TITLE="autogen-s-script-remote-setup-$1" s gitlab ssh-key-add
