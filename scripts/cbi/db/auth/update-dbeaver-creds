@@ -9,6 +9,8 @@ conn_password="$(echo "$credsInfo" | jq -r .PASSWORD)"
 conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
 
 DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sources.json"
+mkdir -p $(dirname "$DBEAVERCONNECTIONSFILE")
+
 cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(gdate +%s)"
 TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq ".connections | to_entries | map(select(.value.name == \"CBI $cbienv $targetDb\")) | first | .key" -r)
 NEWDBEAVERCONNECTIONSFILE=$(cat "$DBEAVERCONNECTIONSFILE" | jq --arg targetConn "$TARGETCONNECTIONKEY" \
