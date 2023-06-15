@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# NOTE currently just clears inactive tickets from being set as active
 if ! s jira ticket-is-incomplete; then
     s jira clear-active-ticket
+fi
+
+currentTicketFromOnline=$(jira active-ticket | jq -r '.issues[].key')
+
+if [[ -n $currentTicketFromOnline ]]; then
+    s jira set-current-ticket "$currentTicketFromOnline"
 fi

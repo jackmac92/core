@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+s jira update-current-ticket-state
 while [[ -z $(s jira get-active-ticket) ]]; do
    s jira change-active-ticket
 done
