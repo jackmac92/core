@@ -3,18 +3,4 @@ set -euo pipefail
 
 cbienv=${1:-$(s cbi local curr-env-dwim)}
 targetDb=${2:-"main"}
-credsInfo="$(s cbi db auth latest-creds-json "$cbienv" "$targetDb")"
-conn_username="$(echo "$credsInfo" | jq -r .USERNAME)"
-conn_password="$(echo "$credsInfo" | jq -r .PASSWORD)"
-conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
-
-DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sources.json"
-mkdir -p $(dirname "$DBEAVERCONNECTIONSFILE")
-
-cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(gdate +%s)"
-TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq ".connections | to_entries | map(select(.value.name == \"CBI $cbienv $targetDb\")) | first | .key" -r)
-NEWDBEAVERCONNECTIONSFILE=$(cat "$DBEAVERCONNECTIONSFILE" | jq --arg targetConn "$TARGETCONNECTIONKEY" \
-    '.connections[$targetConn].configuration.host = "'"$conn_host"'" |.connections[$targetConn].configuration.user = "'"$conn_username"'" | .connections[$targetConn].configuration.password = "'"$conn_password"'"')
-if ! [ -z "$NEWDBEAVERCONNECTIONSFILE" ]; then
-    echo "$NEWDBEAVERCONNECTIONSFILE" >"$DBEAVERCONNECTIONSFILE"
-fi
+s cbi db auth latest-creds-json "$cbienv" "$targetDb" | s cbi db auth update-dbeaver-creds-via-stdin "$cbienv" "$targetDb"
