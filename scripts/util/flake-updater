@@ -4,7 +4,7 @@ set -euo pipefail
 cd ~/.config/nixpkgs
 nix flake update
 chezmoi add --create flake.lock
-trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/exact_nixpkgs/create_flake.lock; rm -f ~/.config/nixpkgs/flake.lock; exit 1" ERR
+trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/exact_nixpkgs/create_flake.lock; rm -f ~/.config/nixpkgs/flake.lock; chezmoi apply --force ~/.config/nixpkgs/flake.lock; exit 1" ERR
 
 cd
 
