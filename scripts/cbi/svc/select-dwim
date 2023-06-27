@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
 case $PWD/ in
-    $HOME/cbinsights/*) realpath --relative-base $HOME/cbinsights/gitlab.cbinsights.com/ $(git root-directory) ;;
+    $HOME/cbinsights/*)
+        git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+        if [ -n "$git_root" ]; then
+            realpath --relative-base $HOME/cbinsights/gitlab.cbinsights.com/ $git_root
+        else
+            s cbi svc select --sync
+        fi
+        ;;
     *) s cbi svc select --sync ;;
 esac
