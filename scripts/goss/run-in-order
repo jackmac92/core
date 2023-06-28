@@ -2,13 +2,18 @@
 set -euo pipefail
 
 TARGET_DIR=${1:?"Required arg"}
+GOSS_EXIT_CODE=255
+
+if [[ -n $JM_GOSS_KEEP_GOING ]]; then
+    GOSS_EXIT_CODE=1;
+fi
 
 fd --type directory \
     --max-depth=1 . $TARGET_DIR |
     sort --numeric-sort -r |
-    xargs -I_ bash -c "s goss run-in-order _ || exit 255"
+    xargs -I_ bash -c "s goss run-in-order _ || exit $GOSS_EXIT_CODE"
 
 fd --type file --type symlink \
     --max-depth=1 . $TARGET_DIR |
     sort --numeric-sort -r |
-    xargs -I_ bash -c '>&2 echo -en "\r\033[Ktesting $(basename _)"; chronic goss -g _ validate --format=json --format-options=verbose || exit 255'
+    xargs -I_ bash -c '>&2 echo -en "\r\033[Ktesting $(basename _)"; chronic goss -g _ validate --format=json --format-options=verbose || exit '"$GOSS_EXIT_CODE"
