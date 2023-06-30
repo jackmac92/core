@@ -5,7 +5,6 @@ if command -v sysctl >/dev/null 2>&1; then
 fi
 
 s cbi start-vpn
-s jira update-current-ticket-state
 
 bw sync
 
