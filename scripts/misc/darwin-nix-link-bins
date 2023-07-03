@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd . /etc/profiles/per-user/jmccown/bin/ -x sudo ln -s {} $HOME/.nix-profile/bin/{/}
