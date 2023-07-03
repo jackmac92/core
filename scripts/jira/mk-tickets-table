@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jo id="" current=0 branch_name="" | sqlite-utils insert --alter --replace --pk id "$JIRA_HELPER_DB" tickets -
