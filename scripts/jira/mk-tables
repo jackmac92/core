@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s jira mk-tickets-table
+s jira mk-ticket-branchnames-table
+s jira mk-ticket-repos-table

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jo id="" repo=0 | sqlite-utils insert --alter "$JIRA_HELPER_DB" ticket_repos -
