@@ -3,7 +3,7 @@ set -euo pipefail
 
 reqfile=${1:-requirements.txt}
 
-if [ -n "$VIRTUAL_ENV" ]; then
+if [ -n "${VIRTUAL_ENV:-""}" ]; then
     pip install -r $reqfile
 else
     pip install --user -r $reqfile
