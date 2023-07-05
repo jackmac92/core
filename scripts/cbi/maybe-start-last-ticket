@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+activeTicket=$(s jira get-active-ticket)
+if [ -n "$activeTicket" ] && gum confirm "Continue with active jira ticket? ($activeTicket)"; then
+  s cbi start-last-ticket
+fi
