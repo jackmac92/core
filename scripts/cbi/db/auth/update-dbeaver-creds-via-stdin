@@ -20,11 +20,19 @@ else
 fi
 
 DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sources.json"
-mkdir -p $(dirname "$DBEAVERCONNECTIONSFILE")
-touch $DBEAVERCONNECTIONSFILE
 
+if [[ ! -s $DBEAVERCONNECTIONSFILE ]]; then
+    echo "DBeaver config not setup at all yet, bailing"
+    exit 1
+fi
+
+jqUery=".connections | to_entries | map(select(.value.name == \"CBI $cbienv $targetDb\")) | first"
+if ! cat "$DBEAVERCONNECTIONSFILE" | jq -e $jqUery; then
+    echo "DBeaver config does not have $cbienv $targetDb setup yet, bailing"
+    exit 1
+fi
 cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(gdate +%s)"
-TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq ".connections | to_entries | map(select(.value.name == \"CBI $cbienv $targetDb\")) | first | .key" -r)
+TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq "$jqUery | first | .key" -r)
 NEWDBEAVERCONNECTIONSFILE=$(cat "$DBEAVERCONNECTIONSFILE" | jq --arg targetConn "$TARGETCONNECTIONKEY" \
     '.connections[$targetConn].configuration.host = "'"$conn_host"'" |.connections[$targetConn].configuration.user = "'"$conn_username"'" | .connections[$targetConn].configuration.password = "'"$conn_password"'"')
 if ! [ -z "$NEWDBEAVERCONNECTIONSFILE" ]; then
