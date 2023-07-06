@@ -1,0 +1,13 @@
+command:
+  has fd:
+    exec: which fd
+    exit-status: 0
+  has fzf:
+    exec: which fzf
+    exit-status: 0
+  has sad for find and replace:
+    exec: which sad
+    exit-status: 0
+  has zx for node shell scripts:
+    exec: which zx
+    exit-status: 0
