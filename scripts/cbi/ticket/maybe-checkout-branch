@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Fetching latest repo"
+git fetch
+echo "Done fetching"
+
+jiraticket=$(s jira select-active-ticket-dwim)
+
+if [ -z $jiraticket ]; then
+    echo "No active ticket"
+    exit 0
+fi
+
+if ! git branch | rg --quiet "$jiraticket"; then
+    echo "No branch for ticket, creating..."
+    git checkout master
+    git pull --ff-only || true
+    ticketbranch=$(s cbi get-branchname-dwim "$jiraticket")
+    git branch "$ticketbranch" "$(git log --oneline origin/master | head -n 1 | choose 0)"
+else
+    ticketbranch=$(git branch | rg --color=never "$jiraticket" | sd '^\*' ' ' | fzf --header="Which branch for $jiraticket" | xargs)
+fi
+
+git switch "$ticketbranch"
