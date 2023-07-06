@@ -40,7 +40,7 @@ checkScriptDir() {
                     (
                         set +e
                         jo ID="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --pk ID $SCRIPTS_LOCAL_DIR/s-scripts-meta.db invocations -
-                    );
+                    )
                 fi
                 if [[ -f "$dir/$command.inproc" ]]; then
                     source "$dir/$command" "$@"
@@ -57,17 +57,17 @@ checkScriptDir() {
                     (
                         set +e
                         jo ID="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --pk ID $SCRIPTS_LOCAL_DIR/s-scripts-meta.db executions -
-                    );
+                    )
                 fi
                 exit 0
             fi
         fi
     done
     deadEndDirs+=("$dir")
-
-    no_commands=1
-    for scriptdir in $(echo "${SCRIPTS_PATH:-"$HOME/.local/s-scripts/scripts:$HOME/.local/scripts/porcelain:$HOME/.local/scripts/wrappers:$HOME/.local/scripts/personal-apps:$HOME/.local/scripts/junk-drawer:$HOME/.local/sysspecific_scripts:$HOME/.local/chez-managed-s-scripts"}" | tr ':' '\n'); do
 }
+
+no_commands=1
+for scriptdir in $(echo "${SCRIPTS_PATH:-"$HOME/.local/s-scripts/scripts:$HOME/.local/scripts/porcelain:$HOME/.local/scripts/wrappers:$HOME/.local/scripts/personal-apps:$HOME/.local/scripts/junk-drawer:$HOME/.local/sysspecific_scripts:$HOME/.local/chez-managed-s-scripts"}" | tr ':' '\n'); do
     checkScriptDir "$scriptdir" "${orig_args[@]}"
 done
 set +x
