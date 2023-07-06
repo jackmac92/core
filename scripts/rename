@@ -67,8 +67,8 @@ if [ -e "$tgt_file.inproc" ]; then
 fi
 
 ln -s "$dest_file" "$tgt_file"
-
 touch "$tgt_file.linger"
+scriptgit add "$tgt_file" "$tgt_file.linger"
 
 (
     fd -t f . ~/.local/share/chezmoi
