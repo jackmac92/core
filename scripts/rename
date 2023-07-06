@@ -2,6 +2,11 @@
 
 set -uo pipefail
 
+if [[ $(chezmoi git status -- --short | wc -l) -ne 0 ]]; then
+    echo "Refusing to run with dirty worktree"
+    exit 1
+fi
+
 tgt_file_cmpts=""
 dest_file_cmpts=""
 while [[ $# -gt 0 ]]; do
@@ -54,8 +59,6 @@ scriptmv() {
     fi
 }
 
-# scriptgit stash --all
-
 scriptmv "$tgt_file" "$dest_file"
 
 if [ -e "$tgt_file.help" ]; then
@@ -77,6 +80,4 @@ scriptgit add "$tgt_file" "$tgt_file.linger"
     done
 ) | sad --exact "s $tgt_file_cmpts" "s $dest_file_cmpts"
 
-scriptgit commit -m "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
-
-# scriptgit stash pop
+scriptgit commit -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
