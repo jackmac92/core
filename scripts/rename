@@ -75,7 +75,7 @@ scriptgit add "$tgt_file" "$tgt_file.linger"
     for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
         fd -t x . "$scriptdir"
     done
-) | sad --exact "s $*" "s $dest_file_cmpts"
+) | sad --exact "s $tgt_file_cmpts" "s $dest_file_cmpts"
 
 scriptgit commit -m "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
 
