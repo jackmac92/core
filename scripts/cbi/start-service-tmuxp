@@ -15,7 +15,7 @@ panes=$(
   python - <<___EOF
 import copy
 import json
-start_after_lcl_svc = "s cbi maybe-checkout-branch-for-current-ticket; waitForIt 127.0.0.1:8500/v1/kv/Environment\?raw -- make local"
+start_after_lcl_svc = "s cbi ticket maybe-checkout-branch; waitForIt 127.0.0.1:8500/v1/kv/Environment\?raw -- make local"
 default = [{
   "main": start_after_lcl_svc,
 }, {
