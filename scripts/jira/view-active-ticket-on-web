@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xdg-open "https://cbinsights.atlassian.net/browse/$(jira active-ticket | jq -r ".issues[].key")"
