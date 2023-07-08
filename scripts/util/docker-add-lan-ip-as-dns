@@ -1,4 +1,1 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-cat /etc/docker/daemon.json | jq --arg lanip $MY_LAN_IP '.dns += [ $lanip ] | .dns |= (. | unique)' | sudo sponge /etc/docker/daemon.json
+/home/jmccown/.local/share/chezmoi/chez-ignore/scripts/wrappers/docker/add-lan-ip-as-docker-dns
