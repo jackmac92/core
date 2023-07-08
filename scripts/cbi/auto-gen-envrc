@@ -5,6 +5,7 @@ echo "auto gen envrc"
 echo "
 source_up
 use cbirepovars
+use_cbirepolcldev
 export GRPC_PORT=${GRPC_PORT:-$(s util find-open-port)}
 export CBI_SERVICE_PROTO_ROOT=$PWD/.__proto_dont_modify__/
 " >.envrc
