@@ -23,7 +23,7 @@ if [[ ! -s $DBEAVERCONNECTIONSFILE ]]; then
 fi
 
 dbname="CBI $cbienv $targetDb"
-if ! cat "$DBEAVERCONNECTIONSFILE" | jq --arg dbname "$dbname" '.connections | to_entries | map(select(.value.name == $dbname)) | first'; then
+if ! cat "$DBEAVERCONNECTIONSFILE" | jq --arg dbname "$dbname" '.connections | to_entries | map(select(.value.name == $dbname)) | first' > /dev/null; then
     echo "DBeaver config does not have $cbienv $targetDb setup yet, bailing"
     exit 1
 fi
