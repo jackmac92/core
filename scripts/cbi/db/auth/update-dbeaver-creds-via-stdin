@@ -29,8 +29,8 @@ if ! cat "$DBEAVERCONNECTIONSFILE" | jq --arg dbname "$dbname" '.connections | t
 fi
 
 credsInfo="$(cat /dev/stdin)"
-conn_username="$(echo "$credsInfo" | rg USERNAME | yq -r .USERNAME)"
-conn_password="$(echo "$credsInfo" | rg PASSWORD | yq -r .PASSWORD)"
+conn_username="$(echo "$credsInfo" | jq -r .USERNAME)"
+conn_password="$(echo "$credsInfo" | jq -r .PASSWORD)"
 conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
 
 cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(gdate +%s)"
