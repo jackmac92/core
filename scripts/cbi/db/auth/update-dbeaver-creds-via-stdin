@@ -3,10 +3,6 @@ set -euo pipefail
 
 cbienv=${1:-$(s cbi local curr-env-dwim)}
 targetDb=${2:-"main"}
-credsInfo="$(cat /dev/stdin)"
-conn_username="$(echo "$credsInfo" | rg USERNAME | yq -r .USERNAME)"
-conn_password="$(echo "$credsInfo" | rg PASSWORD | yq -r .PASSWORD)"
-conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
 
 DBEAVERCONFIGBASE=""
 
@@ -26,13 +22,19 @@ if [[ ! -s $DBEAVERCONNECTIONSFILE ]]; then
     exit 1
 fi
 
-jqUery=".connections | to_entries | map(select(.value.name == \"CBI $cbienv $targetDb\")) | first"
-if ! cat "$DBEAVERCONNECTIONSFILE" | jq -e $jqUery; then
+dbname="CBI $cbienv $targetDb"
+if ! cat "$DBEAVERCONNECTIONSFILE" | jq --arg dbname "$dbname" '.connections | to_entries | map(select(.value.name == $dbname)) | first' > /dev/null; then
     echo "DBeaver config does not have $cbienv $targetDb setup yet, bailing"
     exit 1
 fi
+
+credsInfo="$(cat /dev/stdin)"
+conn_username="$(echo "$credsInfo" | jq -r .USERNAME)"
+conn_password="$(echo "$credsInfo" | jq -r .PASSWORD)"
+conn_host="$(s cbi db get-hostname "$cbienv" "$targetDb")"
+
 cp "$DBEAVERCONNECTIONSFILE" "$DBEAVERCONNECTIONSFILE.bak-$(gdate +%s)"
-TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq "$jqUery | first | .key" -r)
+TARGETCONNECTIONKEY=$(cat "$DBEAVERCONNECTIONSFILE" | jq --arg dbname "$dbname" '.connections | to_entries | map(select(.value.name == $dbname)) | first | .key' -r)
 NEWDBEAVERCONNECTIONSFILE=$(cat "$DBEAVERCONNECTIONSFILE" | jq --arg targetConn "$TARGETCONNECTIONKEY" \
     '.connections[$targetConn].configuration.host = "'"$conn_host"'" |.connections[$targetConn].configuration.user = "'"$conn_username"'" | .connections[$targetConn].configuration.password = "'"$conn_password"'"')
 if ! [ -z "$NEWDBEAVERCONNECTIONSFILE" ]; then
