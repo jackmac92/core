@@ -16,14 +16,30 @@ else
 fi
 
 DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sources.json"
+# DBEAVERCONNECTIONSFILE="$DBEAVERCONFIGBASE/workspace6/General/.dbeaver/data-sources-cbi-$cbienv-$targetDb.json"
+
+dbname="CBI $cbienv $targetDb"
 
 if [[ ! -s $DBEAVERCONNECTIONSFILE ]]; then
+    # jq --null-input --arg folder "CBI/$cbienv" --arg name "$dbname" --arg connname "mysql8-$(uuid)" '{ $connname: { name: $name, "read-only": false, "save-password": true, folder: $folder provider: "mysql",  driver: "mysql8", } }'
+    # "mysql8-17827c7fcb2-142183083ce09f26": {
+    #    "configuration": {
+    #      "host": "mysql-dev.cbinsights.com",
+    #      "port": "3306",
+    #      "database": "cbi_data",
+    #      "url": "jdbc:mysql://mysql-dev.cbinsights.com:3306/cbi_data",
+    #      "type": "dev",
+    #      "auth-model": "native",
+    #      "user": "v-full-AJ93ARnU0",
+    #      "password": "A1a-BE5UW00LkJ1zkPdo"
+    #    }
+    #  },
+
     echo "DBeaver config not setup at all yet, bailing"
     exit 1
 fi
 
-dbname="CBI $cbienv $targetDb"
-if ! cat "$DBEAVERCONNECTIONSFILE" | jq --arg dbname "$dbname" '.connections | to_entries | map(select(.value.name == $dbname)) | first' > /dev/null; then
+if ! cat "$DBEAVERCONNECTIONSFILE" | jq --arg dbname "$dbname" '.connections | to_entries | map(select(.value.name == $dbname)) | first' >/dev/null; then
     echo "DBeaver config does not have $cbienv $targetDb setup yet, bailing"
     exit 1
 fi
