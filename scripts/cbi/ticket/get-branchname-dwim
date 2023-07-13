@@ -7,7 +7,7 @@ knownName=$(s cbi get-branchname-for-ticket "$jiraticket")
 
 if [[ -z "$knownName" ]]; then
     newname=$(s cbi make-branchname "$jiraticket")
-    s cbi set-branchname-for-ticket "$newname" "$jiraticket"
+    s cbi ticket set-branchname "$newname" "$jiraticket"
     echo "$newname"
 else
     echo "$knownName"

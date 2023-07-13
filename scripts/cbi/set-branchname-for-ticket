@@ -1,7 +1,1 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-newname="$1"
-jiraticket=${2:-"$(s jira select-active-ticket-dwim)"}
-
-jo id="$jiraticket" branch_name="$newname" | sqlite-utils insert --replace --pk id "$JIRA_HELPER_DB" tickets_branchnames -
+/home/jmccown/.local/share/chezmoi/chez-ignore/scripts/core/scripts/cbi/ticket/set-branchname
