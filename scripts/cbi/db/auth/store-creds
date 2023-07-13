@@ -6,5 +6,7 @@ targetDb=$2
 
 bwnotename="cbi-db-auth-creds-dir-$cbienv-$targetDb"
 
+jsoncreds="$(rg ":" | yq)"
+
 s bitwarden ensure-note-exists "$bwnotename"
-s bitwarden update-note "$bwnotename" "$(rg ":")"
+s bitwarden update-note "$bwnotename" "$jsoncreds"
