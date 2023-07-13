@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# rclone cat s3personal:jmccown-cbi-workstuff/jira.db > $JIRA_HELPER_DB
+rclone copy s3personal:jmccown-cbi-workstuff/jira.db $JIRA_HELPER_DB
