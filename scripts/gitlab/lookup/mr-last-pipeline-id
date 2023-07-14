@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s gitlab lookup mr-pipeline | jq -r '.[0].id'
+s gitlab lookup mr-pipelines | jq -r '.[0].id'
