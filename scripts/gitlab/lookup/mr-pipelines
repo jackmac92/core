@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab this-project-request "merge_requests/$(s gitlab lookup mr-for-branch)/pipelines"

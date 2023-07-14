@@ -13,7 +13,7 @@ while [ -z ${lastCommitPipelineId:-""} ]; do
         break
     fi
     if [ $attempts -gt 5 ]; then
-        exit 1
+        s gitlab lookup mr-last-pipeline-id
     fi
     sleep 0.75
 done

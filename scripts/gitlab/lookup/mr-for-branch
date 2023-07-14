@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ref="${1:-"$(git current-branch)"}"
+
+s gitlab this-project-request "merge_requests" source_branch=="$ref" | jq -r '.[0].id'

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab this-project-request "pipelines/$(s gitlab pipelines get-latest-for-branch)/jobs"
