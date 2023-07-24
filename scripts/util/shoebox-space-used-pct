@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+df /mnt/Media | tail -n 1 | choose -2 | sd '%' ''
+
