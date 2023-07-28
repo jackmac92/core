@@ -5,4 +5,4 @@ repo=${1:-$PWD}
 repo=$(realpath $repo)
 
 zoxide add $PWD
-chronic emacsclient --no-wait --eval "$(printf "(jm/register-project \"%s\")" "$repo")"
+timeout 5 emacsclient --no-wait --eval "$(printf "(jm/register-project \"%s\")" "$repo")"
