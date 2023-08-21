@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 <package-name> <version>"
+  exit 1
+fi
+
+PACKAGE_NAME="$1"
+VERSION="$2"
+SHA256=$(nix-prefetch-url "https://pypi.io/packages/source/${PACKAGE_NAME:0:1}/$PACKAGE_NAME/$PACKAGE_NAME-$VERSION.tar.gz" 2>/dev/null)
+
+cat > mypackage.nix <<EOL
+{ lib, buildPythonPackage, fetchPypi }:
+
+buildPythonPackage rec {
+  pname = "$PACKAGE_NAME";
+  version = "$VERSION";
+
+  src = fetchPypi {
+    inherit pname version;
+    sha256 = "$SHA256";
+  };
+
+  meta = with lib; {
+    description = "A Python package from PyPI"; # Add a proper description
+    license = licenses.mit; # Replace with the correct license
+  };
+}
+EOL
+
+echo "mypackage.nix created."
+
