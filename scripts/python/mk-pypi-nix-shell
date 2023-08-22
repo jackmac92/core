@@ -1,15 +1,29 @@
 #!/usr/bin/env bash
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 <package-name> <version>"
+
+
+
+
+#!/bin/bash
+
+PACKAGE_NAME="$1"
+
+if [ -z "$PACKAGE_NAME" ]; then
+  echo "Usage: $0 <package-name> [version]"
   exit 1
 fi
 
-PACKAGE_NAME="$1"
-VERSION="$2"
-SHA256=$(nix-prefetch-url "https://pypi.io/packages/source/${PACKAGE_NAME:0:1}/$PACKAGE_NAME/$PACKAGE_NAME-$VERSION.tar.gz" 2>/dev/null)
+if [ -z "$2" ]; then
+  VERSION=$(curl -s "https://pypi.org/pypi/$PACKAGE_NAME/json" | jq -r '.info.version')
+else
+  VERSION="$2"
+fi
 
-cat > mypackage.nix <<EOL
+
+URL="https://pypi.io/packages/source/${PACKAGE_NAME:0:1}/$PACKAGE_NAME/$PACKAGE_NAME-$VERSION.tar.gz"
+SHA256=$(nix-prefetch-url "$URL" 2>/dev/null)
+
+cat <<EOL
 { lib, buildPythonPackage, fetchPypi }:
 
 buildPythonPackage rec {
@@ -28,5 +42,4 @@ buildPythonPackage rec {
 }
 EOL
 
-echo "mypackage.nix created."
 
