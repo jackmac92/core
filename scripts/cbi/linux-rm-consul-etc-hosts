@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat /etc/hosts | grep -v consul.service.consul | sudo tee /etc/hosts
+
