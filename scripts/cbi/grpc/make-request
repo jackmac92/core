@@ -50,11 +50,13 @@ REQ_BODY=$(generateRequestBody ${1:-""})
 
 if [ -z ${CBI_ENV_OVERRIDE:-""} ]; then
     # echo "Making request via local envoy" >/dev/stderr
-    SERVER_ADDRESS=172.16.1.81:8888
+    SERVER_ADDRESS="${CBI_ENVOY_PROXY_ADDRESS:-172.16.1.81:8888}"
 else
     # echo "Overriding current environment" >/dev/stderr
     SERVER_ADDRESS=$(s cbi svc lookup-deployed-service-port "$SERVICE_NAME")
 fi
+
+echo 2>"Making request to $SERVER_ADDRESS"
 
 USER_METADATA=""
 ADMIN_METADATA=""
