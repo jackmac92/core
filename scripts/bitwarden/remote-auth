@@ -16,9 +16,9 @@ echo \"export BW_SESSION=\$BW_SESSION\" | tee /tmp/bw-temp-auth
 source /tmp/bw-temp-auth
 "
     ssh -t "$vpsname" '
+      s util unlock-passwords
       . /tmp/bw-temp-auth
       echo -n "$BW_SESSION" | envchain --set main BW_SESSION
-      rm -f /tmp/bw-temp-auth
     '
 }
 
