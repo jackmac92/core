@@ -1,8 +1,0 @@
-#! /usr/bin/env bash
-set -uo pipefail
-
-for i in dev stg prd; do
-    for j in main table; do
-        s cbi db auth update-dbeaver-creds "$i" "$j"
-    done
-done

@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-xdg-open $(
-	python - "$1" "$2" <<EOF
-url=r"""https://kibana.cbinsights.com/app/kibana#/discover?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(columns:!(_source),filters:!(('\$state':(store:appState),meta:(alias:!n,disabled:!f,index:e4ab3740-66c4-11e9-9f65-fdef782a6f9a,key:service,negate:!f,params:(query:{service}),type:phrase,value:{service}),query:(match:(service:(query:{service},type:phrase)))),('\$state':(store:appState),meta:(alias:!n,disabled:!f,index:e4ab3740-66c4-11e9-9f65-fdef782a6f9a,key:server_env,negate:!f,params:(query:{environment}),type:phrase,value:{environment}),query:(match:(server_env:(query:{environment},type:phrase))))),index:e4ab3740-66c4-11e9-9f65-fdef782a6f9a,interval:auto,query:(language:kuery,query:''),sort:!(timestamp,desc))"""; import sys; print(url.format(service=sys.argv[1], environment=sys.argv[2]))
-EOF
-)

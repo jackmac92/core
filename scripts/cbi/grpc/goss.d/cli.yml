@@ -1,4 +1,0 @@
-command:
-  has grpcurl cli:
-    exec: which grpcurl
-    exit-status: 0

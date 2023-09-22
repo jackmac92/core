@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-cbienv=${1:-$(s cbi local curr-env-dwim)}
-targetDb=${2:-"main"}
-
-s cbi db auth latest-creds "$cbienv" "$targetDb"

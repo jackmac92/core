@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-goss -g ~/cbinsights/.config/goss/local-service.yml validate

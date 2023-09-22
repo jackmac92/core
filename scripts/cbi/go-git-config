@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-git config --global url.ssh://git@gitlab.cbinsights.com/.insteadOf https://gitlab.cbinsights.com/
-

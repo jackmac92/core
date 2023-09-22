@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-jiraticket=${1:-"$(s jira select-active-ticket-dwim)"}
-
-sqlite3 $JIRA_HELPER_DB "SELECT branch_name FROM tickets_branchnames WHERE id='$jiraticket'"

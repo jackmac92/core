@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-jiraticket="${1:-$(s jira select-active-ticket-dwim)}"
-
-for r in $(s cbi svc select-many); do
-    jo id="$jiraticket" repo="$r" | sqlite-utils insert "$JIRA_HELPER_DB" ticket_repos -
-done

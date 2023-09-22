@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo ${1:-"$(cat /dev/stdin)"} | tee ~/cbinsights/.active-local-env
-cp -f ~/cbinsights/.active-local-env ~/cbinsights/.last-local-env

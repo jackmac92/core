@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-# --fail to exit non-zero if the http request is not successful
-curl --fail --silent 'localhost:8500/v1/kv/Environment?raw' && echo

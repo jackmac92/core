@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-xdg-open "https://cbinsights.atlassian.net/servicedesk/customer/portal/5/group/90/create/201?customfield_11300=$(curl -s ifconfig.me)&customfield_11301=10411"

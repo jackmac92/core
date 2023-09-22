@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-jiraticket=${1:-"$(s jira select-active-ticket-dwim)"}
-
-ticketdesc=$(gum input --char-limit 0 --width 80 --header "$jiraticket terse ticket description" --value "$(jira get-details "$jiraticket" | jq -r .fields.summary)" | sd ' ' '-' | tr '[:upper:]' '[:lower:]')
-
-echo "$jiraticket-$ticketdesc"

@@ -1,9 +1,0 @@
-#! /usr/bin/env bash
-set -euo pipefail
-
-mycli --login-path "prd-main" --csv -e "
-        SELECT u.email, u.id_user
-        FROM cbi_user.cbi_user u
-        WHERE
-            u.email LIKE '$1%@cbinsights.com'
-            AND u.email NOT LIKE '%+%@cbinsights.com'" | s util convert-csv-to-json | s fzf select-by-json-key "email" | jq -r '.id_user'

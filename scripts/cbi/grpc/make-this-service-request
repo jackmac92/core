@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-s cbi grpc make-request - "$1"

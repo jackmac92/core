@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-direnv exec ~/Projects/python/unblock-me poetry run unblock-me

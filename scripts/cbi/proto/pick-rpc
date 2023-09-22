@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -eo pipefail
-
-s cbi proto list-rpcs $1 | choose -f '\.' -1 | sed -r '/^\s*$/d' | fzf --sync

@@ -1,8 +1,0 @@
-#! /usr/bin/env bash
-set -euo pipefail
-
-tgt_svc="${1:-$(s cbi svc select-dwim)}"
-
-tgt_svc=$(choose --field-separator="/" -1 <<<"$tgt_svc")
-
-s cbi nomad job status $tgt_svc | awk '$0 == "Allocations" {i=1;next};i && i++ > 1' | awk '$5 == "run" {print $1}' | s shell strip-trailing-whitespace

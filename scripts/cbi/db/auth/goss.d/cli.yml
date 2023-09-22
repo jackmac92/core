@@ -1,7 +1,0 @@
-command:
-  has expect cli:
-    exec: which expect
-    exit-status: 0
-  has mysql helper:
-    exec: which mysql_config_editor
-    exit-status: 0
