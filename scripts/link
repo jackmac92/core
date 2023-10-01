@@ -2,39 +2,38 @@
 
 set -uo pipefail
 
-tgt_file_cmpts=""
-dest_file_cmpts=""
+src_file_cmpts=""
+link_file_cmpts=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --)
             shift
-            dest_file_cmpts=$(echo "$*" | xargs) # xargs to trim whitespace
-            tgt_file_cmpts=$(echo "$tgt_file_cmpts" | xargs)
+            link_file_cmpts=$(echo "$*" | xargs) # xargs to trim whitespace
+            src_file_cmpts=$(echo "$src_file_cmpts" | xargs)
             break
             ;;
         *)
-            tgt_file_cmpts="$tgt_file_cmpts$1 "
+            src_file_cmpts="$src_file_cmpts$1 "
             ;;
     esac
     shift
 done
 
-tgt_file="$(s which "$tgt_file_cmpts" | xargs realpath)"
+src_file="$(s which "$src_file_cmpts" | xargs realpath)"
 
-if [[ -z $dest_file_cmpts ]]; then
+if [[ -z $link_file_cmpts ]]; then
     echo "Enter destination for link:\n"
-    read dest_file_cmpts
+    read link_file_cmpts
 fi
 
-dest_file="$(s which "$dest_file_cmpts" | xargs realpath)"
 
+dest_file="$HOME/.local/chez-managed-s-scripts/$(echo "$link_file_cmpts" | tr ' ' '/')"
+echo "Dest file is $dest_file"
 dest_dir=$(dirname "$dest_file")
 mkdir -p "$dest_dir"
 
-scriptgit() {
-    git -C "$dest_dir" "$@"
-}
+ln -s "$src_file" "$dest_file"
 
-ln -s "$tgt_file" "$dest_file"
-scriptgit add "$dest_file"
-scriptgit commit -m "linked script $tgt_file_cmpts -> $dest_file_cmpts"
+chezmoi add --template-symlinks "$dest_file"
+chezmoi git add .
+# chezmoi git commit -- -m "linked script $src_file_cmpts -> $link_file_cmpts"

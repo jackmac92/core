@@ -20,6 +20,6 @@ for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
 done
 
 # If all else fails echo first possible location
-for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n' | head -n 1); do
     echo "$root/$script"
 done
