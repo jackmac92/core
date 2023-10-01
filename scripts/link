@@ -36,4 +36,4 @@ ln -s "$src_file" "$dest_file"
 
 chezmoi add --template-symlinks "$dest_file"
 chezmoi git add .
-# chezmoi git commit -- -m "linked script $src_file_cmpts -> $link_file_cmpts"
+chezmoi git commit -- -m "linked script $src_file_cmpts -> $link_file_cmpts"
