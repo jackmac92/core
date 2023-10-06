@@ -15,7 +15,7 @@ echo
 echo \"export BW_SESSION=\$BW_SESSION\" | tee /tmp/bw-temp-auth
 source /tmp/bw-temp-auth
 "
-    if [[ -z $BW_SKIP_SET_ENVCHAIN ]]; then
+    if [[ -z ${BW_SKIP_SET_ENVCHAIN:-""} ]]; then
       ssh -t "$vpsname" '
         s util unlock-passwords
         . /tmp/bw-temp-auth
