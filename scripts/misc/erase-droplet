@@ -7,5 +7,5 @@ if docker node inspect $1 >/dev/null 2>&1; then
 fi
 
 s tailscale remove-device $1
-s misc minions-do-async 'rm -f .config/goss/tailscale-peers.yml'
+# s misc minions-do-async 'rm -f .config/goss/tailscale-peers.yml'
 # TODO remove ssh key from gitlab

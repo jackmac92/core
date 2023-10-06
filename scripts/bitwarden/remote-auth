@@ -15,11 +15,13 @@ echo
 echo \"export BW_SESSION=\$BW_SESSION\" | tee /tmp/bw-temp-auth
 source /tmp/bw-temp-auth
 "
-    ssh -t "$vpsname" '
-      s util unlock-passwords
-      . /tmp/bw-temp-auth
-      echo -n "$BW_SESSION" | envchain --set main BW_SESSION
-    '
+    if [[ -z $BW_SKIP_SET_ENVCHAIN ]]; then
+      ssh -t "$vpsname" '
+        s util unlock-passwords
+        . /tmp/bw-temp-auth
+        echo -n "$BW_SESSION" | envchain --set main BW_SESSION
+      '
+    fi
 }
 
 chronic ssh "$vpsname" "rm -rf ~/.bw-auth ~/.config/Bitwarden\ CLI"
