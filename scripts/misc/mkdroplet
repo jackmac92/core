@@ -4,7 +4,7 @@ set -euo pipefail
 vpsname=${1:-"$(s util prompt-and-confirm "Enter a name for digital ocean vps: ")"}
 
 if [[ $vpsname = ${PRIMARY_BOX_NAME:-elixium} ]]; then
-    export DROPLET_SIZE="s-2vcpu-2gb"
+    export DROPLET_SIZE=${DROPLET_SIZE:-"s-2vcpu-2gb-intel"}
 fi
 
 gum spin --spinner meter --title "Creating new host" -- s misc mkvps-dwim "$vpsname"
