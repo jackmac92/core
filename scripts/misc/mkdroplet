@@ -8,4 +8,4 @@ if [[ $vpsname = ${PRIMARY_BOX_NAME:-elixium} ]]; then
 fi
 
 gum spin --spinner meter --title "Creating new host" -- s misc mkvps-dwim "$vpsname"
-bash <(s cat misc setup-droplet) "$vpsname"
+s misc setup-droplet "$vpsname"
