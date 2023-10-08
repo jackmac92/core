@@ -3,24 +3,26 @@ set -euo pipefail
 
 vpsname=$1
 
+BW_TEMP_FILE_PATH=${BW_TEMP_FILE_PATH:-"/tmp/bw-temp-auth"}
+
 bitwardenSignin() {
-    ssh -t "$vpsname" "
+    ssh "$vpsname" "
 # for darwin
 export PATH=\$PATH:/opt/homebrew/bin/
 . /etc/profile # adds nix to path
 BW_CLIENTID=user.fc84d6d5-9ada-4210-a68f-a9f4003df894 BW_CLIENTSECRET=${BW_CLIENTSECRET:-$(secret-tool lookup password bitwarden-client-secret)} bw login jackmac92@protonmail.com --apikey
 export BW_SESSION=\"\$(bw unlock --raw ${BW_PASSWORD:-$(secret-tool lookup password bitwarden-primary)})\"
-touch /tmp/bw-temp-auth
+touch $BW_TEMP_FILE_PATH
 echo
-echo \"export BW_SESSION=\$BW_SESSION\" | tee /tmp/bw-temp-auth
-source /tmp/bw-temp-auth
+echo \"export BW_SESSION=\$BW_SESSION\" | tee $BW_TEMP_FILE_PATH
+source $BW_TEMP_FILE_PATH
 "
     if [[ -z ${BW_SKIP_SET_ENVCHAIN:-""} ]]; then
-      ssh -t "$vpsname" '
+      ssh -t "$vpsname" "
         s util unlock-passwords
-        . /tmp/bw-temp-auth
-        echo -n "$BW_SESSION" | envchain --set main BW_SESSION
-      '
+        . $BW_TEMP_FILE_PATH
+        echo -n \"\$BW_SESSION\" | envchain --set main BW_SESSION
+      "
     fi
 }
 
