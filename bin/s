@@ -42,7 +42,7 @@ checkScriptDir() {
                 #         jo ID="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --pk ID $SCRIPTS_LOCAL_DIR/s-scripts-meta.db invocations -
                 #     )
                 # fi
-                if [[ -f "$dir/$command.inproc" ]]; then
+                if [[ -f "$dir/$command.inproc" ]] || ! [ -z "${S_FORCE_INPROC:-""}" ]; then
                     source "$dir/$command" "$@"
                 elif [[ -f "$dir/$command.direnv" ]]; then
                     direnv exec $dir "$dir/$command" "$@"
