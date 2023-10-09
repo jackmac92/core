@@ -19,8 +19,11 @@ source $BW_TEMP_FILE_PATH
 "
     if [[ -z ${BW_SKIP_SET_ENVCHAIN:-""} ]]; then
       ssh -t "$vpsname" "
-        s util unlock-passwords
+        echo 'unlocking passwords'
+        s util keyring-unlock-dwim
+        echo 'unlocking passwords done'
         . $BW_TEMP_FILE_PATH
+        echo 'setting to envchain'
         echo -n \"\$BW_SESSION\" | envchain --set main BW_SESSION
       "
     fi

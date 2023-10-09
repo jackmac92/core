@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if s util passwords-unlocked-p; then
+    echo "Keychain already unlocked" >&2;
+    exit 0
+fi
+
+s util unlock-passwords
