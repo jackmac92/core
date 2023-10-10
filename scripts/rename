@@ -42,36 +42,19 @@ if [[ $(git -C $tgt_dir remote get-url origin) = $(git -C $dest_dir remote get-u
     isWithinRepoMove=1
 fi
 
-scriptgit() {
-    if [[ $isWithinRepoMove -eq 1 ]]; then
-        git -C "$dest_dir" "$@"
-    else
-        git -C "$dest_dir" "$@"
-        git -C "$tgt_dir" "$@"
-    fi
-}
-
-scriptmv() {
-    if [[ $isWithinRepoMove -eq 1 ]]; then
-        scriptgit mv $*
-    else
-        mv $*
-    fi
-}
-
-scriptmv "$tgt_file" "$dest_file"
+mv "$tgt_file" "$dest_file"
 
 if [ -e "$tgt_file.help" ]; then
-    scriptmv "$tgt_file.help" "$dest_file.help"
+    mv "$tgt_file.help" "$dest_file.help"
 fi
 
 if [ -e "$tgt_file.inproc" ]; then
-    scriptmv "$tgt_file.inproc" "$dest_file.inproc"
+    mv "$tgt_file.inproc" "$dest_file.inproc"
 fi
 
 ln -s "$dest_file" "$tgt_file"
 touch "$tgt_file.linger"
-scriptgit add "$tgt_file" "$tgt_file.linger"
+chezmoi git add "$tgt_file" "$tgt_file.linger"
 
 (
     fd -t f . ~/.local/share/chezmoi
@@ -80,4 +63,5 @@ scriptgit add "$tgt_file" "$tgt_file.linger"
     done
 ) | sad --exact "s $tgt_file_cmpts" "s $dest_file_cmpts"
 
-scriptgit commit -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
+chezmoi git add .
+chezmoi git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
