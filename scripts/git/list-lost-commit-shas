@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+git fsck --lost-found | rg '^dangling commit' | choose 2

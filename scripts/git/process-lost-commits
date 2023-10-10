@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s git list-lost-commit-shas |
+    head -n 1 |
+    xargs s git diff-dangling-commit

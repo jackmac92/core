@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-git fsck --lost-found | rg '^dangling commit' | choose 2 | fzf --preview='git show {}' --multi
-
+s git list-lost-commit-shas | fzf --preview='git show {}' --multi

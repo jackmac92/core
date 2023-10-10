@@ -7,12 +7,17 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-base_branch=master
+base_branch=${JM_GIT_CHECK_MAIN_BRANCH:-"master"}
 input_sha=$1
-worktree_dir="/tmp/chez/temp-branch-$base_branch-$input_sha"
-diff_file="/tmp/chez/diff-$base_branch-$input_sha.txt"
-target_sha=""
+worktree_dir="/tmp/git-wrktree/temp-branch-$base_branch-$input_sha"
+diff_file="/tmp/git-result/diff-$base_branch-$input_sha.txt"
 
+echo $worktree_dir
+echo $worktree_dir
+echo $worktree_dir
+mkdir -p $(dirname $diff_file)
+
+target_sha=""
 if s git is-merge-commit-p "$input_sha"; then
   target_sha=$(git merge-base $input_sha $base_branch)
 else
@@ -24,17 +29,18 @@ fi
 # Create a temporary branch from the common ancestor
 git branch temp-branch-$base_branch-$input_sha $target_sha
 
-trap "git branch -d temp-branch-$base_branch-$input_sha" INT TERM
+trap "git branch -d temp-branch-$base_branch-$input_sha" EXIT
 
 # Create a new worktree and check out the temporary branch in it
 git worktree add $worktree_dir temp-branch-$base_branch-$input_sha
 
 # Optionally, clean up the temporary worktree and branch
-trap "git worktree remove $worktree_dir" INT TERM
+trap "git worktree remove $worktree_dir" EXIT
 
 # Change to the new worktree directory
 cd $worktree_dir
 
+echo "STARTING CHERRY PICK"
 set +e
 # Attempt to cherry-pick the merge commit
 git cherry-pick --no-edit $input_sha
@@ -48,6 +54,9 @@ else
     exit 0
 fi
 set -e
+echo "DONE CHERRY PICK"
 
 # Diff the temporary branch against the base branch
 git diff $base_branch > $diff_file
+
+exit 0
