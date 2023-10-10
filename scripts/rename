@@ -54,12 +54,14 @@ if [ -e "$tgt_file.inproc" ]; then
     mv "$tgt_file.inproc" "$dest_file.inproc"
 fi
 
+set +e
 (
     fd -t f . ~/.local/share/chezmoi
     for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
         fd -t x . "$scriptdir"
     done
-) | sad --exact "s $tgt_file_cmpts" "s $dest_file_cmpts"
+) | sad --exact "$tgt_file_cmpts" "$dest_file_cmpts"
+set -e
 
 chezmoi git add .
 chezmoi git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
