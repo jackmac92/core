@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-if [[ $(chezmoi git status -- --short | wc -l) -ne 0 ]]; then
+if [[ $(chezmoi git diff -- --name-only | wc -l) -ne 0 ]]; then
     echo "Refusing to run with dirty worktree"
     exit 1
 fi
