@@ -2,7 +2,7 @@
 set -euo pipefail
 
 readonly SECRET="$GITLAB_API_TOKEN" # export gitlab api key as GITLAB_API_TOKEN env variable
-readonly GITLAB_HOST=https://gitlab.cbinsights.com
+readonly GITLAB_HOST=https://gitlab.com
 readonly SCRIPT_NAME=$(basename $0)
 readonly SCRIPT_TMP_DIR="/tmp/$SCRIPT_NAME-tmp"
 
