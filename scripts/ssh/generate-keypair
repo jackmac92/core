@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ssh-keygen -q -t ed25519 -b 4096 -N '' -f ~/.ssh/id_ed25519 -C jackmac79@gmail.com
