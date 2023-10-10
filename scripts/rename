@@ -26,7 +26,9 @@ done
 
 mkdir -p $(dirname "$(s which "$tgt_file_cmpts")")
 
-tgt_file="$(s which "$tgt_file_cmpts" | xargs realpath)"
+tgt_file="$(s which "$tgt_file_cmpts")"
+touch $tgt_file
+tgt_file="$(realpath "$tgt_file")"
 
 if [[ -z $dest_file_cmpts ]]; then
     echo "Enter destination for script:\n"
