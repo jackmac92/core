@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ -z "$(git log --merges -n 1 $1)" ]]

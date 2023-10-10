@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Ensure the merge commit SHA is provided
+if [[ -z $1 ]]; then
+    echo "Usage: $0 <merge-commit-sha>"
+    exit 1
+fi
+
+base_branch=master
+input_sha=$1
+worktree_dir="/tmp/chez/temp-branch-$base_branch-$input_sha"
+diff_file="/tmp/chez/diff-$base_branch-$input_sha.txt"
+target_sha=""
+
+if s git is-merge-commit-p "$input_sha"; then
+  target_sha=$(git merge-base $input_sha $base_branch)
+else
+  target_sha=$input_sha
+fi
+
+# Find the common ancestor
+
+# Create a temporary branch from the common ancestor
+git branch temp-branch-$base_branch-$input_sha $target_sha
+
+trap "git branch -d temp-branch-$base_branch-$input_sha" INT TERM
+
+# Create a new worktree and check out the temporary branch in it
+git worktree add $worktree_dir temp-branch-$base_branch-$input_sha
+
+# Optionally, clean up the temporary worktree and branch
+trap "git worktree remove $worktree_dir" INT TERM
+
+# Change to the new worktree directory
+cd $worktree_dir
+
+set +e
+# Attempt to cherry-pick the merge commit
+git cherry-pick --no-edit $input_sha
+if [ $? -eq 0 ]; then
+    if git status | grep -q "nothing to commit"; then
+        echo 0 > $diff_file
+    fi
+    git cherry-pick --continue --no-edit
+fi
+# Diff the temporary branch against the base branch
+git diff $base_branch > $diff_file
