@@ -60,7 +60,7 @@ set +e
     for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
         fd -t x . "$scriptdir"
     done
-) | sad --exact "$tgt_file_cmpts" "$dest_file_cmpts"
+) | ifne sad --exact "$tgt_file_cmpts" "$dest_file_cmpts"
 set -e
 
 chezmoi git add .
