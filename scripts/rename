@@ -24,22 +24,15 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-echo "Making target dir"
-mkdir -p $(dirname "$(s which "$tgt_file_cmpts")" | xargs realpath)
-
-echo "::1"
-tgt_file="$(s which "$tgt_file_cmpts")"
-echo "::2"
-touch $tgt_file
-echo "::3"
-tgt_file="$(realpath "$tgt_file")"
-echo "determined target file"
+mkdir -p $(dirname "$(s which "$tgt_file_cmpts")")
+tgt_file="$(s which "$tgt_file_cmpts" | xargs realpath)"
 
 if [[ -z $dest_file_cmpts ]]; then
     echo "Enter destination for script:\n"
     read dest_file_cmpts
 fi
 
+mkdir -p $(dirname "$(s which "$dest_file_cmpts")")
 dest_file="$(s which "$dest_file_cmpts" | xargs realpath)"
 
 dest_dir=$(dirname "$dest_file")
