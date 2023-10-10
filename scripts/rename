@@ -64,6 +64,8 @@ set +e
 set -e
 
 chezmoi git add .
+chezmoi git submodule foreach git add .
+chezmoi git submodule foreach git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
 chezmoi git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
 
 s link $dest_file_cmpts -- $tgt_file_cmpts
