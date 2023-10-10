@@ -56,7 +56,7 @@ fi
 
 ln -s "$dest_file" "$tgt_file"
 touch "$tgt_file.linger"
-chezmoi git add "$tgt_file" "$tgt_file.linger"
+chezmoi git add --template-symlinks "$tgt_file" "$tgt_file.linger"
 
 (
     fd -t f . ~/.local/share/chezmoi
@@ -65,5 +65,5 @@ chezmoi git add "$tgt_file" "$tgt_file.linger"
     done
 ) | sad --exact "s $tgt_file_cmpts" "s $dest_file_cmpts"
 
-chezmoi git add .
+chezmoi git add --template-symlinks .
 chezmoi git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
