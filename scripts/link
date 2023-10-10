@@ -35,5 +35,7 @@ mkdir -p "$dest_dir"
 ln -s "$src_file" "$dest_file"
 
 chezmoi add --template-symlinks "$dest_file"
+chezmoi git submodule foreach git add .
+chezmoi git submodule foreach git commit -- -am "linked script $src_file_cmpts -> $link_file_cmpts" || true
 chezmoi git add .
 chezmoi git commit -- -m "linked script $src_file_cmpts -> $link_file_cmpts"
