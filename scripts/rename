@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 if [[ $(chezmoi git diff -- --name-only | wc -l) -ne 0 ]]; then
@@ -44,7 +43,9 @@ if [[ $(git -C $tgt_dir remote get-url origin) = $(git -C $dest_dir remote get-u
     isWithinRepoMove=1
 fi
 
+set -x
 mv "$tgt_file" "$dest_file"
+set +x
 
 if [ -e "$tgt_file.help" ]; then
     mv "$tgt_file.help" "$dest_file.help"
