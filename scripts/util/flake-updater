@@ -4,13 +4,13 @@ set -euo pipefail
 cd ~/.config/home-manager
 nix flake update
 chezmoi add --create flake.lock
-trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/exact_nixpkgs/create_flake.lock; rm -f ~/.config/home-manager/flake.lock; chezmoi apply --force ~/.config/nixpkgs/flake.lock; exit 1" ERR
+trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/exact_home-manager/create_flake.lock; rm -f ~/.config/home-manager/flake.lock; chezmoi apply --force ~/.config/home-manager/flake.lock; exit 1" ERR
 
 cd
 
 s dot run-script home_manager_update
 
-cd ~/.local/share/chezmoi/private_dot_config/exact_nixpkgs
+cd ~/.local/share/chezmoi/private_dot_config/exact_home-manager
 git add *flake*
 git commit -m "flake update" && {
     git pull --no-edit
