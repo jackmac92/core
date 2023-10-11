@@ -64,8 +64,10 @@ set +e
 ) | ifne sad --exact "$tgt_file_cmpts" "$dest_file_cmpts"
 set -e
 
+echo "Starting git submodule updates"
 chezmoi git submodule foreach git add .
 chezmoi git submodule foreach git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts" || true
+echo "Starting git updates"
 chezmoi git add .
 chezmoi git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
 
