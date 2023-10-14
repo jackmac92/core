@@ -2,12 +2,21 @@
 set -uo pipefail
 
 sudo howdy disable 1 || true
-rm -f ~/.config/monitors.xml
-cp ~/monitors.xml-tinypilot-only ~/.config/monitors.xml
-sudo rm -f ~gdm/.config/monitors.xml
 
-sudo cp ~/.config/monitors.xml ~gdm/.config/
-s misc makvm-shutdown
-echo "Rebooting in 7 sec..."
-sleep 7
-sudo reboot
+connected_outputs=$(xrandr --query | grep " connected" | awk '{print $1}')
+
+TINYPILOT_INPUT=DP-5
+
+# Iterate through all connected outputs
+for output in $connected_outputs; do
+    if [[ "$output" != "$TINYPILOT_INPUT" ]]; then
+        xrandr --output "$output" --off
+    else
+        xrandr --output "$output" --on
+    fi
+done
+
+
+# echo "Rebooting in 7 sec..."
+# sleep 7
+# sudo reboot
