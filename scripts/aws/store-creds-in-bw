@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "not implemented"
+exit 1
+
+s aws gen-json-auth |

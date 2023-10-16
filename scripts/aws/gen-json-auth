@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+aws sts get-session-token | jq '{
+  Version: 1,
+  AccessKeyId: .Credentials.AccessKeyId,
+  SecretAccessKey: .Credentials.SecretAccessKey,
+  SessionToken: .Credentials.SessionToken,
+  Expiration: .Credentials.Expiration
+}'
