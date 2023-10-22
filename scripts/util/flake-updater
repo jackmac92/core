@@ -10,6 +10,11 @@ cd
 
 s dot run-script home_manager_update
 
+if [[ ${CHEZ_JM_EMACS_ENABLED:-""} == 1 ]]; then
+    s emacs reload-config-lite
+    s emacs run-director-tests
+fi
+
 cd ~/.local/share/chezmoi/private_dot_config/exact_home-manager
 git add *flake*
 git commit -m "flake update" && {
