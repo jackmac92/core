@@ -6,5 +6,5 @@ repo=$(realpath $repo)
 
 echo "Add repo to zoxide"
 zoxide add $PWD
-echo "Add repo to emacs"
-timeout 5 emacsclient --no-wait --eval "$(printf "(jm/register-project \"%s\")" "$repo")"
+# echo "Add repo to emacs"
+# timeout 5 emacsclient --no-wait --eval "$(printf "(jm/register-project \"%s\")" "$repo")"
