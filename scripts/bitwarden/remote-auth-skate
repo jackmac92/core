@@ -20,7 +20,7 @@ source $BW_TEMP_FILE_PATH
     if [[ -z ${BW_SKIP_SET_SKATE:-""} ]]; then
       ssh -t "$vpsname" "
         . $BW_TEMP_FILE_PATH
-        ~/go/bin/skate set bw-sess-token \"\$BW_SESSION\"
+        skate set bw-sess-token \"\$BW_SESSION\"
       "
     fi
 }
