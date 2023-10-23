@@ -21,6 +21,7 @@ source $BW_TEMP_FILE_PATH
       ssh -t "$vpsname" "
         s util keyring-unlock-dwim
         . $BW_TEMP_FILE_PATH
+        . /etc/profile
         echo -n \"\$BW_SESSION\" | envchain --set main BW_SESSION
       "
     fi
