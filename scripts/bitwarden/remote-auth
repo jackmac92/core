@@ -19,9 +19,9 @@ source $BW_TEMP_FILE_PATH
 "
     if [[ -z ${BW_SKIP_SET_ENVCHAIN:-""} ]]; then
       ssh -t "$vpsname" "
+        . /etc/profile
         s util keyring-unlock-dwim
         . $BW_TEMP_FILE_PATH
-        . /etc/profile
         echo -n \"\$BW_SESSION\" | envchain --set main BW_SESSION
       "
     fi
