@@ -43,21 +43,20 @@ fi
 # Change to the new worktree directory
 cd $worktree_dir
 
-echo "STARTING CHERRY PICK"
 set +e
 # Attempt to cherry-pick the merge commit
 git cherry-pick --no-edit --allow-empty $input_sha
-if [ $? -eq 0 ]; then
-    if git status | grep -q "nothing to commit"; then
-        echo 0 > $diff_file
+gcpexit=$?
+
+if git status | grep -q "nothing to commit"; then
+    git commit --allow-empty --no-edit
+else
+    if [ $gcpexit -eq 0 ]; then
+        echo 1 > $diff_file
         exit 0
     fi
-else
-    echo 1 > $diff_file
-    exit 0
 fi
 set -e
-echo "DONE CHERRY PICK"
 
 # Diff the temporary branch against the base branch
 git diff $base_branch > $diff_file
