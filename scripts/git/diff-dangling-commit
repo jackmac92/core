@@ -29,13 +29,16 @@ fi
 # Create a temporary branch from the common ancestor
 git branch temp-branch-$base_branch-$input_sha $target_sha
 
-trap "git branch -d temp-branch-$base_branch-$input_sha" EXIT
+if [[ -n "${JM_GIT_DANGLING_DIFF_CLEANUP:-""}" ]]; then
+  trap "git branch -d temp-branch-$base_branch-$input_sha" EXIT
+fi
 
 # Create a new worktree and check out the temporary branch in it
 git worktree add $worktree_dir temp-branch-$base_branch-$input_sha
 
-# Optionally, clean up the temporary worktree and branch
-trap "git worktree remove $worktree_dir" EXIT
+if [[ -n "${JM_GIT_DANGLING_DIFF_CLEANUP:-""}" ]]; then
+  trap "git worktree remove $worktree_dir" EXIT
+fi
 
 # Change to the new worktree directory
 cd $worktree_dir
@@ -43,7 +46,7 @@ cd $worktree_dir
 echo "STARTING CHERRY PICK"
 set +e
 # Attempt to cherry-pick the merge commit
-git cherry-pick --no-edit $input_sha
+git cherry-pick --no-edit --allow-empty $input_sha
 if [ $? -eq 0 ]; then
     if git status | grep -q "nothing to commit"; then
         echo 0 > $diff_file
