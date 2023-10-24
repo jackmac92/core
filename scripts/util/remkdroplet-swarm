@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s docker swarm destroy-mine
+s docean remkdroplet $PRIMARY_BOX_NAME
+s docker swarm create-anew
