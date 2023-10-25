@@ -9,14 +9,13 @@ fi
 
 base_branch=${JM_GIT_CHECK_MAIN_BRANCH:-"master"}
 input_sha=$1
-worktree_dir="/tmp/git-wrktree/temp-branch-$base_branch-$input_sha"
-diff_file="/tmp/git-result/diff-$base_branch-$input_sha.txt"
 
 echo $worktree_dir
 echo $worktree_dir
 echo $worktree_dir
 mkdir -p $(dirname $diff_file)
 
+# Find the common ancestor
 target_sha=""
 if s git is-merge-commit-p "$input_sha"; then
   target_sha=$(git merge-base $input_sha $base_branch)
@@ -24,17 +23,20 @@ else
   target_sha=$input_sha
 fi
 
-# Find the common ancestor
+branch_name=temp-branch-$base_branch-$input_sha
+worktree_dir="/tmp/git-wrktree/$branch_name"
+diff_file="/tmp/git-result/diff-$base_branch-$input_sha--$target_sha.txt"
+
 
 # Create a temporary branch from the common ancestor
-git branch temp-branch-$base_branch-$input_sha $target_sha
+git branch $branch_name $target_sha
 
 if [[ -n "${JM_GIT_DANGLING_DIFF_CLEANUP:-""}" ]]; then
-  trap "git branch -d temp-branch-$base_branch-$input_sha" EXIT
+  trap "git branch -d $branch_name" EXIT
 fi
 
 # Create a new worktree and check out the temporary branch in it
-git worktree add $worktree_dir temp-branch-$base_branch-$input_sha
+git worktree add $worktree_dir $branch_name
 
 if [[ -n "${JM_GIT_DANGLING_DIFF_CLEANUP:-""}" ]]; then
   trap "git worktree remove $worktree_dir" EXIT
@@ -61,4 +63,3 @@ set -e
 # Diff the temporary branch against the base branch
 git diff $base_branch > $diff_file
 
-exit 0
