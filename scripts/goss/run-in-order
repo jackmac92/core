@@ -16,4 +16,4 @@ fd --type directory \
 fd --type file --type symlink \
     --max-depth=1 . $TARGET_DIR |
     sort --numeric-sort -r |
-    xargs -I_ bash -c '>&2 echo -en "\r\033[Ktesting $(basename _)"; chronic goss -g _ validate --format=json --format-options=verbose || exit '"$GOSS_EXIT_CODE"
+    xargs -I_ bash -c '>&2 echo -en "\r\033[Ktesting $(basename _)"; gossOut='"$(mktemp)"'; goss -g _ validate --format=json --format-options=verbose > $gossOut; if [ $? -ne 0 ]; then >&2 echo -en "\r\033[K"; cat $gossOut | >&2 jq; '"exit $GOSS_EXIT_CODE;"'fi'
