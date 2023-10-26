@@ -4,7 +4,7 @@ set -euo pipefail
 TARGET_DIR=${1:?"Required arg"}
 GOSS_EXIT_CODE=255
 
-if [[ -n $JM_GOSS_KEEP_GOING ]]; then
+if [[ -n ${JM_GOSS_KEEP_GOING:-""} ]]; then
     GOSS_EXIT_CODE=1;
 fi
 
