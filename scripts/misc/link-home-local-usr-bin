@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd -t x . $HOME/.local/bin -x sudo ln -s {} /usr/local/bin/{/}
