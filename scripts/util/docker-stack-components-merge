@@ -3,10 +3,8 @@ set -euo pipefail
 
 python3 -c '
 import glob
-import yaml
 import sys
 import os
-from deepmerge import always_merger
 import json
 
 def distinct(lst):
@@ -15,13 +13,28 @@ def distinctify(obj, key):
     if obj is not None and key in obj:
         obj[key] = distinct(obj[key])
 
+def deep_merge(dict1, dict2):
+    """ Recursively merges dict2 into dict1. """
+    for key in dict2:
+        if key in dict1:
+            if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                deep_merge(dict1[key], dict2[key])
+            elif isinstance(dict1[key], list) and isinstance(dict2[key], list):
+                dict1[key].extend(dict2[key])
+            elif isinstance(dict1[key], (int, float)) and isinstance(dict2[key], (int, float)):
+                dict1[key] += dict2[key]
+            else:
+                dict1[key] = dict2[key]
+        else:
+            dict1[key] = dict2[key]
+    return dict1
 
-tgt = os.path.join(sys.argv[1], "*yml")
+tgt = os.path.join(sys.argv[1], "*json")
 ymlfiles = glob.glob(tgt)
-objs = [yaml.safe_load(open(i, "r")) for i in ymlfiles]
+objs = [json.load(open(i, "r")) for i in ymlfiles]
 result = {}
 for x in objs:
-    result = always_merger.merge(result, x)
+    result = deep_merge(result, x)
 conf = result
 
 for svcname in conf["services"]:
@@ -42,8 +55,8 @@ for svcname in conf["services"]:
     if build_id is not None:
         svc["image"]+= ":" + build_id
 
-with os.fdopen(sys.stdout.fileno(), "wb", closefd=False) as stdout:
-    stdout.write(yaml.dump(conf, encoding="utf-8"))
+with os.fdopen(sys.stdout.fileno(), "w", closefd=False) as stdout:
+    json.dump(conf, stdout)
     stdout.flush()
 
 ' "${1:-"./"}"
