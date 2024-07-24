@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+import json
+import shlex
+import re
+import os
+import sys
+
+ENV_VAR_PREFIX = os.environ.get("JM_ENV_PREFIX") or "JM_ENV_WORKAROUND"
+ENV_VAR_PREFIX = ENV_VAR_PREFIX + "__"
+
+def flatten_json(obj, prefix=''):
+    result = {}
+    for key, value in obj.items():
+        new_key = f"{prefix}{key}"
+        if isinstance(value, dict):
+            result.update(flatten_json(value, f"{new_key}_"))
+        else:
+            result[new_key] = value
+    return result
+
+def sanitize_key(key):
+    # Replace hyphens with underscores and remove any other invalid characters
+    return re.sub(r'[^a-zA-Z0-9_]', '_', key)
+
+def set_env_vars(flat_obj, prefix=ENV_VAR_PREFIX):
+    for key, value in flat_obj.items():
+        sanitized_key = sanitize_key(key)
+        env_var_name = f"{prefix}{sanitized_key.upper()}"
+        escaped_value = shlex.quote(str(value))
+        print(f"{env_var_name}={escaped_value}")
+
+def main():
+    try:
+        json_data = json.load(sys.stdin)
+
+        # Flatten the JSON object
+        flattened_data = flatten_json(json_data)
+
+        # Set environment variables
+        set_env_vars(flattened_data)
+
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON file")
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"Error: File not found: {json_file_path}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
