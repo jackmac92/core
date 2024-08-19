@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+racket <<EOF
+(require syntax/parse/define)
+(define-simple-macro (dep-reader)
+(begin
+    (require (file "info.rkt"))
+    (displayln (string-join deps " "))))
+(dep-reader)
+
+EOF
