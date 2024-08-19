@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python3 -c '
-import toml
-import sys
-import json
-
-input = toml.load(sys.stdin)
-print(json.dumps(input))
-'
+dasel -r toml -w json

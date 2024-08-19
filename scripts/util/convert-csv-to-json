@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
-python -c 'import csv; import sys; import json; print(json.dumps(list(csv.DictReader(sys.stdin))))'
+
+dasel -r csv -w json
