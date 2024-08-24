@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt_action=$1
+shift
+
+params=$(jq 'object_to_search_params' <<<"$@")
+
+xdg-open "hackydanger://$tgt_action?$params"
