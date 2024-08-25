@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-xpanes --stay -t -ss -c "youtube-dl '{}'" $(s tabfs list-urls)
-
+xpanes --stay -t -ss -c "yt-dlp '{}'" $(s tabfs list-urls)
