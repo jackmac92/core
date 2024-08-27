@@ -5,17 +5,17 @@ cmd=""
 script_name=""
 
 while test $# -gt 0; do
-    case "$1" in
-        --)
-            shift
-            cmd="$*"
-            break
-            ;;
-        *)
-            script_name="$script_name$1 "
-            ;;
-    esac
+  case "$1" in
+  --)
     shift
+    cmd="$*"
+    break
+    ;;
+  *)
+    script_name="$script_name$1 "
+    ;;
+  esac
+  shift
 done
 
 script_name=$(echo "$script_name" | sd '\s*$' '')
@@ -24,8 +24,8 @@ script_name="$(echo "$script_name")"
 script_path="$(s which $script_name)"
 
 if [ -f "$script_path" ]; then
-    echo "File already exists!"
-    exit 1
+  echo "File already exists!"
+  exit 1
 fi
 
 mkdir -p "$(dirname "$script_path")"
@@ -33,12 +33,12 @@ script_path="$(realpath "$script_path")"
 echo >&2 "Script name is: $script_name"
 echo >&2 "Script path is: $script_path"
 
-dest_dir=$(dirname "$script_path")
-scriptgit() {
-    git -C "$dest_dir" "$@"
-}
+# dest_dir=$(dirname "$script_path")
+# scriptgit() {
+#     git -C "$dest_dir" "$@"
+# }
 
-scriptgit switch master
+# scriptgit switch master
 
 # scriptgit stash --all
 
@@ -51,15 +51,15 @@ EOF
 
 chmod +x "$script_path"
 if [[ -z "$cmd" ]]; then
-    s edit "$script_name"
+  s edit "$script_name"
 else
-    echo "$cmd" >>"$script_path"
-    echo >>"$script_path"
+  echo "$cmd" >>"$script_path"
+  echo >>"$script_path"
 fi
 
 # s mkhelp "$script_name"
 
-scriptgit add "$script_path*"
-scriptgit commit --message 'added new s script'
+# scriptgit add "$script_path*"
+# scriptgit commit --message 'added new s script'
 #
 # scriptgit stash pop
