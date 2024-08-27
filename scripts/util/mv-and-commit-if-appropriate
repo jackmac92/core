@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import shutil
+import subprocess
+import tempfile
+
+
+class TransactionError(Exception):
+    pass
+
+
+def is_git_repo(path):
+    """Check if the given path is inside a Git repository."""
+    try:
+        subprocess.run(
+            ["git", "-C", path, "rev-parse", "--is-inside-work-tree"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
+def git_add_commit(file_path, message):
+    """Add and commit changes to a file in a Git repository."""
+    repo_root = (
+        subprocess.check_output(
+            ["git", "-C", os.path.dirname(file_path), "rev-parse", "--show-toplevel"]
+        )
+        .decode()
+        .strip()
+    )
+    rel_path = os.path.relpath(file_path, repo_root)
+    subprocess.run(["git", "-C", repo_root, "add", rel_path], check=True)
+    subprocess.run(["git", "-C", repo_root, "commit", "-m", message], check=True)
+
+
+class FileOperation:
+    def __init__(self, src, dst):
+        self.src = src
+        self.dst = dst
+        self.src_in_git = is_git_repo(os.path.dirname(src))
+        self.dst_in_git = is_git_repo(os.path.dirname(dst))
+        self.backup_src = None
+        self.backup_dst = None
+
+    def execute(self):
+        # Backup source and destination
+        if os.path.exists(self.src):
+            _, self.backup_src = tempfile.mkstemp()
+            shutil.copy2(self.src, self.backup_src)
+
+        if os.path.exists(self.dst):
+            _, self.backup_dst = tempfile.mkstemp()
+            shutil.copy2(self.dst, self.backup_dst)
+
+        # Perform the move
+        shutil.move(self.src, self.dst)
+        print(f"Moved {self.src} to {self.dst}")
+
+        # Handle Git operations
+        if self.src_in_git:
+            git_add_commit(
+                os.path.dirname(self.src), f"Remove {os.path.basename(self.src)}"
+            )
+            print(f"Committed removal of {self.src} in source repository")
+
+        if self.dst_in_git:
+            git_add_commit(self.dst, f"Add {os.path.basename(self.dst)}")
+            print(f"Committed addition of {self.dst} in destination repository")
+
+    def rollback(self):
+        if self.backup_src:
+            shutil.move(self.backup_src, self.src)
+            print(f"Rolled back: restored {self.src}")
+
+        if self.backup_dst:
+            shutil.move(self.backup_dst, self.dst)
+            print(f"Rolled back: restored {self.dst}")
+
+        if self.src_in_git:
+            subprocess.run(
+                ["git", "-C", os.path.dirname(self.src), "reset", "--hard", "HEAD~1"],
+                check=True,
+            )
+            print(f"Rolled back: reset Git commit in {os.path.dirname(self.src)}")
+
+        if self.dst_in_git:
+            subprocess.run(
+                ["git", "-C", os.path.dirname(self.dst), "reset", "--hard", "HEAD~1"],
+                check=True,
+            )
+            print(f"Rolled back: reset Git commit in {os.path.dirname(self.dst)}")
+
+
+def transactional_file_operations(operations):
+    try:
+        for op in operations:
+            op.execute()
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        print("Rolling back all operations...")
+        for op in reversed(operations):
+            op.rollback()
+        raise TransactionError(
+            "Transaction failed, all operations have been rolled back."
+        )
+
+
+def main():
+    if len(sys.argv) != 5:
+        print(
+            "Usage: python script.py <source_file1> <destination_file1> <source_file2> <destination_file2>"
+        )
+        sys.exit(1)
+
+    src1, dst1, src2, dst2 = sys.argv[1:]
+
+    operations = [FileOperation(src1, dst1), FileOperation(src2, dst2)]
+
+    try:
+        transactional_file_operations(operations)
+        print("All operations completed successfully.")
+    except TransactionError as e:
+        print(str(e))
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
