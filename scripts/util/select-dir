@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! (emacsclient --eval "(server-running-p)"); then
+  echo "Emacs server is not running."
+  exit 1
+fi
+
+emacsclient -e "(jm/select-directory-via-consult-dir)"
