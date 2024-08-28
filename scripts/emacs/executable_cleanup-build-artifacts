@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd . -e eln -e elc -L --hidden --no-ignore ~/.local/share/emacs.profiles-common ~/.local/share/emacs.profiles -x rm -rf {};
+
