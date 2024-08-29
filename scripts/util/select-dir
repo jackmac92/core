@@ -6,4 +6,7 @@ if ! (emacsclient --eval "(server-running-p)"); then
   exit 1
 fi
 
-emacsclient -e "(jm/select-directory-via-consult-dir)"
+resultWithQuotes=$(emacsclient -ce '(let ((dir (consult-dir--pick))) (when dir (princ dir)))' -e '(delete-frame)')
+
+# strip quotes with jq
+echo "$resultWithQuotes" | jq -r
