@@ -1,7 +1,0 @@
-#!/usr/bin/env zx
-
-let remote = await $`git remote get-url origin`.quiet()
-
-let subpath = `${remote}`.split(':')[1].replace('.git', '')
-
-echo(subpath)
