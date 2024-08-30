@@ -5,10 +5,6 @@ set -euo pipefail
 
 SINGLE_TEST_TIMEOUT_SECS=60
 
-# original
-# fd --type file -e spec.el --max-depth=1 . $DOOMDIR/emacs-config-tests.d |
-#     xargs -P1 -I_ bash -c "echo 'Running _';timeout $SINGLE_TEST_TIMEOUT_SECS emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l $DOOMDIR/emacs-config-tests.d/init.el -l _ || exit 255"
-
 # Modified to only report failures
-fd --type file -e spec.el --max-depth=1 . $DOOMDIR/integration-tests |
-    xargs -P1 -I_ bash -c "timeout $SINGLE_TEST_TIMEOUT_SECS emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l $DOOMDIR/emacs-config-tests.d/init.el -l _ >/dev/null 2>&1 || echo '_'"
+fd --type file -e spec.el --max-depth=1 . $DOOMDIR/tests.d/integration |
+    xargs -P1 -I_ bash -c "timeout $SINGLE_TEST_TIMEOUT_SECS emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l $DOOMDIR/tests.d/integration/init.el -l _ >/dev/null 2>&1 || echo '_'"
