@@ -1,8 +1,13 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env doomscript
 
-cd ~/.doom.d
-# suggested command, but I get no func found for buttercup
+(cd (getenv "DOOMDIR"))
 
-# emacs -batch -f package-initialize -L . -f buttercup-run-discover
-emacs -f buttercup-run-discover
+(defcli! buttercup ()
+         (require 'doom-start)
+         (require 'buttercup)
+         ;; prepend . to load path
+         (setq load-path (cons "." load-path))
+         (buttercup-run-discover))
+
+(run! "buttercup")
+
