@@ -6,7 +6,5 @@ if ! (emacsclient --eval "(server-running-p)"); then
   exit 1
 fi
 
-resultWithQuotes=$(emacsclient -ce '(let ((dir (consult-dir--pick))) (when dir (princ dir)))' -e '(delete-frame)')
+emacsclient -cne '(consult-omni-spotlight)')
 
-# strip quotes with jq
-echo "$resultWithQuotes" | jq -r
