@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! (emacsclient --eval "(server-running-p)"); then
+  echo "Emacs server is not running."
+  exit 1
+fi
+
+resultWithQuotes=$(emacsclient -ce '(let ((dir (consult-dir--pick))) (when dir (princ dir)))' -e '(delete-frame)')
+
+# strip quotes with jq
+echo "$resultWithQuotes" | jq -r
