@@ -44,15 +44,15 @@ if [[ $(git -C $tgt_dir remote get-url origin) = $(git -C $dest_dir remote get-u
 fi
 
 set -x
-mv "$tgt_file" "$dest_file"
+s util mv-and-commit-if-appropriate "$tgt_file" "$dest_file" || mv "$tgt_file" "$dest_file"
 set +x
 
 if [ -e "$tgt_file.help" ]; then
-    mv "$tgt_file.help" "$dest_file.help"
+    s util mv-and-commit-if-appropriate "$tgt_file.help" "$dest_file.help" || mv "$tgt_file.help" "$dest_file.help"
 fi
 
 if [ -e "$tgt_file.inproc" ]; then
-    mv "$tgt_file.inproc" "$dest_file.inproc"
+    s util mv-and-commit-if-appropriate "$tgt_file.inproc" "$dest_file.inproc" || mv "$tgt_file.inproc" "$dest_file.inproc"
 fi
 
 set +e
