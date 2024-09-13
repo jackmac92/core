@@ -12,6 +12,8 @@
          (setq command-line-args-left
                (list
                 "--no-color"
+                "--traceback"
+                "pretty"
                 (expand-file-name "tests.d/unit" curr-doomdir)))
          (condition-case err
              (buttercup-run-discover)
