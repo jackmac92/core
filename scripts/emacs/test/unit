@@ -1,13 +1,18 @@
 #!/usr/bin/env doomscript
 
-(cd (getenv "DOOMDIR"))
+(setq curr-doomdir (getenv "DOOMDIR"))
+
+(cd curr-doomdir)
 
 (defcli! buttercup ()
          (require 'doom-start)
          (require 'buttercup)
          ;; prepend . to load path
          (setq load-path (cons "." load-path))
+         (setq command-line-args-left
+               (list
+                "--no-color"
+                (expand-file-name "tests.d/unit" curr-doomdir)))
          (buttercup-run-discover))
 
 (run! "buttercup")
-
