@@ -13,6 +13,10 @@
                (list
                 "--no-color"
                 (expand-file-name "tests.d/unit" curr-doomdir)))
-         (buttercup-run-discover))
+         (condition-case err
+             (buttercup-run-discover)
+           (progn
+             (print! "Failed with error: %S" err)
+             (exit! 128))))
 
 (run! "buttercup")
