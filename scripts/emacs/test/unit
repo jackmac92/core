@@ -19,6 +19,6 @@
              (buttercup-run-discover)
            (progn
              (print! "Failed with error: %S" err)
-             (exit! 128))))
+             (exit! 127))))
 
 (run! "buttercup")
