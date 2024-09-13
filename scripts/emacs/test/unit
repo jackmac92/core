@@ -3,6 +3,15 @@
 (setq curr-doomdir (getenv "DOOMDIR"))
 (setq use-debug (getenv "DEBUG"))
 
+(setq buttercup-args
+      (list
+       (when (getenv "NOCOLOR")
+         "--no-color")
+       "--traceback"
+       "pretty"
+       (expand-file-name "tests.d/unit" curr-doomdir)
+       (expand-file-name "modules/ui/generic-popup" curr-doomdir)))
+
 (cd curr-doomdir)
 
 (defcli! buttercup ()
@@ -13,12 +22,7 @@
          ;; prepend . to load path
          (setq load-path (cons "." load-path))
          (setq command-line-args-left
-               (list
-                "--no-color"
-                "--traceback"
-                "pretty"
-                (expand-file-name "tests.d/unit" curr-doomdir)
-                (expand-file-name "modules/ui/generic-popup" curr-doomdir)))
+               (-non-nil buttercup-args))
 
          (condition-case err
              (buttercup-run-discover)
