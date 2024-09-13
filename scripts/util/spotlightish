@@ -6,4 +6,4 @@ if ! (emacsclient --eval "(server-running-p)"); then
   exit 1
 fi
 
-emacsclient -cne '(jm/consult-omni-spotlight)'
+emacsclient -e '(jm/consult-omni-spotlight)'
