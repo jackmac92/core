@@ -1,0 +1,38 @@
+#!/usr/bin/env zx
+
+const { default: getArgs } = await import(
+  `${process.env.HOME}/.local/libs/zx/args.mjs`
+);
+
+const templateType = getArgs(__filename)[0];
+
+const schemasToApply = {};
+
+((
+  {
+    "deno-pkg": ["npm", "gitlab"],
+  }[templateType] ?? []
+).forEach((el) => {
+  schemasToApply[el] = true;
+}));
+
+if (templateType.startsWith("pika")) {
+  schemasToApply["npm"] = true;
+  schemasToApply["gitlab"] = true;
+}
+
+if (templateType.endsWith("-service")) {
+  schemasToApply["docker"] = true;
+}
+
+if (await fs.pathExists("Dockerfile")) {
+  schemasToApply["docker"] = true;
+}
+
+const schemas = Object.keys(schemasToApply).join(" ");
+
+$`s gitlab gitlabform-this-repo ${schemas}`;
+
+// Local Variables:
+// mode: js2
+// End:
