@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 1 ]; then
+  echo "Must supply emacs socket names to check"
+  exit 1
+fi
+
+for arg in $@; do
+  if
+    EMACS_SOCKET_NAME="$arg" emacsclient -e "(server-running-p)" >/dev/null 2>&1
+  then
+    echo "$arg"
+    exit 0
+  fi
+done
+exit 1
