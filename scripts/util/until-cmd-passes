@@ -1,5 +1,8 @@
 #!/usr/bin/env zx
-import getArgs from `${process.env.HOME}/.local/libs/zx/args.mjs`;
+
+const { default: getArgs } = await import(
+  `${process.env.HOME}/.local/libs/zx/args.mjs`
+);
 
 const cmd = getArgs(__filename);
 
