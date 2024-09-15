@@ -1,0 +1,33 @@
+#!/usr/bin/env doomscript
+
+
+;; SINGLE_TEST_TIMEOUT_SECS=60
+
+;; # Modified to only report failures
+;; fd --type file -e spec.el --max-depth=1 . $DOOMDIR/tests.d/integration |
+;;     xargs -P1 -I_ bash -c "timeout $SINGLE_TEST_TIMEOUT_SECS emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l $DOOMDIR/tests.d/integration/init.el -l _ || echo '_'"
+
+(setq curr-doomdir (getenv "DOOMDIR"))
+(setq use-debug (getenv "DEBUG"))
+
+(cd curr-doomdir)
+
+(defcli! director-run-test (&args test-files)
+         (setq test-files '("/home/jmccown/.local/share/emacs.profiles/default/doom/tests.d/integration/magit-status.spec.el"))
+         (when use-debug
+           (doom-debug-mode +1))
+         (require 'doom-start)
+         ;; (require 'director (expand-file-name "default/data/straight/repos/emacs-director/director.el" (getenv "JM_EMACS_PROFILES_ROOT")))
+         (require 'director)
+         ;; prepend . to load path
+         (setq load-path (cons "." load-path))
+
+         (setq org-roam-db-autosync-mode nil)
+         (setq eager-load-hooks-disabled t)
+
+         (dolist (test-file test-files)
+           (print! "Running test for %s" test-file)
+           (eval (file->elisp test-file))
+           (load test-file)))
+
+(run! "director-run-test")
