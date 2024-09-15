@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rg --iglob "*.el" '\(use-package!? (\S+)' --no-filename --only-matching -r '$1' | sd '\)+$' '' | sort
+
