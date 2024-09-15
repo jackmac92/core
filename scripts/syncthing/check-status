@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+deviceSyncInfo=$(stc | awk -v RS= -v n=3 'NR==n' | s shell strip-blank-lines)
+headLabels=$(head -n 1<<<"$deviceSyncInfo")
+deviceSyncInfo=$(s util decapitext<<<"$deviceSyncInfo")
