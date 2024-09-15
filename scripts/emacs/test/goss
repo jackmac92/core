@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+goss --gossfile="$DOOMDIR/tests.d/goss/entry.yaml" validate

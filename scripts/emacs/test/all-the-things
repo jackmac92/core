@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s emacs test goss
+s emacs test unit
+doom doctor
+s emacs test integration
