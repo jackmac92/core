@@ -5,4 +5,11 @@ repo_to_clone=${1:-$(xclip -selection clipboard -o)}
 repo_to_clone=$(s git convert-ssh-url-to-http "$repo_to_clone")
 
 cd $GIT_CLONES_DIR
-git clone $repo_to_clone $(s git convert-http-remote-to-clone-path <<<"$repo_to_clone")
+
+output_dir="$(s git convert-http-remote-to-clone-path <<<"$repo_to_clone")"
+
+git clone $repo_to_clone "$output_dir"
+
+cd "$output_dir"
+
+s git register-repo
