@@ -1,0 +1,15 @@
+#!/usr/bin/env zx
+
+const svc = argv.svc || argv._;
+
+$.verbose = true;
+
+$`journalctl --user --follow -u ${svc}`;
+
+await $`systemctl --user restart ${svc}`.quiet();
+
+process.exit(0);
+
+// Local Variables:
+// mode: typescript-ts
+// End:
