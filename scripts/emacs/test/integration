@@ -4,7 +4,19 @@ set -euo pipefail
 # TODO test config differences, by cloning the emacs profile with zfs and changing
 
 SINGLE_TEST_TIMEOUT_SECS=60
-
+fast_fail=${1-:""}
+error_handler=""
+if [[ -n "$fast_fail" ]]; then
+    error_handler="exit 255"
+else
+    error_handler="echo '_'"
+fi
 # Modified to only report failures
 fd --type file -e spec.el --max-depth=1 . $DOOMDIR/tests.d/integration |
-    xargs -P1 -I_ bash -c "timeout $SINGLE_TEST_TIMEOUT_SECS xvfb-run emacs -l ~/.local/share/emacs/director-test-bootstrap.el -l $DOOMDIR/tests.d/integration/init.el -l _ >/dev/null 2>&1 || echo '_'"
+    xargs -P1 -I_ \
+        gum spin --title '_' --show-error -- \
+        bash -c \
+        "timeout $SINGLE_TEST_TIMEOUT_SECS \
+        xvfb-run emacs -l ~/.local/share/emacs/director-test-bootstrap.el \
+        -l $DOOMDIR/tests.d/integration/init.el \
+        -l _ || $error_handler"
