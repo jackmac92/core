@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bw create attachment --file="$1" --itemid="${2:-$(s bitwarden select-one | jq -r .id)}"
