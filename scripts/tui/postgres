@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+. ~/.config/custom/secrets.d/postgres
+rainfrog --username $PG_SELFHOSTED_ADMIN_USER  --host $PG_SELFHOSTED_HOST  --port $PG_SELFHOSTED_PORT  --database miniflux --password $PG_SELFHOSTED_ADMIN_PASS
+
