@@ -5,6 +5,7 @@ testresults=$(cat /dev/stdin)
 # NOTE how do I fix files? since the exists check fails first, I don't know if I can just make a symlink here
 cmdz=$(
 	(
+		# get meta.fix instructions
 		jq -r '.results
    		| map(select(.successful | not))
 		| map(select(.meta!=null))
@@ -32,3 +33,14 @@ fi
 echo "Running..."
 echo $cmdz
 bash -l <(echo "$cmdz")
+
+# # get meta.foreachmissing instructions
+# jq -r '.results
+# | map(select(.successful | not))
+# | map(select(.meta!=null))
+# | map(select(.meta.foreachmissing!=null))
+# | map({
+#  foreachmissing: .meta.foreachmissing,
+#  missing_elements: ."matcher-result"."missing-elements"
+#  })
+# | map(.foreachmissing as $cmdbase | .missing_elements | map($cmdbase | gsub("{}"; .)))'
