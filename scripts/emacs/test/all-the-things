@@ -3,5 +3,5 @@ set -euo pipefail
 
 s emacs test goss
 s emacs test unit
-doom doctor
+doom doctor | /bin/cat
 s emacs test integration
