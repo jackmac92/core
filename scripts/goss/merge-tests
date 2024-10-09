@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+spruce merge $(fd . -e yml --exclude '*.needs_env.yml' --exclude '*.needs_display.yml' .config/goss .config/chez-managed-goss .local/share/nix-goss.d)
