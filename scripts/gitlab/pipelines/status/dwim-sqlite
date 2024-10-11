@@ -13,7 +13,7 @@ fi
 
 latestPipelineId=$(s gitlab pipelines get-latest-for-project "$prjid")
 
-existingRecord="$(sqlite3 '.mode json' "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" 'SELECT * FROM pipelines WHERE project_id='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1' 2>/dev/null || echo "")"
+existingRecord="$(sqlite3 "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" '.mode json' 'SELECT * FROM pipelines WHERE project_id='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1' 2>/dev/null || echo "")"
 
 if [[ -z ${existingRecord:-""} ]]; then
     s gitlab this-project-request "pipelines/$latestPipelineId" | sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
