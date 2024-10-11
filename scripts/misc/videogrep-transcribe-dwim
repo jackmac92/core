@@ -2,6 +2,11 @@
 set -euo pipefail
 
 cd /mnt/Media
-echo "Transcribing videos (never worked last time I checked)"
-s misc videogrep-list-videos-without-transcription |
-    xargs -0 -I_ gum spin --title="_" -- videogrep -i "_" --transcribe
+# echo "Transcribing videos (never worked last time I checked)"
+# s misc videogrep-list-videos-without-transcription |
+#     xargs -0 -I_ gum spin --title="_" -- videogrep -i "_" --transcribe
+
+echo "Transcribing videos that need it but its lame w/o gum spinner"
+fd --exclude=Pics -0 \
+    -e mp4 -e mkv -e avi \
+    -x bash -c 'if [[ ! -f "{.}.json" ]]; then videogrep -i "{}" --transcribe; fi'
