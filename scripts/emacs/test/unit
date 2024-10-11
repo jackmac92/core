@@ -2,6 +2,7 @@
 
 (setq curr-doomdir (getenv "DOOMDIR"))
 (setq use-debug (getenv "DEBUG"))
+(setq emacs-server-name (getenv "EMACS_SOCKET_NAME"))
 
 (setq buttercup-args
       (list
@@ -17,6 +18,7 @@
 (defcli! buttercup ()
          (when use-debug
            (doom-debug-mode +1))
+         (setq server-name emacs-server-name)
          (require 'doom-start)
          (require 'buttercup)
          ;; prepend . to load path
