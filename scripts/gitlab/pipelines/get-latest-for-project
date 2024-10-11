@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+prjid="$1"
+
+lastCommitPipelineId=""
+attempts=0
+
+while [ -z ${lastCommitPipelineId:-""} ]; do
+    lastCommitPipelineId=$(s gitlab project-request "$prjid" "pipelines" | jq '.[0].id')
+    attempts=$(($attempts + 1))
+    if ! [ -z $lastCommitPipelineId ]; then
+        break
+    fi
+    sleep 0.75
+done
+
+echo "$lastCommitPipelineId"
