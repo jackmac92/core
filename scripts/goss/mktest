@@ -14,7 +14,7 @@ echo "What should the file name be?"
 printf ">> "
 read testname
 
-# TODO handle multiple?
+# TODO: handle multiple?
 # mv $(ls $workingdir/*.yml $workingdir/*.yaml | fzf --header= --select-1) "~/.local/share/chezmoi/private_dot_config/exact_goss/$testname.yml"
 tgt_path="$HOME/.config/goss/$testname.yml"
 mv goss.yaml "$tgt_path"

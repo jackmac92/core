@@ -3,7 +3,7 @@ set -o pipefail
 
 display_key="$1"
 shift
-# TODO allow multi display key, all args before -- are display keys, then preview keys after
+# TODO: allow multi display key, all args before -- are display keys, then preview keys after
 
 preview_key="$1"
 shift
@@ -32,7 +32,7 @@ jq -r --arg tgtVal "\$1" '.[] | select(.$display_key == \$tgtVal) | .$preview_ke
 ___EOF
 
 chmod +x "$tmpscript"
-# TODO add fzf bindings to scroll, and to modify command e.g to just show json keys
+# TODO: add fzf bindings to scroll, and to modify command e.g to just show json keys
 selection=$(for x in "${!choiceDict[@]}"; do echo "$x"; done | fzf ${JM_FZF_JSON_OPTS:-} --preview="$tmpscript "'{}')
 
 if [[ -z $selection ]]; then

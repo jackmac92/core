@@ -6,7 +6,7 @@ notitext="$2"
 notiurl="${3}"
 notitype="${4:-blank}"
 
-# TODO extract url from below
+# TODO: extract url from below
 # gotty -r -w --title-format pushcut-term tmux new-session -t $THIS_TMUX_SESSION
 
 jo title="$notititle" \

@@ -74,7 +74,7 @@ for scriptdir in $(echo "${SCRIPTS_PATH:-"$HOME/.local/s-scripts/scripts:$HOME/.
 done
 set +x
 
-# TODO if deadEndDirs has length
+# TODO: if deadEndDirs has length
 # do below
 # if [[ -e "$dir.help" ]]; then
 #     cat "$dir.help" > /dev/stderr

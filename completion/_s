@@ -43,7 +43,7 @@ function __list_commands {
       next="$dir/$line[1]"
   fi
 
-  # TODO what does recalling this do exactly?
+  # TODO: what does recalling this do exactly?
   # ! -z $line[1] indicates there is more text being completed i think, e.g. s util g[TAB]
   if [[ ! -z $line[1] && -d "$next" ]]; then
     __list_commands "$next"

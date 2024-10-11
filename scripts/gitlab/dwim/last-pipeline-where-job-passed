@@ -2,4 +2,4 @@
 set -euo pipefail
 
 s gitlab this-project-request jobs "job==${targetJobName}"
-# TODO select first from response where jobs status is success
+# TODO: select first from response where jobs status is success

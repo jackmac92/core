@@ -6,7 +6,7 @@ prjid=$(s gitlab lookup-project-id-integer)
 
 existingRecord="$(sqlite3 $SCRIPTS_LOCAL_DIR/gitlab-stuff.db 'SELECT id FROM pipelines WHERE project_id='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1' || echo "")"
 
-# TODO or check existingRecord does not have finished details for pipeline
+# TODO: or check existingRecord does not have finished details for pipeline
 if [[ -z ${existingRecord:-""} ]]; then
     s gitlab this-project-request "pipelines/$latestPipelineId" | sqlite-utils insert --alter --pk id --replace $SCRIPTS_LOCAL_DIR/gitlab-stuff.db pipelines -
 fi

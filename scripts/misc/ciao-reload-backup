@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# TODO doesn't work because of missing PRIMARY_PERSONAL_DOMAIN I think,
+# TODO: doesn't work because of missing PRIMARY_PERSONAL_DOMAIN I think,
 https ciao.priv.$PRIMARY_PERSONAL_DOMAIN/checks.json | jq '.[].id' | xargs --no-run-if-empty -I_ chronic https DELETE ciao.priv.$PRIMARY_PERSONAL_DOMAIN/checks/_.json
 cat ~/.config/custom/ciao-backup.json | jq '.[]' -c | xargs --no-run-if-empty -I_ chronic bash -c "https --verify=false POST ciao.priv.jackdmc.com/checks.json<<<'_'"

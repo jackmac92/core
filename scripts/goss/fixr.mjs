@@ -21,7 +21,7 @@ try {
     p = $`s goss run-in-order-vanilla ~/.config/goss`;
     return p;
   });
-  // TODO need to parse output to determine if fixes needed
+  // TODO: need to parse output to determine if fixes needed
   // await spinner("Running fixes", () => p.pipe($`s goss autofix-input`));
 } catch (err) {
   echo(`Got error: ${err}`);
