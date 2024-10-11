@@ -1,3 +1,10 @@
 file:
   {{ .Env.SCRIPTS_LOCAL_DIR }}/gitlab-stuff.db:
     exists: true
+command:
+  repos table exists:
+    exec: sqlite3 {{ .Env.SCRIPTS_LOCAL_DIR }}/gitlab-stuff.db 'SELECT id FROM repositories LIMIT 1'
+    exit-status: 0
+  pipelines table exists:
+    exec: sqlite3 {{ .Env.SCRIPTS_LOCAL_DIR }}/gitlab-stuff.db 'SELECT id FROM pipelines LIMIT 1'
+    exit-status: 0
