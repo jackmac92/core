@@ -3,5 +3,5 @@ set -euo pipefail
 
 target_cal="${1:-j79}"
 shift
-# TODO: maybe use [[https://github.com/Byron/google-apis-rs/tree/main/gen/calendar3-cli][this]] instead
+
 gcalcli --config-folder ~/.local/gcalcli/$target_cal $*

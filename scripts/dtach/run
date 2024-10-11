@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# TODO: create dunstify notification, where the click opens up a new terminal to trail the dtach output
+# COULDDO: create dunstify notification, where the click opens up a new terminal to trail the dtach output
 procid="$DTACH_SOCKETS_MAIN/${DTACH_TOPIC:-"dtach-default-s-script"}_$(date +%s%N)"
 dtach -n "$procid" $*
