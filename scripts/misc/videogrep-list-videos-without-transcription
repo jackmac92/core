@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /mnt/Media
+fd --exclude=Pics \
+    -e mp4 -e mkv -e avi \
+    -x bash -c 'if [[ ! -f "{.}.json" ]]; then echo "{}"; fi'
