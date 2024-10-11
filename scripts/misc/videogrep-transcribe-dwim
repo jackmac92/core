@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /mnt/Media
+echo "Transcribing videos (never worked last time I checked)"
+s misc videogrep-list-videos-without-transcription |
+    xargs -0 -I_ gum spin --title="_" -- videogrep -i "_" --transcribe

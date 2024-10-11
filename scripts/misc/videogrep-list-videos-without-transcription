@@ -2,6 +2,6 @@
 set -euo pipefail
 
 cd /mnt/Media
-fd --exclude=Pics \
+fd --exclude=Pics -0 \
     -e mp4 -e mkv -e avi \
     -x bash -c 'if [[ ! -f "{.}.json" ]]; then echo "{}"; fi'
