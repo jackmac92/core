@@ -4,9 +4,7 @@ set -euo pipefail
 THEME="${WALLPAPER_THEME:-"$(cat $HOME/.local/wallpaper-query || echo "")"}"
 
 if [ -z "$THEME" ]; then
-    $HOME/apps/styli.sh/styli.sh --gnome --termcolor --nitrogen --monitors 3
+    styli.sh --gnome --nitrogen
 else
-    $HOME/apps/styli.sh/styli.sh --gnome --termcolor --nitrogen --monitors 3 --search "$THEME"
+    styli.sh --gnome --nitrogen --search "$THEME"
 fi
-
-systemctl --user restart racket-notifs-email.service
