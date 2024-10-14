@@ -9,7 +9,6 @@ tgtPipelineId=$(TARGET_GITLAB_PROJECT="$prjid" s gitlab pipelines get-id-for-com
 existingRecord="$(sqlite3 "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" '.mode json' 'SELECT * FROM pipelines WHERE project_id='"$prjid"' AND id='"$tgtPipelineId"' LIMIT 1' 2>/dev/null | jq '.[0]' || echo "")"
 
 if [[ -z ${existingRecord:-""} ]]; then
-    echo "Using cached record" >/dev/stderr
     s gitlab project-request "$prjid" "pipelines/$tgtPipelineId" | sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
 fi
 
