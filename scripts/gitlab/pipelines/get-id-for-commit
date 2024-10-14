@@ -4,10 +4,11 @@ set -euo pipefail
 sha=$1
 ref=$(git current-branch)
 lastCommitPipelineId=""
+tgtProj="${TARGET_GITLAB_PROJECT:-"$(s gitlab get-url-encoded-project-name-from-remote)"}"
 attempts=0
 
 while [ -z ${lastCommitPipelineId:-""} ]; do
-    lastCommitPipelineId=$(s gitlab this-project-request "pipelines" sha=="$sha" ref=="$ref" | jq '.[0].id')
+    lastCommitPipelineId=$(s gitlab project-request "$tgtProj" "pipelines" sha=="$sha" ref=="$ref" | jq '.[0].id')
     attempts=$(($attempts + 1))
     if ! [ -z $lastCommitPipelineId ]; then
         break

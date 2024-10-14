@@ -3,6 +3,7 @@ set -euo pipefail
 
 # take an arg or lookup the current projects id
 prjid="${1:-"$(s gitlab lookup-project-id-integer)"}"
+commit="${2:-""}"
 
 # if used an arg, it may be a project name instead of the id,
 # so if it is not yet a number try looking the number up by name
@@ -11,19 +12,23 @@ if ! [[ $prjid =~ $re ]]; then
     prjid="$(s gitlab lookup-project-id-integer "$prjid")"
 fi
 
+if [[ -n "$commit" ]]; then
+    s gitlab pipelines status dwim-sqlite-for-commit "$prjid" "$commit"
+fi
+
 latestPipelineId=$(s gitlab pipelines get-latest-for-project "$prjid")
 
 existingRecord="$(sqlite3 "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" '.mode json' 'SELECT * FROM pipelines WHERE project_id='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1' 2>/dev/null | jq '.[0]' || echo "")"
 
 if [[ -z ${existingRecord:-""} ]]; then
     echo "Using cached record" >/dev/stderr
-    s gitlab this-project-request "pipelines/$latestPipelineId" | sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
+    s gitlab project-request "$prjid" "pipelines/$latestPipelineId" | sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
 fi
 
 existingRecordStatus="$(jq -r '.status' <<<"$existingRecord")"
 if [[ ${existingRecordStatus:-""} = pending ]] || [[ ${existingRecordStatus:-""} = running ]]; then
     # fetch updated status
-    s gitlab this-project-request "pipelines/$latestPipelineId" | sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
+    s gitlab project-request "$prjid" "pipelines/$latestPipelineId" | sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
 fi
 
 sqlite3 "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" '.mode json' 'SELECT * FROM pipelines WHERE project_id='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1' | jq '.[0]'
