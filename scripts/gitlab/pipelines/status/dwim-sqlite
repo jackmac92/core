@@ -16,6 +16,7 @@ latestPipelineId=$(s gitlab pipelines get-latest-for-project "$prjid")
 existingRecord="$(sqlite3 "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" '.mode json' 'SELECT * FROM pipelines WHERE project_id='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1' 2>/dev/null | jq '.[0]' || echo "")"
 
 if [[ -z ${existingRecord:-""} ]]; then
+    echo "Using cached record" >/dev/stderr
     s gitlab this-project-request "pipelines/$latestPipelineId" | sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
 fi
 
