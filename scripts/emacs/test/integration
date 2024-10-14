@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# TODO: test config differences, by cloning the emacs profile with zfs and changing
+# COULDDO: test config differences, by cloning the emacs profile with zfs and changing
 
 SINGLE_TEST_TIMEOUT_SECS=60
 fast_fail=${1-:""}
