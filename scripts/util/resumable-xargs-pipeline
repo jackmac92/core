@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# to allow resuming w/o requiring passing in the same input file
+# create a wrapper script which accepts the input file via stdin with a name/key. The name/key is how the file is found/ processing resume
+input_file="files_to_process.txt"
+processed_file="processed_files.txt"
+total_files=$(wc -l <"$input_file")
+
+touch "$processed_file"
+
+process_file() {
+    local file="$1"
+    echo "Processing $file"
+    # Replace the following line with your actual processing command
+    sleep 1 # Simulating some work
+
+    # Mark as processed and remove from input file atomically
+    echo "$file" >>"$processed_file"
+    sed -i "\#^$file\$#d" "$input_file"
+}
+
+export -f process_file
+
+# Use a temp file to store progress
+temp_progress=$(mktemp)
+
+cat "$input_file" |
+    pv -l -s "$total_files" >"$temp_progress"
+
+# Process files
+cat "$temp_progress" | xargs -I {} bash -c 'process_file "{}"'
+
+# Clean up
+rm "$temp_progress"
+
+echo "Completed processing. Remaining files: $(wc -l <"$input_file")"
