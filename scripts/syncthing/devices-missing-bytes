@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+stc json_dump | jq '.devices[] | select(.missingBytes > 0) | .deviceName'
+
