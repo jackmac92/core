@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+http POST :16800/jsonrpc \
+    jsonrpc=2.0 method=aria2.addUri \
+    id=$RANDOM \
+    params:="$(jo -a "$(jo -a "$1")")"
