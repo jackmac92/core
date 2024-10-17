@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sqlite3 "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" '.mode json' \
+    "WITH params AS (
+        SELECT 4 AS years_threshold
+     )
+     SELECT *
+     FROM repositories
+     WHERE datetime(last_activity_at) < datetime('now', '-' || (SELECT years_threshold FROM params) || ' years')
+           AND path_with_namespace LIKE 'jackmac92/%'"
