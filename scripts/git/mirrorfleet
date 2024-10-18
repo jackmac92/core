@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-fd --hidden -t d '^.git$' -x bash -c '
+fd --no-ignore --hidden -t d '^.git$' -x bash -c '
 cd {//}
 '"$@"
