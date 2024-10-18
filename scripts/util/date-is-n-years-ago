@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+N_YEARS_AGO=${N_YEARS_AGO:-3}
+
+is_more_than_three_years_ago() {
+    local given_date="$1"
+    local current_date=$(date +%Y-%m-%d)
+
+    # Convert dates to seconds since epoch
+    local given_seconds=$(date -d "$given_date" +%s)
+    local current_seconds=$(date -d "$current_date" +%s)
+
+    # Calculate the difference in seconds
+    local diff_seconds=$((current_seconds - given_seconds))
+
+    # Calculate N years in seconds (approx.)
+    local three_years_seconds=$((N_YEARS_AGO * 365 * 24 * 60 * 60))
+
+    # Compare and return result
+    if [ $diff_seconds -gt $three_years_seconds ]; then
+        return 0 # True, it is more than 3 years ago
+    else
+        return 1 # False, it is not more than 3 years ago
+    fi
+}
+
+is_more_than_three_years_ago "$1"
