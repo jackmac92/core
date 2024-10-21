@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VIDEO_FILE="${1:-""}"
+
+# Check if a file path is provided
+if [[ -z $VIDEO_FILE ]]; then
+    echo "Usage: $0 <path_to_video_file>" >&2
+    exit 1
+fi
+
+# Check if the file exists
+if [ ! -f "$VIDEO_FILE" ]; then
+    echo "Error: Provided file path '$VIDEO_FILE' does not exist." >&2
+    exit 1
+fi
+
+# Use ffprobe to check the video file
+if ! ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$VIDEO_FILE" >/dev/null 2>&1; then
+    echo "Error: The video file '$VIDEO_FILE' seems to be corrupt or unreadable." >&2
+    exit 1
+fi
