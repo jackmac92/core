@@ -2,11 +2,12 @@
 set -euo pipefail
 
 url="$1"
-title=$(youtube-dl --get-title "$url")
+title=$(youtube-dl --get-title "$url" | sed 's/#[^ ]*//g')
 url=$(youtube-dl --get-url "$url")
+params="$(jo -a "$(jo -a "$url")" "$(jo out="${title:0:60}")")"
 
 http --ignore-stdin \
     POST :16800/jsonrpc \
     jsonrpc=2.0 method=aria2.addUri \
     id=$RANDOM \
-    params:="$(jo -a "$(jo -a "$(jo -a "$url")" "$(jo out="$title")")")"
+    params:="$params"
