@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+url="$1"
+title=$(youtube-dl --get-title "$url")
+url=$(youtube-dl --get-url "$url")
+
+http --ignore-stdin \
+    POST :16800/jsonrpc \
+    jsonrpc=2.0 method=aria2.addUri \
+    id=$RANDOM \
+    params:="$(jo -a "$(jo -a "$(jo -a "$url")" "$(jo out="$title")")")"
