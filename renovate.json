@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "groupName": "Non-major dependencies",
+      "automerge": true
+    }
+  ],
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 5,
+  "commitMessagePrefix": "chore[RENOVATE]:"
+}
