@@ -4,9 +4,9 @@ set -euo pipefail
 most_recent_id=""
 while true; do
 	next_set="$(s gitlab request "projects" sort==asc order_by==id min_access_level==30 archived==false id_after==$most_recent_id | jq -c)"
-	most_recent_id="$(jq 'first | .id' <<<"$next_set")"
+	most_recent_id="$(jq -e 'first | .id' <<<"$next_set")"
 	if [[ -z $most_recent_id ]]; then
 		break
 	fi
 	jq '.[]' <<<"$next_set"
-done | jq -s | sqlite-utils insert --alter --pk id "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" repositories -
+done | jq -s | sqlite-utils upsert --alter --pk id "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" repositories -
