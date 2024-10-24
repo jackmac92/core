@@ -3,10 +3,10 @@ set -euo pipefail
 
 page_no=0
 while true; do
-    next_set="$(s gitlab request "merge_requests" order_by==created_at sort==desc in==abandoned per_page==50 page==$page_no | jq -c)"
+    next_set="$(s gitlab request "merge_requests" order_by==created_at sort==desc in==Renovate per_page==50 page==$page_no | jq -c)"
     if [[ -z $(jq '.[].id' <<<"$next_set") ]]; then
         break
     fi
     jq '.[]' <<<"$next_set"
     page_no=$((page_no + 1))
-done | jq -s
+done | jq -c 'select(.title == "Configure Renovate - abandoned")' | jq -s

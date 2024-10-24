@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s gitlab list-abandoned-renovate-mrs | jq -r '.[] | select(.title == "Configure Renovate - abandoned") | "/projects/\(.project_id)/merge_requests/\(.iid)"' | xargs -n 1 -d $'\n' s gitlab request DELETE
+s gitlab list-abandoned-renovate-mrs |
+    jq -r '.[] | "/projects/\(.project_id)/merge_requests/\(.iid)"' |
+    xargs -n 1 -d $'\n' s gitlab request DELETE
