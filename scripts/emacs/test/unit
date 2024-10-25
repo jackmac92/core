@@ -11,6 +11,7 @@
        "--traceback"
        "pretty"
        (expand-file-name "tests.d/unit" curr-doomdir)
+       (expand-file-name "modules/personal/emacs-debug-tools" curr-doomdir)
        (expand-file-name "modules/ui/generic-popup" curr-doomdir)))
 
 (cd curr-doomdir)
