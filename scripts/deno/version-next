@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jq \
+    --arg newVersion "$(svu --strip-prefix next)" \
+    '.version = $newVersion' \
+    deno.json |
+    sponge deno.json
