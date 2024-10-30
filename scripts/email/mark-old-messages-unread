@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DURATION="1months"
+tgtaccount=$1
+
+notmuch tag -unread -- 'date:.."'"-$DURATION"'" and tag:unread AND '"tag:$tgtaccount"
