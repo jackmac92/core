@@ -1,0 +1,4 @@
+include:
+  - project: "quickstart-templates/ci-templates"
+    ref: v0.18.3
+    file: "base.yml"
