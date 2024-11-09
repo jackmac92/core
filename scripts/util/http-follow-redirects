@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt="$1"
+timeout 3 curl "$tgt" -Ls --output /dev/null -w %{url_effective}
