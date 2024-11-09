@@ -2,12 +2,12 @@
 set -euo pipefail
 
 url="$1"
-
 url="$(youtube-dl --get-url "$url")"
+# url="$(s util http-follow-redirects "$url")"
 filename="$(youtube-dl --get-title "$url")"
-# url="$(curl -Ls -w '%{url_effective}' "$url")"
 http --ignore-stdin \
+  --print bhBH \
   POST :16800/jsonrpc \
   jsonrpc=2.0 method=aria2.addUri \
   id=$RANDOM \
-  params:="$(jq --null-input --arg url "$url" --arg name "$filename" '[[$url, { out: $name }]]')"
+  params:="$(jq --null-input --arg homeDir "$HOME" --arg url "$url" --arg name "$filename" '[[$url, { out: $name, dir: "\($homeDir)/motrix" }]]')"
