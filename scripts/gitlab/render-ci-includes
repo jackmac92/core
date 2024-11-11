@@ -11,10 +11,13 @@ class GitlabCIMerger:
         self.base_includes_path = Path(base_includes_path)
         self.processed_files: Set[str] = set()
 
-    def resolve_include_path(self, include_data: Dict[str, str]) -> Path:
+    def resolve_include_path(
+        self, include_data: Dict[str, str], current_project_base: Path
+    ) -> Path:
         if "local" in include_data:
-            # Handle local includes relative to the current file
-            return Path(include_data["local"])
+            # Handle local includes relative to the current project's base path
+            local_path = include_data["local"].lstrip("/")  # Remove leading slash
+            return current_project_base / local_path
         elif "project" in include_data:
             # Handle project includes
             project = include_data["project"]
@@ -22,6 +25,17 @@ class GitlabCIMerger:
             return self.base_includes_path / project / file_path
         else:
             raise ValueError(f"Unsupported include format: {include_data}")
+
+    def get_project_base_from_path(self, file_path: Path) -> Path:
+        """Get the project base path from a file path by finding 'entrypoints' directory"""
+        parts = file_path.parts
+        try:
+            entrypoints_idx = parts.index("entrypoints")
+            # Get the path up to but not including 'entrypoints'
+            return Path(*parts[:entrypoints_idx])
+        except ValueError:
+            # If 'entrypoints' not found, use the parent directory
+            return file_path.parent
 
     def process_includes(self, yaml_content: Dict, current_file: Path) -> Dict:
         if "include" not in yaml_content:
@@ -32,21 +46,15 @@ class GitlabCIMerger:
             includes = [includes]
 
         merged_content = yaml_content.copy()
+        current_project_base = self.get_project_base_from_path(current_file)
 
         for include in includes:
             if isinstance(include, str):
                 # Handle simple string includes (local files)
-                include_path = current_file.parent / include
+                include_path = current_project_base / include.lstrip("/")
             else:
                 # Handle dictionary includes (project or local)
-                include_path = self.resolve_include_path(include)
-                if not include_path.is_absolute():
-                    if "local" in include:
-                        # Local includes are relative to current file
-                        include_path = current_file.parent / include_path
-                    else:
-                        # Project includes are relative to base path
-                        include_path = self.base_includes_path / include_path
+                include_path = self.resolve_include_path(include, current_project_base)
 
             # Prevent infinite recursion
             str_path = str(include_path.resolve())
