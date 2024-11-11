@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+target_dir="$1"
+
+# Verify input
+if [ -z "$target_dir" ]; then
+    echo "Error: Please provide a target directory"
+    return 1
+fi
+
+# Get ZFS dataset for the directory
+dataset=$(zfs list -H -o name,mountpoint | awk -v dir="$target_dir" '$2 == dir {print $1}')
+
+if [ -z "$dataset" ]; then
+    echo "Error: $target_dir is not a ZFS mountpoint"
+    return 1
+fi
+
+echo "Available checkpoints for $target_dir:"
+zfs list -H -t snapshot -o name,creation | grep "${dataset}@checkpoint_" |
+    sed 's/^.*@checkpoint_//' |
+    sort -r

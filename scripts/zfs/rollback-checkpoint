@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+target_dir="$1"
+
+# Verify input
+if [ -z "$target_dir" ]; then
+    echo "Error: Please provide a target directory"
+    return 1
+fi
+
+# Ensure directory exists
+if [ ! -d "$target_dir" ]; then
+    echo "Error: Directory $target_dir does not exist"
+    return 1
+fi
+
+# Get ZFS dataset for the directory
+dataset=$(zfs list -H -o name,mountpoint | awk -v dir="$target_dir" '$2 == dir {print $1}')
+
+if [ -z "$dataset" ]; then
+    echo "Error: $target_dir is not a ZFS mountpoint"
+    return 1
+fi
+
+# Check if latest snapshot exists
+if ! zfs list -H -t snapshot -o name | grep "${dataset}@checkpoint_latest" >/dev/null; then
+    echo "Error: No 'latest' checkpoint found for $target_dir"
+    return 1
+fi
+
+# Perform rollback
+if ! zfs rollback -r "${dataset}@checkpoint_latest"; then
+    echo "Error: Failed to rollback to latest checkpoint"
+    return 1
+fi
+
+echo "Successfully rolled back $target_dir to latest checkpoint"
