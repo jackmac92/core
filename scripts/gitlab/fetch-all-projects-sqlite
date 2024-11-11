@@ -3,7 +3,7 @@ set -euo pipefail
 
 while true; do
 	most_recent_id=$(sqlite3 "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" 'SELECT id FROM repositories ORDER BY id desc LIMIT 1' 2>/dev/null || echo "")
-	next_set="$(s gitlab request "projects" sort==asc order_by==id min_access_level==30 archived==false id_after==$most_recent_id | jq -c)"
+	next_set="$(s gitlab request "projects" sort==asc order_by==id min_access_level==30 id_after==$most_recent_id | jq -c)"
 	if [[ -z $(jq '.[].id' <<<"$next_set") ]]; then
 		break
 	fi
