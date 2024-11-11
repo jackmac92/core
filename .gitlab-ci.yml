@@ -2,4 +2,3 @@ include:
   - project: "quickstart-templates/ci-templates"
     ref: v0.19.0
     file: "base.yml"
-  - local: ".env"
