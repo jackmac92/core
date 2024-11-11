@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+import os
+import sys
+import yaml
+from pathlib import Path
+from typing import Dict, List, Union, Set
+
+
+class GitlabCIMerger:
+    def __init__(self, base_includes_path: str):
+        self.base_includes_path = Path(base_includes_path)
+        self.processed_files: Set[str] = set()
+
+    def resolve_include_path(self, include_data: Dict[str, str]) -> Path:
+        if "local" in include_data:
+            # Handle local includes relative to the current file
+            return Path(include_data["local"])
+        elif "project" in include_data:
+            # Handle project includes
+            project = include_data["project"]
+            file_path = include_data["file"]
+            return self.base_includes_path / project / file_path
+        else:
+            raise ValueError(f"Unsupported include format: {include_data}")
+
+    def process_includes(self, yaml_content: Dict, current_file: Path) -> Dict:
+        if "include" not in yaml_content:
+            return yaml_content
+
+        includes = yaml_content.pop("include")
+        if not isinstance(includes, list):
+            includes = [includes]
+
+        merged_content = yaml_content.copy()
+
+        for include in includes:
+            if isinstance(include, str):
+                # Handle simple string includes (local files)
+                include_path = current_file.parent / include
+            else:
+                # Handle dictionary includes (project or local)
+                include_path = self.resolve_include_path(include)
+                if not include_path.is_absolute():
+                    if "local" in include:
+                        # Local includes are relative to current file
+                        include_path = current_file.parent / include_path
+                    else:
+                        # Project includes are relative to base path
+                        include_path = self.base_includes_path / include_path
+
+            # Prevent infinite recursion
+            str_path = str(include_path.resolve())
+            if str_path in self.processed_files:
+                continue
+            self.processed_files.add(str_path)
+
+            try:
+                with open(include_path, "r") as f:
+                    included_content = yaml.safe_load(f)
+                    if included_content:
+                        # Recursively process includes in the included file
+                        included_content = self.process_includes(
+                            included_content, include_path
+                        )
+                        # Merge the included content
+                        self.merge_yaml(merged_content, included_content)
+            except FileNotFoundError:
+                print(
+                    f"Warning: Include file not found: {include_path}", file=sys.stderr
+                )
+            except Exception as e:
+                print(f"Error processing include {include_path}: {e}", file=sys.stderr)
+
+        return merged_content
+
+    def merge_yaml(self, target: Dict, source: Dict) -> None:
+        """Merge source YAML into target, handling GitLab CI specific merging rules"""
+        for key, value in source.items():
+            if key not in target:
+                target[key] = value
+            elif isinstance(target[key], dict) and isinstance(value, dict):
+                self.merge_yaml(target[key], value)
+            elif isinstance(target[key], list) and isinstance(value, list):
+                target[key].extend(value)
+            # For other cases, target takes precedence (already exists)
+
+    def process_file(self, input_file: Path) -> Dict:
+        """Process a single GitLab CI file and all its includes"""
+        self.processed_files.clear()
+        with open(input_file, "r") as f:
+            content = yaml.safe_load(f)
+            if content:
+                return self.process_includes(content, input_file)
+            return {}
+
+
+def main():
+    if len(sys.argv) != 3:
+        print("Usage: gitlab-ci-merger.py <input_gitlab_ci.yml> <base_includes_path>")
+        sys.exit(1)
+
+    input_file = Path(sys.argv[1])
+    base_includes_path = sys.argv[2]
+
+    merger = GitlabCIMerger(base_includes_path)
+    try:
+        merged_content = merger.process_file(input_file)
+        # Output the merged YAML
+        print(yaml.dump(merged_content, sort_keys=False))
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
