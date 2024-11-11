@@ -12,12 +12,13 @@ class GitlabCIMerger:
         self.processed_files: Set[str] = set()
 
     def resolve_include_path(
-        self, include_data: Dict[str, str], current_project_base: Path
+        self, include_data: Dict[str, str], current_file: Path
     ) -> Path:
         if "local" in include_data:
-            # Handle local includes relative to the current project's base path
+            # Handle local includes relative to the project base path
             local_path = include_data["local"].lstrip("/")  # Remove leading slash
-            return current_project_base / local_path
+            project_base = self.get_project_base_from_path(current_file)
+            return project_base / local_path
         elif "project" in include_data:
             # Handle project includes
             project = include_data["project"]
@@ -27,15 +28,21 @@ class GitlabCIMerger:
             raise ValueError(f"Unsupported include format: {include_data}")
 
     def get_project_base_from_path(self, file_path: Path) -> Path:
-        """Get the project base path from a file path by finding 'entrypoints' directory"""
-        parts = file_path.parts
-        try:
-            entrypoints_idx = parts.index("entrypoints")
-            # Get the path up to but not including 'entrypoints'
-            return Path(*parts[:entrypoints_idx])
-        except ValueError:
-            # If 'entrypoints' not found, use the parent directory
-            return file_path.parent
+        """Get the project base path from a file path"""
+        if not file_path.is_absolute():
+            file_path = file_path.resolve()
+
+        # Find the project root by looking for entrypoints directory
+        current = file_path
+        while current != current.parent:  # Stop at root
+            if "entrypoints" in current.parts:
+                # Get the parent directory of 'entrypoints'
+                entrypoints_idx = current.parts.index("entrypoints")
+                return Path(*current.parts[:entrypoints_idx])
+            current = current.parent
+
+        # If no entrypoints directory found, return the parent of the current file
+        return file_path.parent
 
     def process_includes(self, yaml_content: Dict, current_file: Path) -> Dict:
         if "include" not in yaml_content:
@@ -46,15 +53,16 @@ class GitlabCIMerger:
             includes = [includes]
 
         merged_content = yaml_content.copy()
-        current_project_base = self.get_project_base_from_path(current_file)
 
         for include in includes:
             if isinstance(include, str):
                 # Handle simple string includes (local files)
-                include_path = current_project_base / include.lstrip("/")
+                local_path = include.lstrip("/")
+                project_base = self.get_project_base_from_path(current_file)
+                include_path = project_base / local_path
             else:
                 # Handle dictionary includes (project or local)
-                include_path = self.resolve_include_path(include, current_project_base)
+                include_path = self.resolve_include_path(include, current_file)
 
             # Prevent infinite recursion
             str_path = str(include_path.resolve())
@@ -76,8 +84,10 @@ class GitlabCIMerger:
                 print(
                     f"Warning: Include file not found: {include_path}", file=sys.stderr
                 )
+                print(f"  Referenced from: {current_file}", file=sys.stderr)
             except Exception as e:
                 print(f"Error processing include {include_path}: {e}", file=sys.stderr)
+                print(f"  Referenced from: {current_file}", file=sys.stderr)
 
         return merged_content
 
