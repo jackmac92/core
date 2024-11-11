@@ -6,30 +6,30 @@ target_dir="$1"
 # Verify input
 if [ -z "$target_dir" ]; then
     echo "Error: Please provide a target directory"
-    return 1
+    exit 1
 fi
 
 # Ensure directory exists
 if [ ! -d "$target_dir" ]; then
     echo "Error: Directory $target_dir does not exist"
-    return 1
+    exit 1
 fi
 
 # Get ZFS dataset for the directory
-local dataset=$(zfs list -H -o name,mountpoint | awk -v dir="$target_dir" '$2 == dir {print $1}')
+dataset=$(zfs list -H -o name,mountpoint | awk -v dir="$target_dir" '$2 == dir {print $1}')
 
 if [ -z "$dataset" ]; then
     echo "Error: $target_dir is not a ZFS mountpoint"
-    return 1
+    exit 1
 fi
 
 # Create snapshot with timestamp
 timestamp=$(date +%Y%m%d_%H%M%S)
 snapshot_name="${dataset}@checkpoint_${timestamp}"
 
-if ! zfs snapshot "$snapshot_name"; then
+if ! sudo zfs snapshot "$snapshot_name"; then
     echo "Error: Failed to create snapshot"
-    return 1
+    exit 1
 fi
 
 # Update 'latest' tag by removing old one if it exists
@@ -37,9 +37,9 @@ zfs list -H -t snapshot -o name | grep "${dataset}@checkpoint_latest" >/dev/null
     zfs destroy "${dataset}@checkpoint_latest"
 
 # Create new 'latest' snapshot
-if ! zfs snapshot "${dataset}@checkpoint_latest"; then
+if ! sudo zfs snapshot "${dataset}@checkpoint_latest"; then
     echo "Error: Failed to create 'latest' snapshot tag"
-    return 1
+    exit 1
 fi
 
 echo "Successfully created checkpoint: $snapshot_name"
