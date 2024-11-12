@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <input_file>"
+    exit 1
+fi
+
+input_file="$1"
+filename=$(basename -- "$input_file")
+extension="${filename##*.}"
+filename="${filename%.*}"
+output_file="${filename}.pdf"
+
+# Make sure input file exists
+if [ ! -f "$input_file" ]; then
+    echo "Error: File '$input_file' not found!"
+    exit 1
+fi
+
+# Convert based on file extension
+case "${extension,,}" in # lowercase extension
+# Text-based documents for Pandoc
+md | markdown | txt | rst | html | htm)
+    echo "Converting text document using Pandoc..."
+    pandoc "$input_file" \
+        --pdf-engine=xelatex \
+        -V geometry:margin=1in \
+        -V papersize=letter \
+        -o "$output_file"
+    ;;
+
+# Complex office documents for LibreOffice
+doc | docx | odt | rtf | odp | ppt | pptx | ods | xls | xlsx)
+    echo "Converting office document using LibreOffice..."
+    libreoffice --headless --convert-to pdf "$input_file" --outdir "$(dirname "$input_file")"
+    ;;
+
+# Images
+jpg | jpeg | png | gif | bmp | tiff)
+    echo "Converting image to PDF..."
+    convert "$input_file" "$output_file"
+    ;;
+
+# Already PDF
+pdf)
+    echo "File is already PDF format."
+    exit 0
+    ;;
+
+*)
+    echo "Unsupported file format: .$extension"
+    exit 1
+    ;;
+esac
+
+if [ -f "$output_file" ]; then
+    echo "Successfully converted to: $output_file"
+else
+    echo "Conversion failed!"
+    exit 1
+fi
