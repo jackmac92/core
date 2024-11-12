@@ -34,7 +34,7 @@ fi
 
 # Update 'latest' tag by removing old one if it exists
 zfs list -H -t snapshot -o name | grep "${dataset}@checkpoint_latest" >/dev/null &&
-    zfs destroy "${dataset}@checkpoint_latest"
+    sudo zfs destroy "${dataset}@checkpoint_latest"
 
 # Create new 'latest' snapshot
 if ! sudo zfs snapshot "${dataset}@checkpoint_latest"; then
