@@ -3,7 +3,7 @@ set -euo pipefail
 
 tgt="${1:-$EMACS_SOCKET_NAME}"
 
-cd "~/.local/share/emacs.profiles/$tgt/"
+cd "$HOME/.local/share/emacs.profiles/$tgt"
 
 while true; do
   if doom sync; then
