@@ -3,6 +3,8 @@ set -euo pipefail
 
 tgt="${1:-$EMACS_SOCKET_NAME}"
 
+# WIP TO USE WITH git bisect on doom emacs updates
+
 cd "$HOME/.local/share/emacs.profiles/$tgt"
 
 while true; do
@@ -12,11 +14,19 @@ while true; do
   sleep 2
 done
 
-emacs --bg-daemon
+echo "STARTING DEBUG INIT CHECK"
+
+EMACS_SOCKET_NAME="$tgt" emacs --debug-init --eval '(kill-emacs 0)'
+
+echo "STARTING BG DAEMON"
+
+emacs --bg-daemon="$tgt"
+
+echo "STARTED BG DAEMON"
 
 until emacsclient -s "$tgt" --eval '(server-running-p)'; do
   sleep .5
   printf "server not running yet."
 done
 
-emacsclient -s "$tgt" '(server-stop)'
+emacsclient -s "$tgt" --eval '(server-stop)'
