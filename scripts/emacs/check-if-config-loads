@@ -14,19 +14,21 @@ while true; do
   sleep 2
 done
 
+doom doctor
+
 echo "STARTING DEBUG INIT CHECK"
 
 EMACS_SOCKET_NAME="$tgt" emacs --debug-init --eval '(kill-emacs 0)'
 
-echo "STARTING BG DAEMON"
+# echo "STARTING BG DAEMON"
 
-emacs --bg-daemon="$tgt"
+# emacs --bg-daemon="$tgt"
 
-echo "STARTED BG DAEMON"
+# echo "STARTED BG DAEMON"
 
-until emacsclient -s "$tgt" --eval '(server-running-p)'; do
-  sleep .5
-  printf "server not running yet."
-done
+# until emacsclient -s "$tgt" --eval '(server-running-p)'; do
+#   sleep .5
+#   printf "server not running yet."
+# done
 
-emacsclient -s "$tgt" --eval '(server-stop)'
+# emacsclient -s "$tgt" --eval '(server-stop)'
