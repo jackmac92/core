@@ -4,5 +4,5 @@ set -euo pipefail
 repo=${1:-$PWD}
 repo=$(realpath $repo)
 
-2>&1 echo "Add repo to zoxide"
-zoxide add $PWD
+2>&1 echo "Add repo '$repo' to zoxide"
+zoxide add $repo
