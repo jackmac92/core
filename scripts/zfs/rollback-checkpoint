@@ -29,10 +29,17 @@ if ! zfs list -H -t snapshot -o name | grep "${dataset}@checkpoint_latest" >/dev
     exit 1
 fi
 
+echo "Running filesystem sync"
+sync
+echo "Filesystem sync done"
+
 # Perform rollback
 if ! sudo zfs rollback -r "${dataset}@checkpoint_latest"; then
     echo "Error: Failed to rollback to latest checkpoint"
     exit 1
 fi
+echo "Running filesystem sync"
+sync
+echo "Filesystem sync done"
 
 echo "Successfully rolled back $target_dir to latest checkpoint"
