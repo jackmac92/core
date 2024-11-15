@@ -8,17 +8,22 @@ const templateType = getArgs(__filename)[0];
 
 const schemasToApply = {};
 
-((
-  {
+(
+  ({
     "deno-pkg": ["npm", "gitlab"],
-  }[templateType] ?? []
+  })[templateType] ?? []
 ).forEach((el) => {
   schemasToApply[el] = true;
-}));
+});
 
-if (templateType.startsWith("pika")) {
-  schemasToApply["npm"] = true;
-  schemasToApply["gitlab"] = true;
+if (templateType.startsWith("public")) {
+  schemasToApply["public"] = true;
+}
+
+if (templateType.includes("docker-image")) {
+  schemasToApply["docker"] = true;
+  schemasToApply["semantic-release"] = true;
+  schemasToApply["pipelines"] = true;
 }
 
 if (templateType.endsWith("-service")) {
