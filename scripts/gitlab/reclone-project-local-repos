@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab list-all-projects | jq '"s git clone-repo \(.ssh_url_to_repo) 2>/dev/null || true"' | xargs --no-run-if-empty -n 1 bash -c
+cd ~/repos/gitlab.com
+s git mirrorfleet 's git register-repo' || true
