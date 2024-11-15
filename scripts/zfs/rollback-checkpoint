@@ -2,6 +2,7 @@
 set -euo pipefail
 
 target_dir="$1"
+snapshot_prefix="${2:-"checkpoint"}"
 
 # Verify input
 if [ -z "$target_dir" ]; then
@@ -24,7 +25,7 @@ if [ -z "$dataset" ]; then
 fi
 
 # Check if latest snapshot exists
-if ! zfs list -H -t snapshot -o name | grep "${dataset}@checkpoint_latest" >/dev/null; then
+if ! zfs list -H -t snapshot -o name | grep "${dataset}@${snapshot_prefix}_latest" >/dev/null; then
     echo "Error: No 'latest' checkpoint found for $target_dir"
     exit 1
 fi
@@ -34,7 +35,7 @@ sync
 echo "Filesystem sync done"
 
 # Perform rollback
-if ! sudo zfs rollback -r "${dataset}@checkpoint_latest"; then
+if ! sudo zfs rollback -r "${dataset}@${snapshot_prefix}_latest"; then
     echo "Error: Failed to rollback to latest checkpoint"
     exit 1
 fi

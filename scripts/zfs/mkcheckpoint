@@ -2,6 +2,7 @@
 set -euo pipefail
 
 target_dir="$1"
+snapshot_prefix="${2:-"checkpoint"}"
 
 # Verify input
 if [ -z "$target_dir" ]; then
@@ -25,7 +26,7 @@ fi
 
 # Create snapshot with timestamp
 timestamp=$(date +%Y%m%d_%H%M%S)
-snapshot_name="${dataset}@checkpoint_${timestamp}"
+snapshot_name="${dataset}@${snapshot_prefix}_${timestamp}"
 
 echo "Running filesystem sync"
 sync
@@ -37,11 +38,11 @@ if ! sudo zfs snapshot "$snapshot_name"; then
 fi
 
 # Update 'latest' tag by removing old one if it exists
-zfs list -H -t snapshot -o name | grep "${dataset}@checkpoint_latest" >/dev/null &&
-    sudo zfs destroy "${dataset}@checkpoint_latest"
+zfs list -H -t snapshot -o name | grep "${dataset}@${snapshot_prefix}_latest" >/dev/null &&
+    sudo zfs destroy "${dataset}@${snapshot_prefix}_latest"
 
 # Create new 'latest' snapshot
-if ! sudo zfs snapshot "${dataset}@checkpoint_latest"; then
+if ! sudo zfs snapshot "${dataset}@${snapshot_prefix}_latest"; then
     echo "Error: Failed to create 'latest' snapshot tag"
     exit 1
 fi
