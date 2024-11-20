@@ -3,6 +3,7 @@
 (setq curr-doomdir (getenv "DOOMDIR"))
 (setq use-debug (getenv "DEBUG"))
 (setq emacs-server-name (getenv "EMACS_SOCKET_NAME"))
+(setq doom-profile emacs-server-name)
 
 (setq buttercup-args
       (list
