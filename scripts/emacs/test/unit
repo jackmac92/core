@@ -21,8 +21,8 @@
          (when use-debug
            (doom-debug-mode +1))
          (setq server-name emacs-server-name)
-         (require 'doom-start)
-         (require 'buttercup)
+         (doom-load (doom-profile-init-file doom-profile))
+         (doom-startup)
          ;; prepend . to load path
          (setq load-path (cons "." load-path))
          (setq command-line-args-left
