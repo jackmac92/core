@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt="$1"
+file="$(echo "$tgt" | choose -f \: 0)"
+line_num="$(echo "$tgt" | choose -f \: 1)"
+
+# Check if file exists
+if [ ! -f "$file" ]; then
+    printf "Error: File %s not found\n" "$file" >&2
+    exit 1
+fi
+
+sed "${line_num}d" "$file" | sponge "$file"

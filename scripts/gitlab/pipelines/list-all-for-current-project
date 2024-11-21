@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+page_no=0
+while true; do
+    next_set="$(s gitlab this-project-request "pipelines" per_page==50 page==$page_no | jq -c)"
+    if [[ -z $(jq '.[].id' <<<"$next_set") ]]; then
+        break
+    fi
+    jq '.[]' <<<"$next_set"
+    page_no=$((page_no + 1))
+done | jq -s
