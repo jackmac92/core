@@ -6,6 +6,7 @@ dotfilesProjectId=6831838
 osname=$(uname)
 osnamelowercase=${osname,,}
 
+GITLAB_URL="${GITLAB_URL:-https://gitlab.com}"
 GITLAB_RUNNER_TAGS="os-${osnamelowercase},$(hostname),jmccown-user"
 RUNNER_DESCRIPTION="${RUNNER_DESCRIPTION:-Runner on $(hostname) created at $(date)}"
 
