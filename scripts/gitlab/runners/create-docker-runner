@@ -6,13 +6,12 @@ dotfilesProjectId=6831838
 osname=$(uname)
 osnamelowercase=${osname,,}
 
-GITLAB_URL="${GITLAB_URL:-https://gitlab.com}"
 GITLAB_RUNNER_TAGS="os-${osnamelowercase},$(hostname),jmccown-user"
 RUNNER_DESCRIPTION="${RUNNER_DESCRIPTION:-Runner on $(hostname) created at $(date)}"
 
 echo "Creating runner via GitLab API..."
 response=$(http --ignore-stdin --body POST \
-    "$GITLAB_URL/api/v4/user/runners" \
+    "https://gitlab.com/api/v4/user/runners" \
     "PRIVATE-TOKEN:$GITLAB_API_TOKEN" \
     description="$RUNNER_DESCRIPTION" \
     paused:=false \
