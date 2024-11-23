@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+ITEM_NAME="$1"
+FIELD_NAME="$2"
+NEW_VALUE="$3"
+
+# Get the existing item first
+ITEM=$(bw get item "$ITEM_NAME")
+if [ $? -ne 0 ]; then
+    s bitwarden create-item "$ITEM_NAME"
+    ITEM=$(bw get item "$ITEM_NAME")
+fi
+
+# Check if the field exists in the current item
+FIELD_EXISTS=$(echo "$ITEM" | jq --arg fn "$FIELD_NAME" '.fields | map(select(.name == $fn)) | length')
+
+if [ "$FIELD_EXISTS" -gt 0 ]; then
+    # Update existing field
+    NEW_ITEM=$(echo "$ITEM" | jq --arg fn "$FIELD_NAME" --arg fv "$NEW_VALUE" '(.fields[] | select(.name == $fn)).value = $fv')
+else
+    # Add new field
+    NEW_ITEM=$(echo "$ITEM" | jq --arg fn "$FIELD_NAME" --arg fv "$NEW_VALUE" '.fields += [{"name": $fn, "value": $fv, "type": 0}]')
+fi
+
+# Update the item in Bitwarden
+echo "$NEW_ITEM" | bw encode | bw edit item $(echo "$ITEM" | jq -r '.id')
