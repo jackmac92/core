@@ -26,4 +26,6 @@ response=$(http --ignore-stdin --body POST \
 
 runner_token="$(jq -r '.token' <<<"$response")"
 
-echo "$runner_token" | tee /tmp/gitlab-runner-registration-token-shell-executor
+s bitwarden upsert-field "gitlab.com" "runner-token-${osnamelowercase}-shell" "$runner_token"
+
+echo "$runner_token"
