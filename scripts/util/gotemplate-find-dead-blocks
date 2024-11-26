@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+import re
+from pathlib import Path
+from typing import List, Tuple
+
+
+def find_empty_blocks(file_path: Path) -> List[Tuple[int, int, str]]:
+    """
+    Find template blocks that don't contain meaningful content between their tags.
+    Returns list of (start_line_num, end_line_num, block_content) tuples.
+    """
+    empty_blocks = []
+    with open(file_path) as f:
+        content = f.read()
+
+    # Split into lines while preserving line numbers
+    lines = content.splitlines()
+
+    # Pattern matches {{if ...}} or {{- if ...}} style blocks
+    block_start = re.compile(r"{{-?\s*(if|range)\s+.*?}}")
+    block_end = re.compile(r"{{-?\s*end\s*}}")
+
+    current_block_start = None
+    current_block_type = None
+    current_block_content = []
+
+    for i, line in enumerate(lines, 1):
+        if current_block_start is None:
+            # Look for start of new block
+            if match := block_start.search(line):
+                current_block_start = i
+                current_block_type = match.group(1)
+                current_block_content = [line]
+        else:
+            # Already in a block, look for end
+            current_block_content.append(line)
+            if block_end.search(line):
+                # Block ended, analyze its content
+                block_text = "\n".join(
+                    current_block_content[1:-1]
+                )  # Exclude start/end lines
+
+                # Remove whitespace and template comments
+                clean_text = re.sub(r"{{-?\s*/\*.*?\*/\s*}}", "", block_text)
+                clean_text = re.sub(r"\s+", "", clean_text)
+
+                if not clean_text:
+                    # Block is empty or contains only whitespace/comments
+                    empty_blocks.append(
+                        (current_block_start, i, "\n".join(current_block_content))
+                    )
+
+                current_block_start = None
+                current_block_content = []
+
+    return empty_blocks
+
+
+def main():
+    import sys
+
+    if len(sys.argv) < 2:
+        print("Usage: python template_analyzer.py <template_file>")
+        sys.exit(1)
+
+    file_path = Path(sys.argv[1])
+    if not file_path.exists():
+        print(f"Error: File {file_path} does not exist")
+        sys.exit(1)
+
+    empty_blocks = find_empty_blocks(file_path)
+
+    if not empty_blocks:
+        return
+
+    for start, end, _content in empty_blocks:
+        for i in range(start, end + 1):
+            print(f"{file_path.absolute()}:{i}")
+
+
+if __name__ == "__main__":
+    main()
