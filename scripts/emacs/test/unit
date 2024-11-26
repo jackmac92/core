@@ -23,6 +23,7 @@
          (setq server-name emacs-server-name)
          (doom-load (doom-profile-init-file doom-profile))
          (doom-startup)
+         (require 'buttercup)
          ;; prepend . to load path
          (setq load-path (cons "." load-path))
          (setq command-line-args-left
