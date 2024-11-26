@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+lcl_tgt="$1"
+gdrive_folder="$2"
+
+rclone copy \
+    -P \
+    --drive-allow-import-name-change \
+    --drive-import-formats txt \
+    "$lcl_tgt" "jm79gdrive:$gdrive_folder"
