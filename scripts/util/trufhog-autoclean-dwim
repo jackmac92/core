@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s util trufhog-clean-known-secrets "$(s util trufhog-find-secrets-to-clean)"
