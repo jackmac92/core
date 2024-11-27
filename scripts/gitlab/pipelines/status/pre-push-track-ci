@@ -2,9 +2,12 @@
 set -euo pipefail
 
 prjid=$(s gitlab lookup-project-id-integer)
-latestPipelineId=$(s gitlab pipelines get-id-from-head-commit) # waits for pipeline to be created
+# TODO check whether repo has pipelines enabled
+latestPipelineId=$(TARGET_GITLAB_PROJECT="$prjid" s gitlab pipelines get-id-from-head-commit) # waits for pipeline to be created
 
 dunstify "Pre push pipeline tracking started for $prjid"
-s gitlab project-request "$prjid" "pipelines/$latestPipelineId" |
-    sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
-dunstify "Pre push pipeline tracking done for $prjid"
+(
+    s gitlab project-request "$prjid" "pipelines/$latestPipelineId" |
+        sqlite-utils insert --alter --pk id --replace "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" pipelines -
+    dunstify "Pre push pipeline tracking done for $prjid"
+) &
