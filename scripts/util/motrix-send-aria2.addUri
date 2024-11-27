@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+url="$1"
+filename="$2"
+http --ignore-stdin \
+  --print bhBH \
+  POST :16800/jsonrpc \
+  jsonrpc=2.0 method=aria2.addUri \
+  id=$RANDOM \
+  params:="$(jq --null-input --arg homeDir "$HOME" --arg url "$url" --arg name "$filename" '[[$url, { out: $name, dir: "\($homeDir)/motrix" }]]')"
