@@ -2,7 +2,7 @@
 set -euo pipefail
 
 url="$1"
-url="$(youtube-dl --get-url "$url")"
+url="$((yt-dlp --get-url "$url" || youtube-dl --get-url "$url") | head -n 1)"
 # url="$(s util http-follow-redirects "$url")"
-filename="$(youtube-dl --get-title "$url")"
+filename="$((yt-dlp --get-title "$url" || youtube-dl --get-title "$url") | sed 's/#[^ ]*//g')"
 s util motrix-send-aria2.addUri "$url" "$filename"

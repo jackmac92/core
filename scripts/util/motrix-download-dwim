@@ -2,6 +2,6 @@
 set -euo pipefail
 
 url="$1"
-title=$(youtube-dl --get-title "$url" | sed 's/#[^ ]*//g')
-url=$(youtube-dl --get-url "$url")
+title=$((yt-dlp --get-title "$url" || youtube-dl --get-title "$url") | sed 's/#[^ ]*//g')
+url=$((yt-dlp --get-url "$url" || youtube-dl --get-url "$url") | head -n 1)
 s util motrix-send-aria2.addUri "$url" "${title:0:60}"
