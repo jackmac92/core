@@ -8,50 +8,85 @@ function __list_commands {
   local line dir next
   orig_dir="$1"
   dir="$1"
+
+  # Add debug logging
+  # echo "Processing directory: $dir" >&2
+
+  # Check if directory exists and is readable
+  if [[ ! -d "$dir" || ! -r "$dir" ]]; then
+    # echo "Directory $dir is not accessible" >&2
+    return 1
+  fi
+
   # the parens after the glob contains "glob qualifiers" (see man zshexpn):
   # * executable
   # - follow symlinks
   # , "or" separator
   # / directories
   for file in "$dir"/*(-*,/,-/); do
-    file=$(realpath "$file")
-    command=$(basename "$file")
-    helpfile="$file.help"
+    # Skip if file doesn't exist (glob didn't match)
+    [[ -e "$file" ]] || continue
+
+    # Safely resolve symlinks
+    if ! file_path=$(realpath "$file" 2>/dev/null); then
+      # echo "Failed to resolve path for $file" >&2
+      continue
+    fi
+
+    command=$(basename "$file_path")
+    helpfile="$file_path.help"
+
+    # Skip if command name is empty
+    [[ -n "$command" ]] || continue
+
     if [[ -f "$helpfile" ]]; then
       # Show first line of helpfile in completion
-      help=$(head -n1 "$helpfile")
-    elif [[ -d "$file" ]] ; then
+      help=$(head -n1 "$helpfile" 2>/dev/null || echo "No help available")
+    elif [[ -d "$file_path" ]] ; then
       if ! (($S_SCRIPT_IGNORED_DIRNAMES[(Ie)$command])); then
         # Show dir name + 'commands' in completion
         help="$command commands"
+      else
+        continue
       fi
     else
-      help=$(sed -nE -e '/^#!/d' -e '/^#/{s/^# *//; p; q;}' "$file" || echo "completion err'd")
+      help=$(sed -nE -e '/^#!/d' -e '/^#/{s/^# *//; p; q;}' "$file_path" 2>/dev/null || echo "No description available")
     fi
-    subcmds=($subcmds "$command:\"$help\"")
+
+    # Safely escape the help text
+    help=${help//\"/\\\"}
+    subcmds+=("$command:\"$help\"")
   done
 
-  # calling _arguments populates `line` variable
-  _arguments -C ": :(($subcmds))" "*::arg:->args"
-
-
-  # HACK if calling a command which uses the path of another command (e.g. cat,edit), hide that command from the completion script (do a reset)
-  pattern="$line[1]"
-  if (($S_SCRIPT_PASSTHRU_CMDS[(Ie)$pattern])); then
-      next="$dir"
-  else
-      next="$dir/$line[1]"
+  # Only call _arguments if we have subcmds
+  if (( ${#subcmds} > 0 )); then
+    _arguments -C ": :(($subcmds))" "*::arg:->args"
   fi
 
-  if [[ ! -z $line[1] && -d "$next" ]]; then
-    __list_commands "$next"
-  else
-    if [[ -z $line[1] ]]; then
-      _files
+  # HACK if calling a command which uses the path of another command (e.g. cat,edit), hide that command from the completion script (do a reset)
+  if [[ -n "$line[1]" ]]; then
+    pattern="$line[1]"
+    if (($S_SCRIPT_PASSTHRU_CMDS[(Ie)$pattern])); then
+      next="$dir"
+    else
+      next="$dir/$line[1]"
     fi
+
+    if [[ -d "$next" ]]; then
+      __list_commands "$next"
+    fi
+  else
+    _files
   fi
 }
 
-for i in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+# Ensure SCRIPTS_PATH is set
+if [[ -z "$SCRIPTS_PATH" ]]; then
+  echo "SCRIPTS_PATH is not set" >&2
+  return 1
+fi
+
+# Process each scripts directory
+for i in ${(s.:.)SCRIPTS_PATH}; do
   __list_commands "$i"
 done
