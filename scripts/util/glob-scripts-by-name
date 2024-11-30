@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# export S_INNER_CALL=1
+
+# Convert space-separated arguments to directory structure
+script=$(echo "$@" | tr ' ' '/')
+
+# Iterate through all paths in SCRIPTS_PATH
+for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    find "$root" -type f -path "$root/$script*" 2>/dev/null | while read -r match; do
+        echo "$match"
+    done
+done
