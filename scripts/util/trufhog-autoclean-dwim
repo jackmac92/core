@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s util trufhog-clean-known-secrets "$(s util trufhog-find-secrets-to-clean)"
+found_secrets="$(s util trufhog-find-secrets-to-clean)"
+
+if [ -f "$found_secrets" ]; then
+    s util trufhog-clean-known-secrets "$found_secrets"
+fi
