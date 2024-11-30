@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+trufflehog gitlab --token $GITLAB_API_TOKEN --endpoint="https://gitlab.com" --repo https://gitlab.com/jackmac92/dotFiles.git
+
