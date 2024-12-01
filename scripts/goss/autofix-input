@@ -15,10 +15,15 @@ cmdz=$(
 		| if (.fix | type)=="array" then .fix else [.fix] end
 		| .[]' <<<"$testresults"
 		# autofix missing pkgs
-		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Package" and .property == "installed"))[]."resource-id"' <<<"$testresults" | rg -v '^\s*$' | xargs --no-run-if-empty -n 1 printf "s util syspkg-install %s\n"
+		jq -r '.results
+		| map(select((.successful | not)
+		  and ."resource-type" == "Package"
+		  and .property == "installed"))[]."resource-id"' <<<"$testresults" | rg -v '^\s*$' | xargs --no-run-if-empty -n 1 printf "s util syspkg-install %s\n"
 		# autofix groups
 		jq -r '.results
-   		| map(select((.successful | not) and ."resource-type" == "User" and .property == "groups"))[]
+   		| map(select((.successful | not)
+		  and ."resource-type" == "User"
+		  and .property == "groups"))[]
 		| "\(.expected | first | fromjson | join(",")) \(."resource-id")"' <<<"$testresults" | xargs --no-run-if-empty -d $'\n' -n 1 printf "sudo usermod --append --groups %s\n"
 		# autofix services
 		jq -r '.results | map(select((.successful | not) and ."resource-type" == "Service" and .property == "running"))[]."resource-id"' <<<"$testresults" | xargs --no-run-if-empty -n 1 printf "sudo systemctl restart %s.service\n"
@@ -26,7 +31,8 @@ cmdz=$(
 )
 
 if [[ -z "$cmdz" ]]; then
-	echo "nothing to fix"
+	echo "nothing to fix, but found errors"
+	jq -r '.results | map(select(.successful | not)) | .[].summary' <<<"$testresults"
 	exit 2
 fi
 

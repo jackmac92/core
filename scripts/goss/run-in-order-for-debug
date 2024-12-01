@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET_DIR=${1:?"Required arg"}
+GOSS_EXIT_CODE=255
+
+echo "Top level running $TARGET_DIR"
+
+if [[ -n ${JM_GOSS_KEEP_GOING:-""} ]]; then
+    GOSS_EXIT_CODE=1
+fi
+
+fd --type directory \
+    --max-depth=1 . "$TARGET_DIR" |
+    sort --numeric-sort -r |
+    xargs -I_ bash -c "echo 'Checking subdir _'; s goss run-in-order _ || exit $GOSS_EXIT_CODE"
+
+fd --type file --type symlink \
+    --max-depth=1 . "$TARGET_DIR" |
+    sort --numeric-sort -r |
+    xargs -I_ bash -c 'echo "Testing: $(basename _)"; chronic goss -g _ validate'
