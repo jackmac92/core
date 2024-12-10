@@ -8,4 +8,9 @@ set -euo pipefail
 echo "Transcribing videos that need it but its lame w/o gum spinner"
 fd . /mnt/Media/ --exclude=Pics -0 \
     -e mp4 -e mkv -e avi \
-    -x bash -c 'if [[ ! -f "{.}.json" ]]; then videogrep -i "{}" --transcribe; fi'
+    -x bash -c 'if [[ ! -f "{.}.json" ]]; then
+          echo "Transcribing {}";
+          videogrep -i "{}" --transcribe;
+       else
+          echo >&2 "N/A transcription {}";
+       fi'
