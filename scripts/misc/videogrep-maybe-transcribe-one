@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt="$1"
+
+if [[ ! -f "${tgt%.*}.json" ]]; then
+    # echo "Transcribing $tgt"
+    videogrep -i "$tgt" --transcribe
+# else
+#     echo >&2 "N/A transcription $tgt"
+fi

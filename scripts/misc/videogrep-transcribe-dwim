@@ -1,16 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# echo "Transcribing videos (never worked last time I checked)"
-# s misc videogrep-list-videos-without-transcription |
-#     xargs -0 -I_ gum spin --title="_" -- videogrep -i "_" --transcribe
+inputlist=$(mktemp)
 
-echo "Transcribing videos that need it but its lame w/o gum spinner"
-fd . /mnt/Media/ --exclude=Pics -0 \
-    -e mp4 -e mkv -e avi \
-    -x bash -c 'if [[ ! -f "{.}.json" ]]; then
-          echo "Transcribing {}";
-          videogrep -i "{}" --transcribe;
-       else
-          echo >&2 "N/A transcription {}";
-       fi'
+fd . /mnt/Media/ --exclude=Pics -e mp4 -e mkv -e avi >$inputlist
+
+s util resumable-filelist-process \
+    "$inputlist" \
+    "$(s which misc videogrep-maybe-transcribe-one)"
