@@ -1,8 +1,14 @@
 #!/usr/bin/env -S deno -A
 import Aria2 from "npm:aria2";
+import { parseArgs } from "jsr:@std/cli/parse-args";
 
 const API_KEY = Deno.env.get("MOTRIX_JSON_RPC_APIKEY");
 const API_PORT = Deno.env.get("MOTRIX_JSON_RPC_PORT") || 16800;
+
+const flags = parseArgs(Deno.args, {
+  boolean: ["await", "hideme"],
+  default: { await: false, hideme: true },
+});
 
 export function validateUrl(value) {
   const urlPattern =
@@ -29,6 +35,7 @@ const pass = () => null;
 const handleError = (error) => console.log(`Error: ${error}`);
 
 async function onGot(downloadItem) {
+  console.dir(downloadItem);
   const secret = API_KEY;
   const port = API_PORT;
   const options = {
@@ -69,9 +76,22 @@ async function onGot(downloadItem) {
     };
   }
 
+  // if (flags.hideme) {
+  //   params = {
+  //     ...params,
+  //     "https-proxy": `http://${Deno.env.get("HIDE_ME_USERNAME")}:${Deno.env.get("HIDE_ME_PASSWORD")}@proxy.hide.me:3128`,
+  //   };
+  // }
+
   await aria2
     .call("addUri", [downloadUrl], params)
     .then(async (gid) => {
+      if (!flags.await) {
+        setTimeout(() => {
+          console.log("Download proceeding in background");
+          Deno.exit(0);
+        }, 2000);
+      }
       aria2.on("onDownloadStop", async ([guid]) => {
         console.log("Download stopped");
       });
