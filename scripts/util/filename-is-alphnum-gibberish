@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+filename="$1"
+basename="${filename%.*}" # Remove extension
+
+# Criteria for "gibberish" detection:
+# 1. Contains only alphanumeric characters
+# 2. Has a mix of numbers and letters
+# 3. No recognizable words (simplified check - assumes gibberish won't have 3+ consecutive consonants or vowels)
+
+# Check if filename contains non alphanumeric characters
+if ! [[ "$basename" =~ ^[a-zA-Z0-9]+$ ]]; then
+    exit 1
+fi
+
+# Check if filename has both letters and numbers
+if ! [[ "$basename" =~ [a-zA-Z] ]] || ! [[ "$basename" =~ [0-9] ]]; then
+    exit 1
+fi
+
+# Check for patterns that suggest real words:
+# - 3 or more consecutive vowels (rare in English)
+# - 4 or more consecutive consonants (rare in English)
+if [[ "$basename" =~ [aeiou]{3} ]] || [[ "$basename" =~ [^aeiou]{4} ]]; then
+    exit 1
+fi
