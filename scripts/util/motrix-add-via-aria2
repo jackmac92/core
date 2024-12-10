@@ -121,3 +121,7 @@ await onGot({
   url: Deno.args[0],
   filename: Deno.args[1],
 });
+
+// Local Variables:
+// mode: typescript-ts
+// End:
