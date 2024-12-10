@@ -3,6 +3,6 @@ set -euo pipefail
 
 url="$1"
 filename="$((yt-dlp --get-filename "$url" || youtube-dl --get-filename "$url") | sed 's/#[^ ]*//g')"
-url="$((yt-dlp --format "mp4" --get-url "$url" || youtube-dl --get-url "$url") | head -n 1)"
+url="$((yt-dlp --format "bv*[protocol!*=m3u8][ext=mp4]+ba[ext=m4a]/b[ext=mp4]" --get-url "$url" || youtube-dl --format 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]' --get-url "$url") | head -n 1)"
 # url="$(s util http-follow-redirects "$url")"
-s util motrix-send-aria2.addUri "$url" "$filename"
+s util motrix-deno-download "$url" "$filename"
