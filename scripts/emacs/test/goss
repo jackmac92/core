@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export DOOMLOCALDIR="${DOOMLOCALDIR:-"$HOME/.local/share/doom"}"
 goss --gossfile="$DOOMDIR/tests.d/goss/entry.yaml" validate
