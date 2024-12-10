@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd . /mnt/Media/TV --max-depth=1 -x echo {/}

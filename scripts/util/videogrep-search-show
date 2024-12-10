@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+search_term="$1"
+shift
+tgt_show="$(s media select-downloaded-tv-show $*)"
+echo "Searching '$tgt_show' for phrase '$search_term'"
+videogrep -i "/mnt/Media/TV/$tgt_show/*/*.m*" --search "$search_term"

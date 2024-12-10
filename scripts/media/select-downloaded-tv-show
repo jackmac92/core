@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+filter="$@"
+
+if [ -z "$filter" ]; then
+    s media list-downloaded-tv-shows |
+        fzf
+else
+    s media list-downloaded-tv-shows |
+        rg -i "$filter" |
+        fzf
+fi
