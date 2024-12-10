@@ -4,4 +4,5 @@ set -euo pipefail
 url="$1"
 filename="$((yt-dlp --get-filename "$url" 2>/dev/null || youtube-dl --get-filename "$url") | sed 's/#[^ ]*//g')"
 url="$((yt-dlp --format "bv*[protocol!*=m3u8][ext=mp4]+ba[ext=m4a]/b[ext=mp4]" --get-url "$url" 2>/dev/null || youtube-dl --format 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]' --get-url "$url") | head -n 1)"
+source ~/.config/custom/secrets.d/hideme
 s util motrix-add-via-aria2 "$url" "$filename"
