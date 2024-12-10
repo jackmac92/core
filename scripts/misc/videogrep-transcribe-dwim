@@ -3,7 +3,7 @@ set -euo pipefail
 
 inputlist=$(mktemp)
 
-fd . /mnt/Media/ --exclude=Pics -e mp4 -e mkv -e avi >$inputlist
+fd . "/mnt/Media/${JM_MEDIA_SUBFOLDER:-""}" --exclude=Pics -e mp4 -e mkv -e avi >$inputlist
 
 s util resumable-filelist-process \
     "$inputlist" \

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd /mnt/Media
-fd --exclude=Pics -0 \
+fd . "/mnt/Media/${JM_MEDIA_SUBFOLDER:-""}" \
+    --exclude=Pics -0 \
     -e mp4 -e mkv -e avi \
     -x bash -c 'if [[ ! -f "{.}.json" ]]; then echo "{}"; fi'
