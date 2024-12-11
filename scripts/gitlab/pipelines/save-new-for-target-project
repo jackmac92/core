@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt="$1"
+
+s gitlab pipelines get-new-for-target-project "$tgt" |
+    jq -r '.[] | "s gitlab pipelines fetch-and-save-pipeline \(.project_id) \(.id)"' |
+    xargs -n 1 -d $'\n' bash -c

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+tgt="$1"
+
 while true; do
     most_recent_updated_at=$(sqlite3 "$SCRIPTS_LOCAL_DIR/gitlab-stuff.db" 'SELECT updated_at FROM pipelines ORDER BY updated_at DESC LIMIT 1' 2>/dev/null || echo "")
-    next_set="$(s gitlab this-project-request "pipelines" order_by==updated_at updated_after=="$most_recent_updated_at" | jq -c)"
+    next_set="$(s gitlab project-request "$tgt" "pipelines" order_by==updated_at updated_after=="$most_recent_updated_at" | jq -c)"
     if [[ -z $(jq '.[].id' <<<"$next_set") ]]; then
         break
     fi
