@@ -9,6 +9,6 @@ script=$(echo "$@" | tr ' ' '/')
 # Iterate through all paths in SCRIPTS_PATH
 for root in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
     find "$root" -type f -path "$root/$script*" 2>/dev/null | while read -r match; do
-        echo "$match"
+        bash -c '[[ "$0" =~ ^'"$root"'/(.*) ]] && echo "${BASH_REMATCH[1]}"' "$match"
     done
-done
+done | tr '/' ' '

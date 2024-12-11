@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt_file_cmpts="$1"
+dest_file_cmpts"$2"
+
+(
+    fd -t f . ~/.local/share/chezmoi
+    for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
+        fd -t x . "$scriptdir"
+    done
+) | ifne sad --exact "$tgt_file_cmpts" "$dest_file_cmpts"

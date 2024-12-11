@@ -10,15 +10,15 @@ tgt_file_cmpts=""
 dest_file_cmpts=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --)
-            shift
-            dest_file_cmpts=$(echo "$*" | xargs) # xargs to trim whitespace
-            tgt_file_cmpts=$(echo "$tgt_file_cmpts" | xargs)
-            break
-            ;;
-        *)
-            tgt_file_cmpts="$tgt_file_cmpts$1 "
-            ;;
+    --)
+        shift
+        dest_file_cmpts=$(echo "$*" | xargs) # xargs to trim whitespace
+        tgt_file_cmpts=$(echo "$tgt_file_cmpts" | xargs)
+        break
+        ;;
+    *)
+        tgt_file_cmpts="$tgt_file_cmpts$1 "
+        ;;
     esac
     shift
 done
@@ -55,20 +55,13 @@ if [ -e "$tgt_file.inproc" ]; then
     s util mv-and-commit-if-appropriate "$tgt_file.inproc" "$dest_file.inproc" || mv "$tgt_file.inproc" "$dest_file.inproc"
 fi
 
-set +e
-(
-    fd -t f . ~/.local/share/chezmoi
-    for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' $'\n'); do
-        fd -t x . "$scriptdir"
-    done
-) | ifne sad --exact "$tgt_file_cmpts" "$dest_file_cmpts"
-set -e
+if [ -n "${S_SCRIPTS_AUTO_REWRITE_RENAMES:-""}" ]; then
+    s util post-rename-rewrite-scripts "$tgt_file_cmpts" "$dest_file_cmpts"
+fi
 
-echo "Starting git submodule updates"
-chezmoi git submodule foreach git add .
-chezmoi git submodule foreach git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts" || true
-echo "Starting git updates"
-chezmoi git add .
-chezmoi git commit -- -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
+if [ $isWithinRepoMove -eq 1 ]; then
+    git -C "$tgt_dir" add .
+    git -C "$tgt_dir" commit -am "renamed script $tgt_file_cmpts -> $dest_file_cmpts"
+fi
 
-# s link $dest_file_cmpts -- $tgt_file_cmpts
+s link "$dest_file_cmpts" -- "$tgt_file_cmpts"

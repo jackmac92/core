@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+currRoot="misc videogrep-*"
+refileTgt="videogrep "
+
+s util glob-scripts-by-name "$currRoot" | while read -r script_path; do
+    # Skip if empty line
+    [ -z "$script_path" ] && continue
+
+    currRootStrip="$(echo "$currRoot" | sed 's/\*$//')"
+    suffix="$(echo "$script_path" | sed "s|$currRootStrip||")"
+
+    # Construct the new path
+    new_path="${refileTgt}${suffix}"
+
+    echo "Moving: $script_path -> $new_path"
+
+    # Execute the rename command
+    chronic s rename "$script_path" -- "$new_path" || true
+done
