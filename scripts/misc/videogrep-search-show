@@ -5,4 +5,8 @@ search_term="$1"
 shift
 tgt_show="$(s media select-downloaded-tv-show $*)"
 echo "Searching '$tgt_show' for phrase '$search_term'"
-videogrep -i "/mnt/Media/TV/$tgt_show/*/*.m*" --search "$search_term"
+videogrep \
+    -i "/mnt/Media/TV/$tgt_show"/*/*.m* \
+    --search "$search_term" \
+    --padding 3 \
+    --output "$HOME/Videos/videogrep/search--$search_term--in--$tgt_show.mp4"
