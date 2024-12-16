@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd ~/repos
+
+s util fd-list-git-dirs |
+    xargs realpath |
+    xargs -I_ bash -c 'cd _; s git is-pristine || echo _'
