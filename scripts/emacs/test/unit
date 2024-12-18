@@ -2,8 +2,7 @@
 
 (setq curr-doomdir (getenv "DOOMDIR"))
 (setq use-debug (getenv "DEBUG"))
-(setq emacs-server-name (getenv "EMACS_SOCKET_NAME"))
-(setq doom-profile emacs-server-name)
+(setq doom-profile (getenv "DOOMPROFILE"))
 
 (setq buttercup-args
       (list
@@ -20,7 +19,7 @@
 (defcli! buttercup ()
          (when use-debug
            (doom-debug-mode +1))
-         (setq server-name emacs-server-name)
+         (setq server-name doom-profile)
          (doom-load (doom-profile-init-file doom-profile))
          (doom-startup)
          (require 'buttercup)
@@ -36,4 +35,3 @@
              (exit! 127))))
 
 (run! "buttercup")
-
