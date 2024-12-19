@@ -1,6 +1,8 @@
 #! /usr/bin/env bash
 set -o pipefail
 
+# STDIN Input should be an array of objects (NOT ndjson)
+
 display_key="$1"
 shift
 # TODO: allow multi display key, all args before -- are display keys, then preview keys after
