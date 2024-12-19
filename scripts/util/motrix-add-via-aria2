@@ -1,6 +1,7 @@
 #!/usr/bin/env -S deno -A
 import Aria2 from "npm:aria2";
 import { parseArgs } from "jsr:@std/cli/parse-args";
+import * as path from "jsr:@std/path";
 
 const API_KEY = Deno.env.get("MOTRIX_JSON_RPC_APIKEY");
 const API_PORT = Deno.env.get("MOTRIX_JSON_RPC_PORT") || 16800;
@@ -22,9 +23,10 @@ export function historyToArray(historyMap) {
     .slice(0, 100);
 }
 
-export function parsePath(path) {
-  const filename = path.replace(/^.*[\\/]/, "");
-  const directory = path.match(/(.*)[/\\]/)?.[1] ?? "";
+export function parsePath(p) {
+  const filename = path.basename(p);
+  // const directory = path.dirname(p) ?? "";
+  const directory = `${Deno.env.get("HOME")}/motrix-downloads`;
 
   return {
     dir: directory,
