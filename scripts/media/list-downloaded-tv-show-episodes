@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-show_name="$1"
+show_name="$(s media select-downloaded-tv-show "$1")"
 
-fd . "/mnt/Media/TV/$show_name" -t f -x echo {/}
+cd "/mnt/Media/TV/$show_name"
+
+fd -t f -e mp4 -e mkv -e avi . -x echo {}

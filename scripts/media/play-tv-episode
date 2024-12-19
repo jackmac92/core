@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mpv "$(s media select-downloaded-tv-show-episodes "$show_name" "$*")"

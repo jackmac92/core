@@ -5,11 +5,13 @@ show_name="$1"
 show_name="$(s media select-downloaded-tv-show "$show_name")"
 filter="${2:-""}"
 
-if [ -z "$filter" ]; then
+choice="$(if [ -z "$filter" ]; then
     s media list-downloaded-tv-show-episodes "$show_name" |
         fzf
 else
     s media list-downloaded-tv-show-episodes "$show_name" |
         rg -i "$filter" |
         fzf
-fi
+fi)"
+
+echo "/mnt/Media/TV/$show_name/$choice"
