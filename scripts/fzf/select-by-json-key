@@ -11,9 +11,12 @@ preview_key="$1"
 shift
 
 declare -A choiceDict
-while IFS=$'\t' read -r key value; do
-  choiceDict["$key"]="$value"
-done < <(jq -r --arg displayKey "$display_key" '.[] | [.[$displayKey], (. | @json)] | @tsv')
+IFS=$'\n'
+for el in $(jq -r --arg displayKey "$display_key" '.[] | "\(.[$displayKey])=\(.)"'); do
+  _k=$(echo "$el" | choose -f = 0)
+  _v=$(echo "$el" | choose -f = 1:)
+  choiceDict["$_k"]="$_v"
+done
 
 if [[ "${#choiceDict[@]}" -eq 0 ]]; then
   echo "No choices found" >/dev/stderr
@@ -26,7 +29,7 @@ for x in "${!choiceDict[@]}"; do echo "${choiceDict["$x"]}"; done | jq -s -c | s
 tmpscript=$(mktemp)
 cat <<___EOF >>"$tmpscript"
 #! /usr/bin/env bash
-jq -r --arg tgtVal "\$1" '.[] | select(.["$display_key"] == \$tgtVal) | .["$preview_key"]' "$fullset"
+jq -r --arg tgtVal "\$1" '.[] | select(.$display_key == \$tgtVal) | .$preview_key' "$fullset"
 
 ___EOF
 
