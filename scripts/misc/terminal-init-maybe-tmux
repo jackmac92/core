@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+for ii in $(seq 20); do echo; done
+echo "Enter any key to avoid entering tmux"
+read -t 3 -r notmux
+echo k
+
+if [ -n "$notmux" ]; then
+    zsh -l
+else
+    tmux -L main new -A -s Personal
+fi
