@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 
 for ii in $(seq 20); do echo; done
-echo "Enter any key to avoid entering tmux"
-read -t 3 -r notmux
-echo k
-
-if [ -n "$notmux" ]; then
-    zsh -l
+if command -v gum >/dev/null 2>&1; then
+    if gum confirm "Open Tmux?"; then
+        tmux -L main new -A -s Personal
+    else
+        zsh -l
+    fi
 else
-    tmux -L main new -A -s Personal
+    echo "Enter any key to avoid entering tmux"
+    read -t 3 -r notmux
+    echo k
+
+    if [ -n "$notmux" ]; then
+        zsh -l
+    else
+        tmux -L main new -A -s Personal
+    fi
 fi
