@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+jq -R -s -c 'split("\n") | map(select(. != "" and . != null)) | .[]'
