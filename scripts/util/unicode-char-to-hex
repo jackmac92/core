@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+import sys
+
+# Starting with \u format
+chars = "".join([l.strip() for l in sys.stdin.readlines()])
+
+# # Convert to bytes and get hex representation
+# converted = chars.encode("utf-8").hex(" ")
+# specifically want \x format:
+converted = "".join("\\x{:02x}".format(b) for b in chars.encode("utf-8"))
+
+print(converted)
