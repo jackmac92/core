@@ -6,4 +6,4 @@ if ! (emacsclient --eval "(server-running-p)"); then
   exit 1
 fi
 
-emacsclient -e '(jm/spotlight-popup)'
+direnv exec ~/.local/fullenv emacsclient -e '(jm/spotlight-popup)'
