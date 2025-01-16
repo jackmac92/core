@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# todo retrieve body/author
+tweetJson="$(http 'https://publish.twitter.com/oembed' url=="$1")"
+tweetAuthor="$(jq -r '.author_name' <<<"$tweetJson")"
+tweetBody="$(jq -r '.html' <<<"$tweetJson" | pup 'blockquote' | pandoc -f html -t gfm)"
+
+jo author="$tweetAuthor" markdownBody="$tweetBody"
