@@ -3,7 +3,8 @@ set -euo pipefail
 
 # todo retrieve body/author
 tweetJson="$(http 'https://publish.twitter.com/oembed' url=="$1")"
-tweetAuthor="$(jq -r '.author_name' <<<"$tweetJson")"
-tweetBody="$(jq -r '.html' <<<"$tweetJson" | pup 'blockquote' | pandoc -f html -t gfm)"
+# tweetAuthor="$(jq -r '.author_name' <<<"$tweetJson")"
+tweetBody="$(jq -r '.html' <<<"$tweetJson" | pup 'blockquote' | pandoc -f html -t ${JM_TWEET_OUTPUT_FORMAT:-"org"})"
 
-jo author="$tweetAuthor" markdownBody="$tweetBody"
+# jo author="$tweetAuthor" tweetBody="$tweetBody"
+echo "$tweetBody"
