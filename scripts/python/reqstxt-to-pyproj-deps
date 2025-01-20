@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+import re
+
+def convert_requirements_to_pyproject(requirements_file_path):
+    """
+    Converts a requirements.txt file to a list of dependencies suitable for a pyproject.toml file.
+
+    Args:
+        requirements_file_path (str): Path to the requirements.txt file.
+
+    Returns:
+        list: List of dependency strings in the format required by pyproject.toml.
+    """
+    dependencies = []
+    with open(requirements_file_path, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#'):  # Skip comments and empty lines
+                continue
+
+            # Extract package name and version (if available)
+            match = re.match(r'([^<=>~]*)([<=>~].*)?', line)
+            package_name = match.group(1)
+            version_constraint = match.group(2) or ""  # Add empty string if no version constraint
+
+            dependency_string = f"{package_name}{version_constraint}"
+            dependencies.append(dependency_string)
+
+    return dependencies
+
+# Example usage:
+requirements_path = "requirements.txt"
+pyproject_dependencies = convert_requirements_to_pyproject(requirements_path)
+
+print("[project]\ndependencies = [")
+for dependency in pyproject_dependencies:
+    print(f"    \"{dependency}\",")
+print("]")
