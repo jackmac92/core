@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+zfs list -H -t snapshot -o name | rg checkpoint | xargs -n 1 sudo zfs destroy
+
