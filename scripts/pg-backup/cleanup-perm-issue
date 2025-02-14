@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# from https://thomasbandt.com/postgres-docker-major-version-upgrade
+
+[ $# -lt 2 ] && {
+    echo "Usage: $0 <postgresql dump> <dbname>"
+    exit 1
+}
+
+dumpfile="$1"
+dbname="$2"
+
+sed "/connect.*$dbname/,\$!d" "$dumpfile" | sed "/PostgreSQL database dump complete/,\$d" >>"$dumpfile"

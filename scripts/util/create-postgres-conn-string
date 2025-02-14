@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+. ~/.config/custom/secrets.d/postgres
+DB_NAME="$1"
+echo "postgres://${PG_SELFHOSTED_ADMIN_USER}:${PG_SELFHOSTED_ADMIN_PASS}@${PG_SELFHOSTED_ADDR}/${DB_NAME}?sslmode=disable"

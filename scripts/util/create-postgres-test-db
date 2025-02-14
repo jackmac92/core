@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Default configurations
+POSTGRES_VERSION="14"
+DEFAULT_PORT=5432
+DEFAULT_DB_USER="postgres"
+DEFAULT_DB_PASSWORD="pass"
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 <database_name> [port] [version]"
+    echo ""
+    echo "  <database_name> : Name of the PostgreSQL database to create (required)"
+    echo "  [port]          : Host port to map to PostgreSQL port 5432 (optional, default: $DEFAULT_PORT)"
+    echo "  [version]       : PostgreSQL version (optional, default: $POSTGRES_VERSION)"
+    exit 1
+}
+
+# Check if at least one argument is provided
+if [ $# -lt 1 ]; then
+    echo >&2 "Error: Database name is required."
+    usage
+fi
+
+# Assign arguments to variables
+DB_NAME="$1"
+HOST_PORT="${2:-$DEFAULT_PORT}"            # Use second argument or default port
+POSTGRES_VERSION="${3:-$POSTGRES_VERSION}" # Use third argument or default version
+
+# Optional: Define a container name based on the DB name
+CONTAINER_NAME="postgres_${DB_NAME}"
+
+# Check if Docker is installed
+if ! command -v docker &>/dev/null; then
+    echo >&2 "Error: Docker is not installed. Please install Docker and try again."
+    exit 1
+fi
+
+# Check if the specified port is available
+if lsof -iTCP -sTCP:LISTEN -P | grep -q ":$HOST_PORT "; then
+    echo >&2 "Error: Port $HOST_PORT is already in use."
+    exit 1
+fi
+
+# Pull the specified PostgreSQL image
+echo >&2 "Pulling PostgreSQL version $POSTGRES_VERSION..."
+docker pull postgres:$POSTGRES_VERSION
+
+docker rm -f "$CONTAINER_NAME"
+
+# Run the PostgreSQL container
+echo >&2 "Starting PostgreSQL container '$CONTAINER_NAME'..."
+docker run --name "$CONTAINER_NAME" \
+    -e POSTGRES_USER="$DEFAULT_DB_USER" \
+    -e POSTGRES_PASSWORD="$DEFAULT_DB_PASSWORD" \
+    -e POSTGRES_DB="$DB_NAME" \
+    -p "$HOST_PORT":5432 \
+    -d postgres:"$POSTGRES_VERSION"
+
+echo >&2 "PostgreSQL container '$CONTAINER_NAME' is up and running."
+echo >&2 "You can connect using the following connection string:"
+echo "postgres://$DEFAULT_DB_USER:$DEFAULT_DB_PASSWORD@localhost:$HOST_PORT/$DB_NAME"
