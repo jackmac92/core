@@ -14,7 +14,7 @@ echo "$query"
 
 # WHERE ='"$prjid"' AND id='"$latestPipelineId"' LIMIT 1'
 
-sqlite3 $SCRIPTS_LOCAL_DIR/s-script-meta.db "$query"
+sqlite3 $SCRIPTS_LOCAL_DIR/s-scripts-meta.db "$query"
 
 # fd --hidden 'invocations' ~/.local/scripts-dir-metrics -x bash -c 'echo {}/* | tr " " "\n"' |
 #     rg -v '\*$' |

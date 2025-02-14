@@ -36,7 +36,7 @@ checkScriptDir() {
         elif [[ -f "$dir/$command" ]]; then
             if [[ -x "$dir/$command" ]]; then
                 runid=$(uuidgen)
-                if [[ -z ${S_INNER_CALL:-""} ]]; then
+                if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
                     (
                         set +e
                         jo ID="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --pk ID "$SCRIPTS_LOCAL_DIR/s-scripts-meta.db" invocations -
@@ -55,7 +55,7 @@ checkScriptDir() {
                 else
                     "$dir/$command" "$@"
                 fi
-                if [[ -z ${S_INNER_CALL:-""} ]]; then
+                if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
                     (
                         set +e
                         jo ID="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --pk ID "$SCRIPTS_LOCAL_DIR/s-scripts-meta.db" executions -
