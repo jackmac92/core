@@ -3,11 +3,11 @@
 set -euo pipefail
 use_debug_mode=""
 if ! [ -z "${S_DEBUGGER:-""}" ]; then
-    use_debug_mode="1"
+  use_debug_mode="1"
 fi
 
 if [ -n "$use_debug_mode" ]; then
-    set -x
+  set -x
 fi
 
 # dir=$SCRIPTS_DIR_ROOT
@@ -23,54 +23,57 @@ IS_TOPLEVEL_CALL=$(if [[ -z ${S_INNER_CALL:-""} ]]; then echo 1; else echo 0; fi
 export S_INNER_CALL=1
 
 checkScriptDir() {
-    dir="$1"
+  dir="$1"
+  shift
+  while [[ $# -gt 0 ]]; do
+    command="$1"
+
+    metrics_dir_path="$execution_tracker$dir/$command"
+
     shift
-    while [[ $# -gt 0 ]]; do
-        command="$1"
-
-        metrics_dir_path="$execution_tracker$dir/$command"
-
-        shift
-        if [[ -d "$dir/$command" ]]; then
-            dir="$dir/$command"
-        elif [[ -f "$dir/$command" ]]; then
-            if [[ -x "$dir/$command" ]]; then
-                runid=$(uuidgen)
-                if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
-                    (
-                        set +e
-                        jo ID="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --pk ID "$SCRIPTS_LOCAL_DIR/s-scripts-meta.db" invocations -
-                    )
-                fi
-                if [[ -f "$dir/$command.inproc" ]] || [[ -n "${S_FORCE_INPROC:-""}" ]]; then
-                    source "$dir/$command" "$@"
-                elif [[ -f "$dir/$command.direnv" ]]; then
-                    direnv exec $dir "$dir/$command" "$@"
-                elif [[ -f "$dir/.envrc" ]]; then
-                    direnv exec $dir "$dir/$command" "$@"
-                elif [ -n "$use_debug_mode" ]; then
-                    set -x
-                    "$dir/$command" "$@"
-                    set +x
-                else
-                    "$dir/$command" "$@"
-                fi
-                if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
-                    (
-                        set +e
-                        jo ID="$runid" command="$dir/$command" args="${orig_args[@]}" | sqlite-utils insert --pk ID "$SCRIPTS_LOCAL_DIR/s-scripts-meta.db" executions -
-                    )
-                fi
-                exit 0
-            fi
+    if [[ -d "$dir/$command" ]]; then
+      dir="$dir/$command"
+    elif [[ -f "$dir/$command" ]]; then
+      if [[ -x "$dir/$command" ]]; then
+        runid=$(uuidgen)
+        if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
+          ( (
+            set +e
+            cmd="$(realpath "$dir/$command" --relative-to=$HOME)"
+            args="$@"
+            jo ID="$runid" command="$cmd" args="$args" | sqlite-utils insert --pk ID "$SCRIPTS_LOCAL_DIR/s-scripts-meta.db" invocations -
+          ) || true) &
         fi
-    done
-    deadEndDirs+=("$dir")
+        if [[ -f "$dir/$command.inproc" ]] || [[ -n "${S_FORCE_INPROC:-""}" ]]; then
+          source "$dir/$command" "$@"
+        elif [[ -f "$dir/$command.direnv" ]]; then
+          direnv exec $dir "$dir/$command" "$@"
+        elif [[ -f "$dir/.envrc" ]]; then
+          direnv exec $dir "$dir/$command" "$@"
+        elif [ -n "$use_debug_mode" ]; then
+          set -x
+          "$dir/$command" "$@"
+          set +x
+        else
+          "$dir/$command" "$@"
+        fi
+        if [[ $IS_TOPLEVEL_CALL -eq 1 ]]; then
+          ( (
+            cmd="$(realpath "$dir/$command" --relative-to=$HOME)"
+            args="$@"
+            jo ID="$runid" command="$cmd" args="$args" | sqlite-utils insert --pk ID "$SCRIPTS_LOCAL_DIR/s-scripts-meta.db" executions -
+          ) || true) &
+        fi
+        exit 0
+      fi
+    fi
+  done
+  deadEndDirs+=("$dir")
 }
 
 no_commands=1
 for scriptdir in $(echo "${SCRIPTS_PATH:-"$HOME/.local/s-scripts/scripts:$HOME/.local/scripts/porcelain:$HOME/.local/scripts/wrappers:$HOME/.local/scripts/personal-apps:$HOME/.local/scripts/junk-drawer:$HOME/.local/sysspecific_scripts:$HOME/.local/chez-managed-s-scripts"}" | tr ':' '\n'); do
-    checkScriptDir "$scriptdir" "${orig_args[@]}"
+  checkScriptDir "$scriptdir" "${orig_args[@]}"
 done
 set +x
 
@@ -106,6 +109,6 @@ set +x
 # # done
 
 if [[ "$no_commands" -eq 1 ]]; then
-    echo "(no subcommands found)"
-    exit 1
+  echo "(no subcommands found)"
+  exit 1
 fi
