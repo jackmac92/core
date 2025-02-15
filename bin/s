@@ -20,7 +20,9 @@ deadEndDirs=()
 orig_args=("$@")
 
 IS_TOPLEVEL_CALL=$(if [[ -z ${S_INNER_CALL:-""} ]]; then echo 1; else echo 0; fi)
-export S_INNER_CALL=1
+if [[ -z ${INHIBIT_S_INNER_CALL:-""} ]]; then
+  export S_INNER_CALL=1
+fi
 
 checkScriptDir() {
   dir="$1"

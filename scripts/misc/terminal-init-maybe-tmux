@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
+export INHIBIT_S_INNER_CALL=1
+
 for ii in $(seq 20); do echo; done
+
 if command -v gum >/dev/null 2>&1; then
     if gum confirm "Open Tmux?"; then
         tmux -L main new -A -s Personal
