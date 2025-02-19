@@ -21,6 +21,12 @@ in
     };
   };
 
+  environment.etc."scripts-path-functions.sh".text = ''
+    get_script_path() {
+      ${getScriptPath "SCRIPT_NAME"}
+    }
+  '';
+
   config = mkIf config.sScripts.enable {
     environment.systemPackages = lib.concatMap (path: [ (pkgs.callPackage (path + "/bin/s") {}) ]) scriptsPaths;
 
@@ -31,4 +37,7 @@ in
     '';
   };
       getScriptPath = scriptName: lib.head (lib.filter (path: lib.fileExists (path + "/bin/" + scriptName)) scriptsPaths);
+  outputs = {
+    getScriptPath = getScriptPath;
+  };
 }
