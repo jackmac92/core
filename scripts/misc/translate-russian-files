@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+
+import os
+import re
+from googletrans import Translator
+
+def is_russian(text):
+    """
+    Check if the text contains any Cyrillic characters.
+    """
+    return bool(re.search('[\u0400-\u04FF]', text))
+
+def sanitize_filename(filename):
+    """
+    Replace invalid characters in filenames with underscores.
+    """
+    return re.sub(r'[\\/*?:"<>|]', "_", filename)
+
+def translate_filename(filename, translator):
+    """
+    Translate the filename from Russian to English.
+    """
+    name, ext = os.path.splitext(filename)
+    try:
+        translation = translator.translate(name, src='ru', dest='en').text
+        translation_clean = sanitize_filename(translation)
+        new_name = f"{translation_clean}{ext}"
+        return new_name
+    except Exception as e:
+        print(f"Error translating '{filename}': {e}")
+        return None
+
+def rename_files_in_directory():
+    """
+    Find and rename files with Russian filenames in the current directory.
+    """
+    translator = Translator()
+    files = os.listdir('.')
+    renamed_files = []
+
+    for filename in files:
+        if os.path.isfile(filename) and is_russian(filename):
+            new_name = translate_filename(filename, translator)
+            if new_name:
+                try:
+                    os.rename(filename, new_name)
+                    renamed_files.append(f'Renamed: "{filename}" to "{new_name}"')
+                except Exception as e:
+                    renamed_files.append(f'Error renaming "{filename}": {e}')
+
+    # Print the results
+    if renamed_files:
+        print("Renaming Results:")
+        for message in renamed_files:
+            print(message)
+    else:
+        print("No Russian filenames found to rename.")
+
+if __name__ == "__main__":
+    rename_files_in_directory()

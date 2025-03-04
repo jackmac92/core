@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+import sqlite3
+import datetime
+import sys
+import socket
+import matplotlib.pyplot as plt
+
+def read_speedtests(db_path):
+    """
+    Read speedtest records from the SQLite database.
+
+    Assumes:
+      • The table name is the same as the current hostname.
+      • Each row already contains JSON-like fields (download, upload, timestamp, etc.)
+         because the database was created using `.mode json` in the CLI.
+    """
+    # Determine the table name as the current hostname.
+    table_name = socket.gethostname()
+
+    # Connect to the database, setting row_factory so rows are dict-like.
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Use backticks around the table name in case it has unusual characters.
+    query = f"SELECT * FROM `{table_name}`"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    conn.close()
+
+    timestamps = []
+    download_speeds = []
+    upload_speeds = []
+
+    for row in rows:
+        try:
+            # Assume row is a dict-like object with the keys as in the JSON output.
+            # Example keys: "timestamp", "download", "upload", etc.
+            ts_str = row["timestamp"]
+            # Remove a trailing "Z", if present.
+            if ts_str.endswith("Z"):
+                ts_str = ts_str[:-1]
+            timestamp = datetime.datetime.fromisoformat(ts_str)
+            timestamps.append(timestamp)
+
+            # Assume download and upload fields hold the speeds in bits per second.
+            # Convert them to megabits per second (Mbps) for readability.
+            download = float(row["download"]) / 1e6
+            upload   = float(row["upload"]) / 1e6
+            download_speeds.append(download)
+            upload_speeds.append(upload)
+
+        except Exception as e:
+            print("Error processing row:", e)
+            continue
+
+    return timestamps, download_speeds, upload_speeds
+
+def plot_speeds(timestamps, download_speeds, upload_speeds):
+    """
+    Plot download and upload speeds over time using matplotlib.
+    """
+    plt.figure(figsize=(10, 5))
+    plt.plot(timestamps, download_speeds, label='Download (Mbps)', marker='o')
+    plt.plot(timestamps, upload_speeds, label='Upload (Mbps)', marker='o')
+
+    plt.xlabel('Time')
+    plt.ylabel('Speed (Mbps)')
+    plt.title('Internet Connection Speeds Over Time')
+    plt.legend()
+    plt.grid(True)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python script.py path_to_database.db")
+        sys.exit(1)
+
+    db_path = sys.argv[1]
+    timestamps, download_speeds, upload_speeds = read_speedtests(db_path)
+
+    if not timestamps:
+        print("No speedtest data available to plot.")
+        sys.exit(1)
+
+    plot_speeds(timestamps, download_speeds, upload_speeds)
+
+if __name__ == '__main__':
+    main()
