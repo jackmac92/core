@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-s util list-files-with-no-extension | xargs -I_ s util auto-restore-video-extension '_'
+s util list-files-with-no-extension | xargs -0 -I_ s util auto-restore-video-extension '_'
 s util video-convert-all-ts-to-mp4

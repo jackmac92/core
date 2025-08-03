@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-fd -t f '^[^.]+$'
-
+fd -0 -t f '^[^.]+$'

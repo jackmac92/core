@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-fd -e ts -x ffmpeg -i '{}' -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k '{.}.mp4'
+fd -e mkv -x ffmpeg -i '{}' -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k '{.}.mp4'
