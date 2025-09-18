@@ -1,0 +1,554 @@
+#!/usr/bin/env python3
+"""
+Tweet Classifier Script
+Classifies bookmarked tweets as "silly" or "serious" using an LLM API.
+"""
+
+import json
+import re
+import time
+import os
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+from collections import defaultdict, Counter
+import openai
+import requests
+from urllib.parse import urlparse, urljoin
+from bs4 import BeautifulSoup
+import hashlib
+
+
+def load_env_from_file(file_path: str) -> Dict[str, str]:
+    """
+    Load environment variables from a file.
+    Supports KEY=VALUE format with optional quotes and comments.
+
+    Args:
+        file_path: Path to the environment file
+
+    Returns:
+        Dictionary of environment variables
+    """
+    env_vars = {}
+
+    if not Path(file_path).exists():
+        return env_vars
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line_num, line in enumerate(f, 1):
+                line = line.strip()
+
+                # Skip empty lines and comments
+                if not line or line.startswith('#'):
+                    continue
+
+                # Parse KEY=VALUE format
+                if '=' not in line:
+                    print(f"Warning: Invalid format in {file_path} line {line_num}: {line}")
+                    continue
+
+                key, value = line.split('=', 1)
+                key = key.strip()
+                value = value.strip()
+
+                # Remove quotes if present
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1]
+                elif value.startswith("'") and value.endswith("'"):
+                    value = value[1:-1]
+
+                env_vars[key] = value
+
+    except Exception as e:
+        print(f"Error loading environment file {file_path}: {str(e)}")
+
+    return env_vars
+
+
+def load_custom_env_vars():
+    """
+    Load environment variables from custom locations.
+    Loads from ~/.config/custom/secrets.d/openai if it exists.
+    """
+    # Try to load from custom secrets directory
+    home = Path.home()
+    secrets_file = home / '.config' / 'custom' / 'secrets.d' / 'openai'
+
+    if secrets_file.exists():
+        print(f"Loading environment variables from {secrets_file}")
+        env_vars = load_env_from_file(str(secrets_file))
+
+        # Set environment variables
+        for key, value in env_vars.items():
+            # Don't override existing environment variables
+            if key not in os.environ:
+                os.environ[key] = value
+                print(f"  Loaded: {key}")
+            else:
+                print(f"  Skipped (already set): {key}")
+    else:
+        print(f"Custom secrets file not found at {secrets_file}")
+        print("You can create this file with your environment variables in KEY=VALUE format")
+
+
+# Load custom environment variables at module import
+load_custom_env_vars()
+
+class TweetClassifier:
+    def __init__(self, api_key: str, model: str = "gpt-3.5-turbo",
+                 fetch_links: bool = True, cache_links: bool = True):
+        """
+        Initialize the tweet classifier.
+
+        Args:
+            api_key: OpenAI API key
+            model: Model to use for classification
+            fetch_links: Whether to fetch and analyze link content
+            cache_links: Whether to cache fetched link content
+        """
+        self.client = openai.OpenAI(api_key=api_key)
+        self.model = model
+        self.author_history = defaultdict(list)  # Track classifications per author
+        self.classifications = []  # Store all classifications
+        self.fetch_links = fetch_links
+        self.cache_links = cache_links
+        self.link_cache = {}  # Cache for fetched link content
+        self.cache_file = "link_cache.json"
+
+        # Load existing link cache
+        if cache_links and Path(self.cache_file).exists():
+            try:
+                with open(self.cache_file, 'r', encoding='utf-8') as f:
+                    self.link_cache = json.load(f)
+                print(f"Loaded {len(self.link_cache)} cached links")
+            except Exception as e:
+                print(f"Error loading link cache: {str(e)}")
+
+        # Headers for web requests - can be customized via env var
+        user_agent = os.getenv('USER_AGENT',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')
+        self.headers = {
+            'User-Agent': user_agent
+        }
+
+    def extract_urls(self, text: str) -> List[str]:
+        """Extract all URLs from text."""
+        url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+        urls = re.findall(url_pattern, text)
+        return urls
+
+    def get_url_hash(self, url: str) -> str:
+        """Generate a hash for URL to use as cache key."""
+        return hashlib.md5(url.encode()).hexdigest()
+
+    def fetch_link_content(self, url: str, timeout: int = None) -> Dict[str, str]:
+        """
+        Fetch and parse content from a URL.
+
+        Args:
+            url: URL to fetch
+            timeout: Request timeout in seconds (defaults to env var or 10)
+
+        Returns:
+            Dictionary with 'title', 'description', 'content_type', and 'text_preview'
+        """
+        if timeout is None:
+            timeout = int(os.getenv('REQUEST_TIMEOUT', '10'))
+
+        url_hash = self.get_url_hash(url)
+
+        # Check cache first
+        if self.cache_links and url_hash in self.link_cache:
+            return self.link_cache[url_hash]
+
+        result = {
+            'title': '',
+            'description': '',
+            'content_type': 'unknown',
+            'text_preview': '',
+            'url': url,
+            'error': None
+        }
+
+        try:
+            # Handle Twitter/X URLs specially
+            if 'twitter.com' in url or 'x.com' in url:
+                result['content_type'] = 'twitter'
+                result['text_preview'] = 'Twitter/X link (content not fetched to avoid rate limits)'
+                return result
+
+            response = requests.get(url, headers=self.headers, timeout=timeout,
+                                  allow_redirects=True)
+            response.raise_for_status()
+
+            # Determine content type
+            content_type = response.headers.get('content-type', '').lower()
+
+            if 'text/html' in content_type:
+                soup = BeautifulSoup(response.content, 'html.parser')
+
+                # Extract title
+                title_tag = soup.find('title')
+                if title_tag:
+                    result['title'] = title_tag.get_text().strip()
+
+                # Extract meta description
+                meta_desc = soup.find('meta', attrs={'name': 'description'}) or \
+                           soup.find('meta', attrs={'property': 'og:description'})
+                if meta_desc:
+                    result['description'] = meta_desc.get('content', '').strip()
+
+                # Extract text preview (first few paragraphs)
+                paragraphs = soup.find_all('p')
+                text_parts = []
+                char_count = 0
+                max_preview_length = int(os.getenv('LINK_PREVIEW_MAX_LENGTH', '500'))
+
+                for p in paragraphs:
+                    text = p.get_text().strip()
+                    if text and char_count < max_preview_length:
+                        text_parts.append(text)
+                        char_count += len(text)
+
+                result['text_preview'] = ' '.join(text_parts)[:max_preview_length]
+                result['content_type'] = 'webpage'
+
+            elif 'application/json' in content_type:
+                result['content_type'] = 'api'
+                result['text_preview'] = 'JSON API response (not parsed)'
+
+            elif any(img_type in content_type for img_type in ['image/', 'video/']):
+                result['content_type'] = 'media'
+                result['text_preview'] = f'Media file ({content_type})'
+
+            else:
+                result['content_type'] = 'other'
+                result['text_preview'] = f'File type: {content_type}'
+
+        except requests.exceptions.Timeout:
+            result['error'] = 'Request timeout'
+        except requests.exceptions.RequestException as e:
+            result['error'] = f'Request failed: {str(e)}'
+        except Exception as e:
+            result['error'] = f'Parsing error: {str(e)}'
+
+        # Cache the result
+        if self.cache_links:
+            self.link_cache[url_hash] = result
+
+        return result
+
+    def save_link_cache(self):
+        """Save link cache to file."""
+        if self.cache_links:
+            try:
+                with open(self.cache_file, 'w', encoding='utf-8') as f:
+                    json.dump(self.link_cache, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                print(f"Error saving link cache: {str(e)}")
+        """Remove URLs and clean up tweet text for classification."""
+        # Remove URLs
+        text = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', text)
+        # Remove extra whitespace
+        text = ' '.join(text.split())
+        return text.strip()
+
+    def get_author_classification_history(self, author: str) -> str:
+        """Get a summary of previous classifications for an author."""
+        if author not in self.author_history:
+            return "No previous classifications for this author."
+
+        classifications = self.author_history[author]
+        silly_count = classifications.count("silly")
+        serious_count = classifications.count("serious")
+        total = len(classifications)
+
+        if total == 0:
+            return "No previous classifications for this author."
+
+        silly_pct = (silly_count / total) * 100
+        serious_pct = (serious_count / total) * 100
+
+        return f"Previous classifications for @{author}: {silly_count} silly ({silly_pct:.1f}%), {serious_count} serious ({serious_pct:.1f}%) out of {total} total tweets."
+
+    def classify_tweet(self, tweet: Dict, use_author_history: bool = True) -> Tuple[str, float]:
+        """
+        Classify a single tweet as silly or serious.
+
+        Args:
+            tweet: Dictionary with 'url', 'author', and 'body' keys
+            use_author_history: Whether to include author's previous classifications in prompt
+
+        Returns:
+            Tuple of (classification, confidence_score)
+        """
+        cleaned_text = self.clean_tweet_text(tweet['body'])
+        author_context = ""
+        link_context = ""
+
+        if use_author_history:
+            author_context = f"\n\nAuthor context: {self.get_author_classification_history(tweet['author'])}"
+
+        # Analyze links if enabled
+        link_analyses = []
+        if self.fetch_links:
+            link_analyses = self.analyze_links_in_tweet(tweet['body'])
+
+            if link_analyses:
+                link_summaries = []
+                for i, link in enumerate(link_analyses, 1):
+                    summary = f"Link {i}: "
+                    if link.get('error'):
+                        summary += f"Could not fetch ({link['error']})"
+                    else:
+                        summary += f"Type: {link['content_type']}"
+                        if link.get('title'):
+                            summary += f", Title: '{link['title'][:100]}'"
+                        if link.get('description'):
+                            summary += f", Description: '{link['description'][:150]}'"
+                        if link.get('text_preview'):
+                            summary += f", Preview: '{link['text_preview'][:200]}'"
+
+                    link_summaries.append(summary)
+
+                link_context = f"\n\nLinked content analysis:\n" + "\n".join(link_summaries)
+
+        prompt = f"""Please classify this tweet as either "silly" or "serious".
+
+Guidelines:
+- "silly": Jokes, memes, humorous observations, casual/lighthearted content, entertainment, funny videos/images
+- "serious": News, politics, educational content, professional discussions, important announcements, technical topics, research papers, serious articles
+
+Tweet by @{tweet['author']}:
+"{cleaned_text}"{link_context}{author_context}
+
+Consider both the tweet text and any linked content when making your classification.
+Respond with just one word: either "silly" or "serious"."""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,  # Low temperature for consistent classification
+                max_tokens=10
+            )
+
+            classification = response.choices[0].message.content.strip().lower()
+
+            # Validate classification
+            if classification not in ["silly", "serious"]:
+                print(f"Warning: Unexpected classification '{classification}' for tweet by @{tweet['author']}")
+                # Default to serious if unclear
+                classification = "serious"
+
+            # For now, we don't have confidence scores from the API, so we'll use a placeholder
+            confidence = 0.9  # You could enhance this by asking for confidence in the prompt
+
+            # Store link analyses in the tweet for later reference
+            if link_analyses:
+                tweet['link_analyses'] = link_analyses
+
+            return classification, confidence
+
+        except Exception as e:
+            print(f"Error classifying tweet by @{tweet['author']}: {str(e)}")
+            return "serious", 0.0  # Default to serious on error
+
+    def classify_tweets(self, tweets: List[Dict], save_progress: bool = True,
+                       progress_file: str = "classification_progress.json") -> List[Dict]:
+        """
+        Classify a list of tweets and optionally save progress.
+
+        Args:
+            tweets: List of tweet dictionaries
+            save_progress: Whether to save progress periodically
+            progress_file: File to save progress to
+
+        Returns:
+            List of tweet dictionaries with added 'classification' and 'confidence' keys
+        """
+        results = []
+
+        # Load existing progress if available
+        if save_progress and Path(progress_file).exists():
+            try:
+                with open(progress_file, 'r', encoding='utf-8') as f:
+                    existing_results = json.load(f)
+                    # Build author history from existing results
+                    for result in existing_results:
+                        if 'classification' in result:
+                            self.author_history[result['author']].append(result['classification'])
+                    results = existing_results
+                    print(f"Loaded {len(results)} existing classifications from {progress_file}")
+            except Exception as e:
+                print(f"Error loading progress file: {str(e)}")
+
+        # Classify remaining tweets
+        start_index = len(results)
+        for i, tweet in enumerate(tweets[start_index:], start_index + 1):
+            print(f"Classifying tweet {i}/{len(tweets)} by @{tweet['author']}")
+
+            classification, confidence = self.classify_tweet(tweet)
+
+            # Add classification to tweet
+            classified_tweet = tweet.copy()
+            classified_tweet['classification'] = classification
+            classified_tweet['confidence'] = confidence
+            classified_tweet['cleaned_text'] = self.clean_tweet_text(tweet['body'])
+
+            results.append(classified_tweet)
+
+            # Update author history
+            self.author_history[tweet['author']].append(classification)
+
+            # Save progress periodically
+            if save_progress and i % 10 == 0:
+                with open(progress_file, 'w', encoding='utf-8') as f:
+                    json.dump(results, f, indent=2, ensure_ascii=False)
+                print(f"Progress saved to {progress_file}")
+
+        # Final save
+        if save_progress:
+            with open(progress_file, 'w', encoding='utf-8') as f:
+                json.dump(results, f, indent=2, ensure_ascii=False)
+            print(f"Final results saved to {progress_file}")
+
+        # Save link cache
+        self.save_link_cache()
+
+        return results
+
+    def analyze_results(self, classified_tweets: List[Dict]) -> None:
+        """Print analysis of classification results."""
+        if not classified_tweets:
+            print("No tweets to analyze.")
+            return
+
+        # Overall stats
+        silly_count = sum(1 for t in classified_tweets if t.get('classification') == 'silly')
+        serious_count = sum(1 for t in classified_tweets if t.get('classification') == 'serious')
+        total = len(classified_tweets)
+
+        print(f"\n=== CLASSIFICATION RESULTS ===")
+        print(f"Total tweets: {total}")
+        print(f"Silly: {silly_count} ({silly_count/total*100:.1f}%)")
+        print(f"Serious: {serious_count} ({serious_count/total*100:.1f}%)")
+
+        # Author breakdown
+        author_stats = defaultdict(lambda: {'silly': 0, 'serious': 0})
+        for tweet in classified_tweets:
+            author = tweet['author']
+            classification = tweet.get('classification', 'unknown')
+            if classification in ['silly', 'serious']:
+                author_stats[author][classification] += 1
+
+        print(f"\n=== TOP AUTHORS ===")
+        author_totals = [(author, stats['silly'] + stats['serious'])
+                        for author, stats in author_stats.items()]
+        author_totals.sort(key=lambda x: x[1], reverse=True)
+
+        for author, total_tweets in author_totals[:10]:  # Top 10 authors
+            stats = author_stats[author]
+            silly_pct = (stats['silly'] / total_tweets) * 100
+            print(f"@{author}: {total_tweets} tweets ({stats['silly']} silly, {stats['serious']} serious) - {silly_pct:.1f}% silly")
+
+        # Link analysis
+        tweets_with_links = [t for t in classified_tweets if 'link_analyses' in t and t['link_analyses']]
+        if tweets_with_links:
+            print(f"\n=== LINK ANALYSIS ===")
+            print(f"Tweets with links: {len(tweets_with_links)}")
+
+            link_types = defaultdict(int)
+            for tweet in tweets_with_links:
+                for link in tweet['link_analyses']:
+                    link_types[link['content_type']] += 1
+
+            print("Link types found:")
+            for link_type, count in sorted(link_types.items(), key=lambda x: x[1], reverse=True):
+                print(f"  {link_type}: {count}")
+
+            # Show classification breakdown for tweets with vs without links
+            with_links_silly = sum(1 for t in tweets_with_links if t.get('classification') == 'silly')
+            with_links_serious = sum(1 for t in tweets_with_links if t.get('classification') == 'serious')
+
+            without_links = [t for t in classified_tweets if 'link_analyses' not in t or not t['link_analyses']]
+            without_links_silly = sum(1 for t in without_links if t.get('classification') == 'silly')
+            without_links_serious = sum(1 for t in without_links if t.get('classification') == 'serious')
+
+            print(f"\nClassification by link presence:")
+            if tweets_with_links:
+                with_silly_pct = (with_links_silly / len(tweets_with_links)) * 100
+                print(f"  With links: {with_links_silly} silly, {with_links_serious} serious ({with_silly_pct:.1f}% silly)")
+            if without_links:
+                without_silly_pct = (without_links_silly / len(without_links)) * 100
+                print(f"  Without links: {without_links_silly} silly, {without_links_serious} serious ({without_silly_pct:.1f}% silly)")
+
+
+def main():
+    """Main function to run the tweet classifier."""
+    print("=== Tweet Classifier ===\n")
+
+    # Configuration from environment variables
+    API_KEY = os.getenv('OPENAI_API_KEY')
+    if not API_KEY:
+        print("Error: OPENAI_API_KEY environment variable not set")
+        print("Please either:")
+        print("  1. Set it with: export OPENAI_API_KEY=your-api-key")
+        print("  2. Add it to ~/.config/custom/secrets.d/openai file:")
+        print("     OPENAI_API_KEY=your-api-key")
+        return
+
+    INPUT_FILE = os.getenv('INPUT_FILE', 'bookmarked_tweets.json')
+    OUTPUT_FILE = os.getenv('OUTPUT_FILE', 'classified_tweets.json')
+    FETCH_LINKS = os.getenv('FETCH_LINKS', 'true').lower() in ('true', '1', 'yes')
+    MODEL = os.getenv('OPENAI_MODEL', 'gpt-3.5-turbo')
+
+    print(f"Configuration:")
+    print(f"  Input file: {INPUT_FILE}")
+    print(f"  Output file: {OUTPUT_FILE}")
+    print(f"  Model: {MODEL}")
+    print(f"  Link fetching: {'enabled' if FETCH_LINKS else 'disabled'}")
+    if FETCH_LINKS:
+        delay = float(os.getenv('LINK_FETCH_DELAY', '0.5'))
+        timeout = int(os.getenv('REQUEST_TIMEOUT', '10'))
+        print(f"  Link fetch delay: {delay}s")
+        print(f"  Request timeout: {timeout}s")
+    print()
+
+    # Initialize classifier
+    classifier = TweetClassifier(API_KEY, model=MODEL, fetch_links=FETCH_LINKS)
+
+    # Load tweets
+    try:
+        with open(INPUT_FILE, 'r', encoding='utf-8') as f:
+            tweets = json.load(f)
+        print(f"Loaded {len(tweets)} tweets from {INPUT_FILE}")
+    except FileNotFoundError:
+        print(f"Error: {INPUT_FILE} not found. Please export your bookmarked tweets first.")
+        return
+    except json.JSONDecodeError:
+        print(f"Error: {INPUT_FILE} is not valid JSON.")
+        return
+
+    # Validate tweet format
+    required_keys = ['url', 'author', 'body']
+    for i, tweet in enumerate(tweets):
+        if not all(key in tweet for key in required_keys):
+            print(f"Warning: Tweet {i} missing required keys. Expected: {required_keys}")
+
+    # Classify tweets
+    print("Starting classification...")
+    classified_tweets = classifier.classify_tweets(tweets, save_progress=True)
+
+    # Save final results
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+        json.dump(classified_tweets, f, indent=2, ensure_ascii=False)
+    print(f"Classification complete! Results saved to {OUTPUT_FILE}")
+
+    # Analyze results
+    classifier.analyze_results(classified_tweets)
+
+
+if __name__ == "__main__":
+    main()
