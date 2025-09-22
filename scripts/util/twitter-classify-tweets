@@ -1,4 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = [
+#   "openai",
+#   "beautifulsoup4",
+#   "requests"
+# ]
+# ///
 """
 Tweet Classifier Script
 Classifies bookmarked tweets as "silly" or "serious" using an LLM API.
@@ -6,14 +13,12 @@ Classifies bookmarked tweets as "silly" or "serious" using an LLM API.
 
 import json
 import re
-import time
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-from collections import defaultdict, Counter
+from typing import Dict, List, Tuple
+from collections import defaultdict
 import openai
 import requests
-from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 import hashlib
 
@@ -142,7 +147,7 @@ class TweetClassifier:
         """Generate a hash for URL to use as cache key."""
         return hashlib.md5(url.encode()).hexdigest()
 
-    def fetch_link_content(self, url: str, timeout: int = None) -> Dict[str, str]:
+    def fetch_link_content(self, url: str, timeout = None) -> Dict[str, str]:
         """
         Fetch and parse content from a URL.
 
@@ -239,21 +244,6 @@ class TweetClassifier:
 
         return result
 
-    def save_link_cache(self):
-        """Save link cache to file."""
-        if self.cache_links:
-            try:
-                with open(self.cache_file, 'w', encoding='utf-8') as f:
-                    json.dump(self.link_cache, f, indent=2, ensure_ascii=False)
-            except Exception as e:
-                print(f"Error saving link cache: {str(e)}")
-        """Remove URLs and clean up tweet text for classification."""
-        # Remove URLs
-        text = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', text)
-        # Remove extra whitespace
-        text = ' '.join(text.split())
-        return text.strip()
-
     def get_author_classification_history(self, author: str) -> str:
         """Get a summary of previous classifications for an author."""
         if author not in self.author_history:
@@ -283,36 +273,37 @@ class TweetClassifier:
         Returns:
             Tuple of (classification, confidence_score)
         """
-        cleaned_text = self.clean_tweet_text(tweet['body'])
+        # cleaned_text = self.clean_tweet_text(tweet['full_text'])
+        cleaned_text = tweet['full_text']
         author_context = ""
         link_context = ""
 
         if use_author_history:
-            author_context = f"\n\nAuthor context: {self.get_author_classification_history(tweet['author'])}"
+            author_context = f"\n\nAuthor context: {self.get_author_classification_history(tweet['screen_name'])}"
 
-        # Analyze links if enabled
-        link_analyses = []
-        if self.fetch_links:
-            link_analyses = self.analyze_links_in_tweet(tweet['body'])
+        # # Analyze links if enabled
+        # link_analyses = []
+        # if self.fetch_links:
+        #     link_analyses = self.analyze_links_in_tweet(tweet['body'])
 
-            if link_analyses:
-                link_summaries = []
-                for i, link in enumerate(link_analyses, 1):
-                    summary = f"Link {i}: "
-                    if link.get('error'):
-                        summary += f"Could not fetch ({link['error']})"
-                    else:
-                        summary += f"Type: {link['content_type']}"
-                        if link.get('title'):
-                            summary += f", Title: '{link['title'][:100]}'"
-                        if link.get('description'):
-                            summary += f", Description: '{link['description'][:150]}'"
-                        if link.get('text_preview'):
-                            summary += f", Preview: '{link['text_preview'][:200]}'"
+        #     if link_analyses:
+        #         link_summaries = []
+        #         for i, link in enumerate(link_analyses, 1):
+        #             summary = f"Link {i}: "
+        #             if link.get('error'):
+        #                 summary += f"Could not fetch ({link['error']})"
+        #             else:
+        #                 summary += f"Type: {link['content_type']}"
+        #                 if link.get('title'):
+        #                     summary += f", Title: '{link['title'][:100]}'"
+        #                 if link.get('description'):
+        #                     summary += f", Description: '{link['description'][:150]}'"
+        #                 if link.get('text_preview'):
+        #                     summary += f", Preview: '{link['text_preview'][:200]}'"
 
-                    link_summaries.append(summary)
+        #             link_summaries.append(summary)
 
-                link_context = f"\n\nLinked content analysis:\n" + "\n".join(link_summaries)
+        #         link_context = f"\n\nLinked content analysis:\n" + "\n".join(link_summaries)
 
         prompt = f"""Please classify this tweet as either "silly" or "serious".
 
@@ -320,7 +311,7 @@ Guidelines:
 - "silly": Jokes, memes, humorous observations, casual/lighthearted content, entertainment, funny videos/images
 - "serious": News, politics, educational content, professional discussions, important announcements, technical topics, research papers, serious articles
 
-Tweet by @{tweet['author']}:
+Tweet by @{tweet['screen_name']}:
 "{cleaned_text}"{link_context}{author_context}
 
 Consider both the tweet text and any linked content when making your classification.
@@ -338,7 +329,7 @@ Respond with just one word: either "silly" or "serious"."""
 
             # Validate classification
             if classification not in ["silly", "serious"]:
-                print(f"Warning: Unexpected classification '{classification}' for tweet by @{tweet['author']}")
+                print(f"Warning: Unexpected classification '{classification}' for tweet by @{tweet['screen_name']}")
                 # Default to serious if unclear
                 classification = "serious"
 
@@ -346,13 +337,13 @@ Respond with just one word: either "silly" or "serious"."""
             confidence = 0.9  # You could enhance this by asking for confidence in the prompt
 
             # Store link analyses in the tweet for later reference
-            if link_analyses:
-                tweet['link_analyses'] = link_analyses
+            # if link_analyses:
+            #     tweet['link_analyses'] = link_analyses
 
             return classification, confidence
 
         except Exception as e:
-            print(f"Error classifying tweet by @{tweet['author']}: {str(e)}")
+            print(f"Error classifying tweet by @{tweet['screen_name']}: {str(e)}")
             return "serious", 0.0  # Default to serious on error
 
     def classify_tweets(self, tweets: List[Dict], save_progress: bool = True,
@@ -387,7 +378,7 @@ Respond with just one word: either "silly" or "serious"."""
         # Classify remaining tweets
         start_index = len(results)
         for i, tweet in enumerate(tweets[start_index:], start_index + 1):
-            print(f"Classifying tweet {i}/{len(tweets)} by @{tweet['author']}")
+            print(f"Classifying tweet {i}/{len(tweets)} by @{tweet['screen_name']}")
 
             classification, confidence = self.classify_tweet(tweet)
 
@@ -395,12 +386,13 @@ Respond with just one word: either "silly" or "serious"."""
             classified_tweet = tweet.copy()
             classified_tweet['classification'] = classification
             classified_tweet['confidence'] = confidence
-            classified_tweet['cleaned_text'] = self.clean_tweet_text(tweet['body'])
+            # classified_tweet['cleaned_text'] = self.clean_tweet_text(tweet['full_text'])
+            classified_tweet['cleaned_text'] = tweet['full_text']
 
             results.append(classified_tweet)
 
             # Update author history
-            self.author_history[tweet['author']].append(classification)
+            self.author_history[tweet['screen_name']].append(classification)
 
             # Save progress periodically
             if save_progress and i % 10 == 0:
@@ -413,9 +405,6 @@ Respond with just one word: either "silly" or "serious"."""
             with open(progress_file, 'w', encoding='utf-8') as f:
                 json.dump(results, f, indent=2, ensure_ascii=False)
             print(f"Final results saved to {progress_file}")
-
-        # Save link cache
-        self.save_link_cache()
 
         return results
 
@@ -438,7 +427,7 @@ Respond with just one word: either "silly" or "serious"."""
         # Author breakdown
         author_stats = defaultdict(lambda: {'silly': 0, 'serious': 0})
         for tweet in classified_tweets:
-            author = tweet['author']
+            author = tweet['screen_name']
             classification = tweet.get('classification', 'unknown')
             if classification in ['silly', 'serious']:
                 author_stats[author][classification] += 1
@@ -532,7 +521,7 @@ def main():
         return
 
     # Validate tweet format
-    required_keys = ['url', 'author', 'body']
+    required_keys = ['url', 'screen_name', 'full_text']
     for i, tweet in enumerate(tweets):
         if not all(key in tweet for key in required_keys):
             print(f"Warning: Tweet {i} missing required keys. Expected: {required_keys}")
