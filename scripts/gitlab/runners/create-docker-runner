@@ -9,23 +9,22 @@ osnamelowercase=${osname,,}
 GITLAB_RUNNER_TAGS="os-${osnamelowercase},$(hostname),jmccown-user"
 RUNNER_DESCRIPTION="${RUNNER_DESCRIPTION:-Runner on $(hostname) created at $(date)}"
 
-echo "Creating runner via GitLab API..."
 response=$(http --ignore-stdin --body POST \
-    "https://gitlab.com/api/v4/user/runners" \
-    "PRIVATE-TOKEN:$GITLAB_API_TOKEN" \
-    description="$RUNNER_DESCRIPTION" \
-    paused:=false \
-    locked:=false \
-    run_untagged:=false \
-    project_id:=$dotfilesProjectId \
-    runner_type="project_type" \
-    tag_list="$GITLAB_RUNNER_TAGS,docker-exe" \
-    maintenance_note="Runner managed by chezmoi script" \
-    maximum_timeout:=3600 \
-    access_level="not_protected")
+	"https://gitlab.com/api/v4/user/runners" \
+	"PRIVATE-TOKEN:$GITLAB_API_TOKEN" \
+	description="$RUNNER_DESCRIPTION" \
+	paused:=false \
+	locked:=false \
+	run_untagged:=false \
+	project_id:=$dotfilesProjectId \
+	runner_type="project_type" \
+	tag_list="$GITLAB_RUNNER_TAGS,docker-exe" \
+	maintenance_note="Runner managed by chezmoi script" \
+	maximum_timeout:=3600 \
+	access_level="not_protected")
 
 runner_token="$(jq -r '.token' <<<"$response")"
 
-s bitwarden upsert-field "gitlab.com" "runner-token-${osnamelowercase}-docker" "$runner_token"
+chronic s bitwarden upsert-field "gitlab.com" "runner-token-${osnamelowercase}-docker" "$runner_token"
 
 echo "$runner_token"
