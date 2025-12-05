@@ -69,7 +69,7 @@ function __list_commands {
   _arguments -C ": :(($subcmds))" "*::arg:->args"
 
   # Handle nested completions when a subcommand is selected
-  if [[ $state == args && CURRENT > 1 ]]; then
+  if (( CURRENT > 1 )); then
     local sel=${words[CURRENT]}
     if (( S_SCRIPT_PASSTHRU_CMDS[(Ie)$sel] )); then
       next="$dir"
