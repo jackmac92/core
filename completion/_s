@@ -61,22 +61,22 @@ function __list_commands {
     _store_cache "$cache_id" subcmds
   fi
 
-  # Process completions
-  if (( ${#subcmds} > 0 )); then
-    _arguments -C ": :(($subcmds))" "*::arg:->args"
+  # Process completions: fallback to file completion when no subcommands
+  if (( ${#subcmds} == 0 )); then
+    _files
+    return
   fi
+  _arguments -C ": :(($subcmds))" "*::arg:->args"
 
-  # Handle nested completions
-  if [[ -n "$line[1]" ]]; then
-    if (($S_SCRIPT_PASSTHRU_CMDS[(Ie)$line[1]])); then
+  # Handle nested completions when a subcommand is selected
+  if (( CURRENT > 1 )); then
+    local sel=${words[2]}
+    if (( S_SCRIPT_PASSTHRU_CMDS[(Ie)$sel] )); then
       next="$dir"
     else
-      next="$dir/$line[1]"
+      next="$dir/$sel"
     fi
-
     [[ -d "$next" ]] && __list_commands "$next"
-  else
-    _files
   fi
 }
 
