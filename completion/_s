@@ -61,6 +61,13 @@ function __list_commands {
     _store_cache "$cache_id" subcmds
   fi
 
+  # Process completions: fallback to file completion when no subcommands
+  if (( ${#subcmds} == 0 )); then
+    _files
+    return
+  fi
+  _arguments -C ": :(($subcmds))" "*::arg:->args"
+
   # Handle nested completions when a subcommand is selected
   if [[ $state == args && CURRENT > 1 ]]; then
     local sel=${words[CURRENT]}
@@ -70,16 +77,7 @@ function __list_commands {
       next="$dir/$sel"
     fi
     [[ -d "$next" ]] && __list_commands "$next"
-    return
   fi
-
-  # Process completions: fallback to file completion when no subcommands
-  if (( ${#subcmds} == 0 )); then
-    _files
-    return
-  fi
-
-  _arguments -C ": :(($subcmds))" "*::arg:->args"
 }
 
 # Only process if SCRIPTS_PATH is set
