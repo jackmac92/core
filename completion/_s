@@ -70,7 +70,7 @@ function __list_commands {
 
   # Handle nested completions when a subcommand is selected
   if (( CURRENT > 1 )); then
-    local sel=${words[CURRENT]}
+    local sel=${words[2]}
     if (( S_SCRIPT_PASSTHRU_CMDS[(Ie)$sel] )); then
       next="$dir"
     else
