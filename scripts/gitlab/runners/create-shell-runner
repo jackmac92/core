@@ -7,6 +7,11 @@ osname=$(uname)
 osnamelowercase=${osname,,}
 
 GITLAB_RUNNER_TAGS="os-${osnamelowercase},$(hostname),jmccown-user"
+
+if docker info | grep -i "Is Manager" | grep -q true; then
+	GITLAB_RUNNER_TAGS="$GITLAB_RUNNER_TAGS,swarm-manager"
+fi
+
 RUNNER_DESCRIPTION="${RUNNER_DESCRIPTION:-Runner on $(hostname) created at $(date)}"
 
 response=$(http --ignore-stdin --body POST \
