@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+registeredRunnerIds=$(s gitlab this-project-request runners tag_list==jmccown-user | jq 'map(.id)')
+allRunners="$(s gitlab request runners status==online tag_list==jmccown-user)"
+availablerunnerIds=$(jq --null-input --argjson availablerunnerIds "$(jq 'map(.id)' <<<"$allRunners")" --argjson alreadyregistered "$registeredRunnerIds" '$availablerunnerIds - $alreadyregistered')
+
+if [[ -z $(jq '.[]' <<<"$availablerunnerIds") ]]; then
+    echo "No runners available"
+    exit 0
+fi
+
+availablerunners=$(jq --argjson idsToUse "$availablerunnerIds" 'map(. as $elem | select($idsToUse | index($elem.id)))' <<<"$allRunners")
+_addRunner() {
+    jq -e --arg tgt "$1" 'map(select(.description | contains($tgt)))[] | .id' -r <<<"$availablerunners" | xargs -d $'\n' -n 1 --no-run-if-empty s gitlab add-this-project-runner
+}
+
+# _addRunner "elixium"
+_addRunner "homeframe"
