@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fullfile="$1"
+filename=$(basename -- "$fullfile")
+extension="${filename##*.}"
+#filename="${filename%.*}"
+
+echo "$extension"
