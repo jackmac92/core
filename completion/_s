@@ -54,6 +54,7 @@ function __list_commands {
       fi
 
       help=${help//\"/\\\"}
+      help=${help//)/\\)}
       subcmds+=("$command:\"$help\"")
     done
 
