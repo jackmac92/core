@@ -11,12 +11,9 @@ preview_key="$1"
 shift
 
 declare -A choiceDict
-IFS=$'\n'
-for el in $(jq -r --arg displayKey "$display_key" '.[] | "\(.[$displayKey])=\(.)"'); do
-  _k=$(echo "$el" | choose -f = 0)
-  _v=$(echo "$el" | choose -f = 1:)
+while IFS= read -r _k && IFS= read -r _v; do
   choiceDict["$_k"]="$_v"
-done
+done < <(jq -r --arg displayKey "$display_key" '.[] | .[$displayKey], tojson')
 
 if [[ "${#choiceDict[@]}" -eq 0 ]]; then
   echo "No choices found" >/dev/stderr
@@ -42,6 +39,6 @@ if [[ -z $selection ]]; then
   exit 1
 fi
 
-for x in $(xargs -n 1 -0 <<<"${selection[@]}"); do
+while IFS= read -r x; do
   echo "${choiceDict["$x"]}"
-done
+done <<< "$selection"
