@@ -5,15 +5,34 @@ TARGET_DIR=${1:?"Required arg"}
 GOSS_EXIT_CODE=255
 
 if [[ -n ${JM_GOSS_KEEP_GOING:-""} ]]; then
-    GOSS_EXIT_CODE=1;
+    GOSS_EXIT_CODE=1
 fi
 
-fd --type directory \
-    --max-depth=1 . $TARGET_DIR |
-    sort --numeric-sort -r |
-    xargs -I_ bash -c "s goss run-in-order _ || exit $GOSS_EXIT_CODE"
+FAILED=0
 
-fd --type file --type symlink \
-    --max-depth=1 . $TARGET_DIR |
-    sort --numeric-sort -r |
-    xargs -I_ bash -c '>&2 echo -en "\r\033[Ktesting $(basename _)"; gossOut='"$(mktemp)"'; goss -g _ validate --format=json --format-options=verbose > $gossOut; if [ $? -ne 0 ]; then >&2 echo -en "\r\033[K"; cat $gossOut | >&2 jq; '"exit $GOSS_EXIT_CODE;"'fi'
+while IFS= read -r subdir; do
+    s goss run-in-order "$subdir" || {
+        ret=$?
+        [[ $ret -eq 255 ]] && exit 255
+        FAILED=1
+    }
+done < <(fd --type directory --max-depth=1 . "$TARGET_DIR" | sort --numeric-sort -r)
+
+while IFS= read -r testfile; do
+    >&2 printf '\r\033[Ktesting %s' "$(basename "$testfile")"
+    gossOut=$(mktemp)
+    if ! goss -g "$testfile" validate --format=json --format-options=verbose >"$gossOut"; then
+        >&2 printf '\r\033[K'
+        jq <"$gossOut" >&2
+        has_meta_failures=$(jq '[.results[] | select(.successful == false and .meta != null)] | length > 0' "$gossOut")
+        rm -f "$gossOut"
+        if [[ "$has_meta_failures" == "true" ]]; then
+            exit "$GOSS_EXIT_CODE"
+        fi
+        FAILED=1
+        continue
+    fi
+    rm -f "$gossOut"
+done < <(fd --type file --type symlink --max-depth=1 . "$TARGET_DIR" | sort --numeric-sort -r)
+
+exit "$FAILED"

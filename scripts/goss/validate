@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Walk up from the current directory collecting goss.yaml/goss.yml files,
+# then run them from root-most to current directory.
+# All args are passed through to `goss validate`.
+#
+# Usage: s goss validate [goss-validate-args...]
+#
+# Set GOSS_WALK_STOP_DIR to stop walking at a specific directory (inclusive).
+# Default: walk to filesystem root (/).
+
+STOP_AT="$(realpath "${GOSS_WALK_STOP_DIR:-/}")"
+
+GOSSFILES=()
+dir="$(pwd)"
+while true; do
+    for candidate in "$dir/goss.yaml" "$dir/goss.yml"; do
+        [[ -f "$candidate" ]] && GOSSFILES=("$candidate" ${GOSSFILES[@]+"${GOSSFILES[@]}"})
+    done
+    [[ "$dir" == "$STOP_AT" || "$dir" == "/" ]] && break
+    dir="$(dirname "$dir")"
+done
+
+if [[ ${#GOSSFILES[@]} -eq 0 ]]; then
+    echo "No goss files found walking up from $(pwd) to ${STOP_AT}." >&2
+    exit 1
+fi
+
+FAILED=0
+for f in "${GOSSFILES[@]}"; do
+    echo "==> $(dirname "$f")"
+    goss -g "$f" validate "$@" || FAILED=1
+done
+exit $FAILED
