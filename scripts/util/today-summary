@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DB="${CLAUDE_MEM_DB:-$HOME/.claude-mem/claude-mem.db}"
+DATE="${1:-$(date +%Y-%m-%d)}"
+
+if [[ ! -f "$DB" ]]; then
+  echo "claude-mem DB not found: $DB" >&2
+  exit 1
+fi
+
+OBS=$(sqlite3 "$DB" "
+  SELECT
+    project,
+    type,
+    COALESCE(title, '(untitled)') as title,
+    COALESCE(subtitle, '') as subtitle,
+    COALESCE(narrative, '') as narrative,
+    strftime('%H:%M', created_at) as time
+  FROM observations
+  WHERE date(created_at) = '$DATE'
+    AND title IS NOT NULL AND title != ''
+  ORDER BY project, created_at_epoch;
+" 2>/dev/null)
+
+if [[ -z "$OBS" ]]; then
+  echo "No observations found for $DATE."
+  exit 0
+fi
+
+COUNT=$(sqlite3 "$DB" "SELECT COUNT(*) FROM observations WHERE date(created_at) = '$DATE';" 2>/dev/null)
+
+PROMPT="You are summarizing a software developer's work for $DATE based on automated memory observations recorded throughout the day.
+
+Below are the observations grouped by project, in chronological order (format: project|type|title|subtitle|narrative|time):
+
+$OBS
+
+Total observations: $COUNT
+
+Write a concise daily summary (3-8 bullet points) covering:
+- What projects were worked on
+- Key features, fixes, or changes made
+- Important discoveries or decisions
+- Current state / what's in progress
+
+Be specific but brief. Use plain bullet points. No headers needed. Focus on substance over process."
+
+echo "Summarizing $COUNT observations for $DATE..." >&2
+echo ""
+
+echo "$PROMPT" | claude -p --model claude-haiku-4-5-20251001
