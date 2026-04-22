@@ -3,13 +3,14 @@ import Aria2 from "npm:aria2";
 import { parseArgs } from "jsr:@std/cli/parse-args";
 import * as path from "jsr:@std/path";
 
-const API_KEY = Deno.env.get("MOTRIX_JSON_RPC_APIKEY");
-const API_PORT = Deno.env.get("MOTRIX_JSON_RPC_PORT") || 16800;
-
 const flags = parseArgs(Deno.args, {
-  boolean: ["await", "hideme"],
-  default: { await: false, hideme: false },
+  boolean: ["await"],
+  string: ["port"],
+  default: { await: false },
 });
+
+const API_KEY = Deno.env.get("MOTRIX_JSON_RPC_APIKEY");
+const API_PORT = flags.port || Deno.env.get("MOTRIX_JSON_RPC_PORT") || 16800;
 
 export function validateUrl(value) {
   try {
@@ -77,14 +78,6 @@ async function onGot(downloadItem) {
     params = {
       ...params,
       header: [`Cookie: ${downloadItem.cookies}`],
-    };
-  }
-
-  if (flags.hideme) {
-    console.log("Applying hide.me vpn for download");
-    params = {
-      ...params,
-      "https-proxy": `http://${Deno.env.get("HIDE_ME_USERNAME")}:${Deno.env.get("HIDE_ME_PASSWORD")}@newyorkcity.hideservers.net:432`,
     };
   }
 

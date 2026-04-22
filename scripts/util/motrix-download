@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-hideme_flag=""
-if [[ "${1:-}" == "--hideme" ]]; then
-  hideme_flag="--hideme"
-  shift
+port_flag=""
+if [[ "${1:-}" == "--port" ]]; then
+  port_flag="--port $2"
+  shift 2
 fi
 
 url="$1"
 filename="$((yt-dlp --get-filename "$url" 2>/dev/null || youtube-dl --get-filename "$url") | sed 's/#[^ ]*//g')"
 url="$((yt-dlp --format "b[ext=mp4][protocol!*=m3u8]/b[ext=mp4]/best" --get-url "$url" 2>/dev/null || youtube-dl --format 'best[ext=mp4]/best' --get-url "$url") | head -n 1)"
-source ~/.config/custom/secrets.d/hideme
-s util motrix-add-via-aria2 $hideme_flag "$url" "$filename"
+s util motrix-add-via-aria2 $port_flag "$url" "$filename"
