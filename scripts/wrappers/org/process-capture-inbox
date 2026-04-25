@@ -1,0 +1,24 @@
+#!/bin/bash -l
+set -euo pipefail
+
+sourcedir="$HOME/.local/ios-capture-inbox"
+cd "$sourcedir" || exit 1
+
+workdir="$sourcedir"
+# workdir="$(mktemp -d)"
+# echo "Copying source state to working dir w/ rclone sync" >/dev/stderr
+# rclone sync 'mac-mini:Library/Mobile Documents/com~apple~CloudDocs/CaptureTrunk' "$workdir"
+
+capturesToProcess=$(fd --exclude failed --exclude Archived -t f Dictionary.json "$workdir" -x realpath)
+export CAPTURE_SERVER="${JM_CAPTURE_SERVER:-"$(s emacs select-active-server donkey default stable)"}"
+export CAPTURE_WORKDIR="$workdir"
+
+if [[ -z "${capturesToProcess:-""}" ]]; then
+	echo "No new captures, exiting"
+	exit 0
+fi
+
+xargs -d $'\n' -P 1 -I_ s org process-capture-inbox-folder '_' 2>&1 <<<"$capturesToProcess"
+
+# rclone sync "$workdir" 'mac-mini:Library/Mobile Documents/com~apple~CloudDocs/CaptureTrunk'
+# echo "Restored source state w/ rclone sync" >/dev/stderr

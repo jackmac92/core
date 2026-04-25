@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat <<EOF >npmBuild.ts
+
+import { build, emptyDir } from "https://deno.land/x/dnt/mod.ts";
+const outDir = "./dist-npm";
+await emptyDir(outDir);
+await build({
+  outDir,
+  entryPoints: ["./mod.ts"],
+  compilerOptions: {
+    lib: ["dom", "esnext"],
+  },
+  shims: {
+    // see JS docs for overview and more options
+    deno: true,
+  },
+  package: {
+    name: "$CI_PROJECT_NAME",
+    version: Deno.args[0],
+  },
+});
+
+EOF
+
+echo '{
+        "plugins": [
+          "@semantic-release/commit-analyzer",
+          "@semantic-release/release-notes-generator",
+          [
+            "@semantic-release/exec",
+            {
+              "prepareCmd": "deno --unstable run --config=./deno.json -A npmBuild.ts ${nextRelease.version}",
+              "publishCmd": "cd dist-npm; echo \"//registry.npmjs.org/:_authToken=${NPM_TOKEN}\" > .npmrc; npm publish"
+            }
+          ],
+          ["@semantic-release/git",
+            {
+              "message": "chore(release): ${nextRelease.version} \n\n${nextRelease.notes}"
+            }
+          ]
+        ]
+      }' >.releaserc

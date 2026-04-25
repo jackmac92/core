@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd ~/.local/share/chezmoi/.chezmoiscripts
+
+sudo_files=$(rg --files-with-matches -l 'sudo')
+
+# Check each file for 'CHEZ_WITH_SUDO'
+while IFS= read -r file; do
+    if ! rg -q 'CHEZ_WITH_SUDO' "$file"; then
+        echo "$file"
+    fi
+done <<<"$sudo_files"

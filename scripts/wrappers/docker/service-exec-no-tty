@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+tgt_svc=${1:-$(s docker pick-service)}
+shift
+set -e
+
+svc_info=$(docker service ps "$tgt_svc" --filter=desired-state=running --format="{{ json . }}")
+
+svc_node=$(jq -r '.Node' <<<"$svc_info")
+svc_name=$(jq -r '.Name' <<<"$svc_info")
+
+all_svcs=$(
+    ssh $svc_node < <(
+        cat <<EOF
+docker ps --format '{{ json . }}'
+
+EOF
+
+    ) | jq -c
+)
+
+svc_instance_id=$(jq -r --arg tgt "$svc_name" 'select(.Names | startswith($tgt)) | .ID' <<<"$all_svcs")
+
+ssh "$svc_node" docker exec "$svc_instance_id" $*

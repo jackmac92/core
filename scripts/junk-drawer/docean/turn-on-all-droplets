@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s docean all-droplet-ids | xargs -d $'\n' -n 1 -P 10 doctl compute droplet-action power-on
+

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo cat /etc/gitlab-runner/config.toml |
+  s util convert-toml-to-json |
+  jq \
+    --arg secret "$(s bitwarden get-field "Personal Amazon" "aws-cbi-macbook-access-secret")" \
+    --arg access "$(s bitwarden get-field "Personal Amazon" "aws-cbi-macbook-access-id")" \
+    '.runners[].cache = {
+              Type: "s3",
+              s3: {
+                  ServerAddress: "s3.us-east-1.amazonaws.com",
+                  AccessKey: $access,
+                  SecretKey: $secret,
+                  BucketName: "jmccown-gitlab-ci-cache",
+                  Insecure: false}}' |
+  s util convert-json-to-toml |
+  sponge /tmp/new-gitlab-runner-config.toml
+
+sudo mv /tmp/new-gitlab-runner-config.toml /etc/gitlab-runner/config.toml

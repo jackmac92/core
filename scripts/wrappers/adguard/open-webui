@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xdg-open "http://priv.$PRIMARY_PERSONAL_DOMAIN:3471"

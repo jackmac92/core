@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd . .git/hooks --type=executable -x sed -i '/^[^#].*/i unset GIT_LITERAL_PATHSPECS' {}
+

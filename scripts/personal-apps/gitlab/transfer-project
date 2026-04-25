@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+s gitlab this-project-request "PUT" "transfer" namespace="jackmac92"
+git remote set-url origin $(git remote get-url origin | sd dropLoop jackmac92)
+s gitlab personal-repo-setup

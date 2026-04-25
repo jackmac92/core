@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+url_base="https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&query="
+url="$url_base""$(s util urlencode $1)"
+
+xdg-open $url

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+doctl compute droplet list --format "Name,ID" --output json | jq --arg filtername "${1:-""}" 'map(select(.name | contains($filtername)))' | s fzf select-by-json-key "name"

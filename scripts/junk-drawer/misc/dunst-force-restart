@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+currnetnotifier=$(DISPLAY=${DISPLAY:-":0"} dunst |& rg PID)
+
+kill $(echo "$currnetnotifier" | choose -1 | sd "'(\d+)'\." '$1') && systemctl --user restart dunst.service

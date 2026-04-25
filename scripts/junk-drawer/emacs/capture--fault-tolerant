@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+org-capture
+
+if [[ $? = 22 ]]; then
+    alacritty -e bash -c "vi ~/org/.capture-fallback/$(date).txt"
+fi

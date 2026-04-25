@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+thisemacsprofile="${1:-${EMACS_PROFILE_NAME:-${PWD##*/}}}"
+edir="$(chezmoi execute-template <<<'{{ template "emacs-profile-emacsd-dir" "'"$thisemacsprofile"'" }}')/"
+emacsbindir=$(chezmoi execute-template '{{ $info := index .emacs.profiles "'"$thisemacsprofile"'" -}}{{- hasKey $info "emacsBinDir" | ternary (get $info "emacsBinDir") (joinPath .chezmoi.homeDir ".nix-profile/bin/") -}}')
+
+mkdir -p bin
+cat <<EOF >./bin/emacs
+#!/usr/bin/env sh
+$emacsbindir/emacs --with-profile '((user-emacs-directory . "$edir") (server-name . "$thisemacsprofile"))' \$*
+EOF
+
+cat <<EOF >./bin/doom
+#!/usr/bin/env sh
+PATH=$emacsbindir:\$PATH doom \$*
+EOF
+
+cat <<EOF >./bin/emacsclient
+#!/usr/bin/env sh
+$emacsbindir/emacsclient \$*
+EOF
+
+chmod +x ./bin/*

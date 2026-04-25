@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${TRAEFIK_NETWORK-}" ]]; then
+  TRAEFIK_NETWORK="drop-loop-net"
+fi
+if [[ -z "${STACK_BUILD_DEF:-}" ]]; then
+  STACK_BUILD_DEF="docker-compose.yml"
+fi
+if [[ -z "${STACK_DEPLOY_DEF:-}" ]]; then
+  STACK_DEPLOY_DEF="docker-stack.yml"
+fi
+if [[ -z "${DEPLOY_WITH_GELF_LOGGING:-}" ]]; then
+  DEPLOY_WITH_GELF_LOGGING="0"
+fi
+if [[ -z "${APP_IMAGE_NAME:-}" ]]; then
+  APP_IMAGE_NAME="whales.jackdmc.com/$CI_PROJECT_NAME"
+fi
+if [[ -z "${TRAEFIK_BASE_DOMAINS:-}" ]]; then
+  TRAEFIK_BASE_DOMAINS="jackdmc.com,hopefullythis.works"
+fi
+if [[ -z "${INTERNAL_DOMAIN_NAMES:-}" ]]; then
+  INTERNAL_DOMAIN_NAMES="priv.jackdmc.com"
+fi
+if [[ -z "${STACK_NAME:-}" ]]; then
+  STACK_NAME="$CI_PROJECT_NAME"
+fi
+if [[ -z "${DEPLOY_VIA_COMPOSE:-}" ]]; then
+  DEPLOY_VIA_COMPOSE="0"
+fi
+if [[ -z "${LE_CERTRESOLVER_SUFFIX:-}" ]]; then
+  LE_CERTRESOLVER_SUFFIX=""
+fi
+
+if ! command -v python3 >/dev/null; then
+  echo "You must install python3"
+  exit 1
+fi
+
+if [ "$CI_PROJECT_NAME" = "docker-registry" ]; then
+  LE_CERTRESOLVER_SUFFIX=""
+fi
+
+mkdir -p specfiles
+debugLogger() {
+  if [ -n "${DEBUG_CI:-""}" ]; then
+    echo -e "$@"
+  fi
+}
+
+nStackComponents=0
+addFileToListBase() {
+  debugLogger "Adding $1 json file with contents\n$2\n\n"
+  tmpYamlFile="$1.json"
+  echo "$2" | yq -c >"specfiles/$nStackComponents-$tmpYamlFile"
+  ((nStackComponents += 1))
+}
+
+if [ -f "${STACK_DEPLOY_DEF:?"Must define a STACK_DEPLOY_DEF"}" ]; then
+  cat "$STACK_DEPLOY_DEF" | yq -c >"specfiles/stack-deploy-def.json"
+elif [ -f "$STACK_DEPLOY_DEF.tmpl" ]; then
+  envsubst <"$STACK_DEPLOY_DEF.tmpl" | yq -c | tee "specfiles/stack-deploy-def.json"
+else
+  # this is ugly dupe but the existing func is too coupled to the loop with closures
+  elseHelper() {
+    echo "services: {""${CORE_SERVICE_KEY:-core}"": {""$1""}}"
+  }
+  addFileToListBase coresvcbyappimage "$(elseHelper "image: $APP_IMAGE_NAME")"
+  if [ -n "${CORE_SERVICE_COMMAND:-""}" ]; then
+    addFileToListBase coresvccommand "$(elseHelper "command: $CORE_SERVICE_COMMAND")"
+  fi
+fi
+
+SERVICES_TO_PROCESS=$(env | grep "CORE_SERVICE_KEY" | tr " " "\n")
+for svc_full_info in $(echo "$SERVICES_TO_PROCESS"); do
+  echo "PROCESSING $svc_full_info"
+  this_svc=$(echo $svc_full_info | cut -d= -f1)
+  this_svc_name=$(echo $svc_full_info | cut -d= -f2)
+  svc_suffix=${this_svc#"CORE_SERVICE_KEY"}
+  STACK_SERVICE_NAME="$STACK_NAME--${this_svc_name}"
+  addFileToList() {
+    addFileToListBase "$1"'-'"$svc_suffix" "$2"
+  }
+  removeFileFromList() {
+    rm -f "specfiles/$1"'-'"$svc_suffix.json"
+  }
+  getIndividualPerServiceEnvVar() {
+    target_var_str="$1"
+    potential_var="$target_var_str""$svc_suffix"
+    set +u
+    eval echo '$'"$potential_var"
+    set -u
+  }
+  checkForPerServiceEnvVar() {
+    target_var_str="$1"
+    set +u
+    potential_var="$target_var_str""$svc_suffix"
+    result=""
+    if ! [ -z "$potential_var" ]; then
+      result=$(eval echo "$potential_var")
+    fi
+    if ! [ -z "$target_var_str" ]; then
+      result=$(eval echo "$target_var_str")
+    fi
+    set -u
+    echo $result
+  }
+
+  wrapYamlInfo() {
+    echo "services: {""$1"": {""$2""}}"
+  }
+  coreService() {
+    wrapYamlInfo "$this_svc_name" "$1"
+  }
+  addLabelToContainer() {
+    fname="$1"'-labels-'
+    if [ ${DEPLOY_VIA_COMPOSE:-""} = "1" ]; then
+      addFileToList "$fname" "$(coreService "labels: $2")"
+    else
+      addFileToList "$fname" "$(coreService "deploy: { labels: $2 }")"
+    fi
+  }
+  removeLabelFromContainer() {
+    rm -f "specfiles/$1"'-labels-'"$svc_suffix.json"
+  }
+  # THIS_SERVICE_COMMAND=$(getIndividualPerServiceEnvVar SERVICE_COMMAND)
+  echo "Funcs and vars set for $svc_full_info"
+  THIS_SERVICE_ENVIRONMENT=$(getIndividualPerServiceEnvVar SERVICE_ENVIRONMENT)
+  if [ -n "${THIS_SERVICE_ENVIRONMENT:-""}" ]; then
+    addFileToList environment "$(coreService "environment: $THIS_SERVICE_ENVIRONMENT")"
+  fi
+  addFileToListBase subdomain-external-net "networks"':'" { $TRAEFIK_NETWORK"':'" { external"':'" true } }"
+  addFileToListBase deploy-update_config "$(coreService "deploy: { update_config: { parallelism: 1, delay: 10s, failure_action: rollback } }")"
+  addFileToListBase deploy-restart_config "$(coreService "deploy: { restart_policy: { max_attempts: 30,  delay: 45s, window: 1400s } }")"
+  addLabelToContainer vector-logging "['vector.logging=true']"
+  NEEDS_TRAEFIK_BASE=0
+
+  echo "Checking for any subdomains"
+  SERVICE_PORTS_TO_EXPOSE=$(env | grep "SERVICE""$svc_suffix""_PORT_" || echo "" | tr " " "\n" || echo "")
+  echo "Processing subdomains!"
+  for exposed_svc_port in $(echo "$SERVICE_PORTS_TO_EXPOSE"); do
+    NEEDS_TRAEFIK_BASE=1
+    DOMAINS_TO_USE=$TRAEFIK_BASE_DOMAINS
+    echo "Setting up subdomain $exposed_svc_port"
+
+    port_full_key=$(echo $exposed_svc_port | cut -d= -f1)
+    port_subdomain=$(echo $exposed_svc_port | cut -d= -f2)
+    port_no=${port_full_key#"SERVICE""$svc_suffix""_PORT_"}
+    lookupPortVar() {
+      set +u
+      eval echo '$'"SERVICE""$svc_suffix""_""$1""_PORT_""$port_no"
+      set -u
+    }
+    TRAEFIK_CONFIG_NAME_ENDPOINT="$STACK_SERVICE_NAME""$port_no"
+    addLabelToContainer "certresolver-$port_no" "['traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.tls.certresolver=letsencrypt$LE_CERTRESOLVER_SUFFIX']"
+
+    THIS_SKIP_SSL=$(lookupPortVar SKIP_SSL)
+    THIS_TRAEFIK_ROUTE_RULE_EXTRAS=$(lookupPortVar TRAEFIK_ROUTE_RULE_EXTRAS)
+
+    # using dns cert resolver challenge for vpn domains
+    if [ "$(lookupPortVar AUTHVPN)" == "1" ]; then
+      DOMAINS_TO_USE="$INTERNAL_DOMAIN_NAMES"
+      removeLabelFromContainer "certresolver-$port_no"
+      addLabelToContainer "certresolver-$port_no" "['traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.tls.certresolver=letsencrypt-dns$LE_CERTRESOLVER_SUFFIX']"
+      if [ "$(lookupPortVar AUTHCUSTOM)" ]; then
+        addLabelToContainer "vpnrestrict-custom-$port_no" "['traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.middlewares=vpnCustom@file']"
+      else
+        addLabelToContainer "vpnrestrict-$port_no" "['traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.middlewares=vpnAuth@file']"
+      fi
+    elif [ "$(lookupPortVar AUTHBASIC)" == "1" ]; then
+      addLabelToContainer "middlewares-$port_no" "['traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.middlewares=myAuth@file']"
+    else
+      addLabelToContainer "stockmiddleware-$port_no" "['traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.middlewares=stock@file']"
+    fi
+
+    if [ "$THIS_SKIP_SSL" == "1" ]; then
+      removeLabelFromContainer "certresolver-$port_no"
+      removeLabelFromContainer "vpnrestrict-$port_no"
+      addLabelToContainer "vpnrestrict-nossl-$port_no" "['traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.middlewares=vpnAuthNoSsl@file']"
+      addLabelToContainer "nossl-$port_no" "['traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.entrypoints.web']"
+    fi
+    HOSTNAME_LIST=$(for i in $(echo $DOMAINS_TO_USE | tr ',' '\n' | perl -pe 'chomp if eof'); do echo "\`$port_subdomain.$i\`"; done | perl -pe 'chomp if eof' | tr '\n' ',')
+    addLabelToContainer "subdomain-$port_no" "['traefik.http.services.$TRAEFIK_CONFIG_NAME_ENDPOINT.loadBalancer.server.port=$port_no', 'traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.rule=Host($HOSTNAME_LIST) $THIS_TRAEFIK_ROUTE_RULE_EXTRAS', 'traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.service=$TRAEFIK_CONFIG_NAME_ENDPOINT@docker', 'traefik.http.routers.$TRAEFIK_CONFIG_NAME_ENDPOINT.tls.options=default']"
+
+    if ! [ -z "$(lookupPortVar INCLUDETRAEFIKHEALTHCHECK)" ]; then
+      HEALTHCHECKPATH="$(lookupPortVar HEALTHCHECKPATH)"
+      addLabelToContainer "healthcheck-$port_no" "['traefik.http.services.$TRAEFIK_CONFIG_NAME_ENDPOINT.loadBalancer.healthCheck.path=${HEALTHCHECKPATH:-"/"}', 'traefik.http.services.$TRAEFIK_CONFIG_NAME_ENDPOINT.loadBalancer.healthCheck.interval=10s']"
+    fi
+  done
+
+  if [ $NEEDS_TRAEFIK_BASE -eq 1 ] && [ -z ${NO_ADD_DOCKER_NETWORK:-""} ]; then
+    addFileToList traefikbase "$(coreService "networks: [ '$TRAEFIK_NETWORK' ]")"
+    addLabelToContainer traefikbase "['traefik.enable=true', 'traefik.docker.network=$TRAEFIK_NETWORK', 'traefik.docker.lbswarm=true']"
+  fi
+
+  SERVICE_VOLUMES_TO_PREPOPULATE=$(env | grep "SERVICE""$svc_suffix""_PREPOP_VOLUME_" || echo "" | tr " " "\n" || echo "") # not sure why this seems to error out without matches (couldn't repro in ubuntu container)
+  echo "Processing subdomains!"
+  for vol_to_prepopulate in $(echo "$SERVICE_VOLUMES_TO_PREPOPULATE"); do
+    local_dir_to_source=$(echo $vol_to_prepopulate | cut -f1 -d:)
+    target_location_to_populate=$(echo $vol_to_prepopulate | cut -f2 -d:)
+    prepop_volume_name="$STACK_SERVICE_NAME""_nfs_prepop_""$local_dir_to_source""volume"
+    addFileToList "prepop-""$local_dir_to_source""-volume-base" "volumes: {$prepop_volume_name"": { external: true }}"
+    addFileToList "prepop-""$local_dir_to_source""-volume" "$(coreService "volumes: ['$prepop_volume_name"":$target_location_to_populate']")"
+  done
+
+  echo "Checking for volumes to apply"
+  THIS_PERSIST_SERVICE_PATH=$(getIndividualPerServiceEnvVar PERSIST_SERVICE_PATH)
+  if ! [ -z $THIS_PERSIST_SERVICE_PATH ]; then
+    persistent_volume_name="$STACK_SERVICE_NAME""_nfs_volume"
+    addFileToList volume-base "volumes: {$persistent_volume_name"": { external: true }}"
+    addFileToList volume "$(coreService "volumes: ['$persistent_volume_name"":$THIS_PERSIST_SERVICE_PATH']")"
+  fi
+  THIS_STACK_DEPLOY_CONFIGS=$(getIndividualPerServiceEnvVar STACK_DEPLOY_CONFIGS)
+  if ! [ -z $THIS_STACK_DEPLOY_CONFIGS ]; then
+    addFileToList deploy-config "$(coreService "deploy: { $THIS_STACK_DEPLOY_CONFIGS }")"
+  fi
+  if [ $DEPLOY_WITH_GELF_LOGGING == "1" ]; then
+    addFileToList logging "$(coreService "logging: { driver: gelf, options: { gelf-address: udp://jackdmc.com:12201, tag: $STACK_SERVICE_NAME } }")"
+  fi
+  echo "FINISHED $svc_full_info"
+done
+
+s util docker-stack-components-merge specfiles >docker-stack-new.yml
+mv -f docker-stack-new.yml docker-stack.yml
+cat docker-stack.yml

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+doctl compute droplet-action reboot "$(s docean select-droplet-id "${1:-""}")"

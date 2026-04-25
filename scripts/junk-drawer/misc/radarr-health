@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# RADARR_HOST="https://radarr.priv.$PRIMARY_PERSONAL_DOMAIN"
+RADARR_HOST="127.0.0.1:7878"
+
+http --check-status --body GET $RADARR_HOST/api/v3/health apiKey==$RADARR_API_KEY | jq '.[]'

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat <<EOF | sudo tee /lib/udev/rules.d/99-howdy-camera-select.rules >/dev/null
+KERNEL=="video3", SYMLINK+="videohowdy"
+KERNEL=="video0", SYMLINK+="videohowdy"
+
+EOF
+
+sudo udevadm trigger
+
+### sudo howdy config
+# device_path = /dev/videohowdy
+### if you close your lid when docked then also
+# ignore_closed_lid = false
+### sudo howdy add # with both cameras seperately.

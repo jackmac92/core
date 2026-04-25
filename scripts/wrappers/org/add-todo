@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+title=$1
+body=${2:-""}
+
+e -e '(setq jm/show-util-captures t)' "org-protocol://capture?template=9D&title=$title&body=$body"

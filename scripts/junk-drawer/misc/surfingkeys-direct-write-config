@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+surfingkeysid=gfbliohnnapiefjpjlpjnehglfpaknnc
+surfingkeysSettings=$HOME/.config/google-chrome/${CHROME_PROF_NAME:-Default}/Local\ Extension\ Settings/$surfingkeysid/
+
+python -c "
+import leveldb
+import sys
+db = leveldb.LevelDB('$surfingkeysSettings')
+db.Put(b'snippets', str.encode(sys.stdin))
+"

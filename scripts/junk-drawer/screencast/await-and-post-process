@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+event="$1"
+
+dtach -n screencast-notification-helper bash -c 'if dunstify --action="default,Show Video" --hints=string:x-dunst-stack-tag:create-screencast "screencast started, click to finish" "saving to $event" | rg -q default; then
+                                                    s screencast toggle-recording
+                                                fi'
+sleep 0.5
+
+s screencast await-video-finish "$event"
+
+dunstify --timeout=500 --hints=string:x-dunst-stack-tag:create-screencast "video recording done"
+
+PATH="/home/jmccown/.local/vip-bin:$PATH" s util optimize-video "$event" mp4
+
+if [[ -n "DISPLAY" ]]; then
+    xdg-open "$(dirname "$event")"
+fi

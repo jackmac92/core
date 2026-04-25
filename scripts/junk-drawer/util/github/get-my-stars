@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$HOME/.config/custom/bash-cache.sh"
+
+_githubGetStarsOnePage() {
+  page="$1"
+  jo query='
+query {
+  viewer {
+    login
+    name
+    starredRepositories(after: "'"$page"'") {
+      edges {
+        cursor
+        node {
+          name
+          url
+        }
+      }
+    }
+  }
+}' | https --body POST api.github.com/graphql Authorization:"Bearer $GITHUB_TOKEN" | jq '.data.viewer.starredRepositories.edges'
+}
+
+_githubGetStarsRaw() {
+  last_results=$(_githubGetStarsOnePage)
+  count_last_results=$(echo $last_results | jq 'length')
+  while [ $count_last_results -gt 0 ]; do
+    echo $last_results | jq -c
+    cursor=$(echo $last_results | jq -r '.[-1].cursor')
+    last_results=$(_githubGetStarsOnePage "$cursor")
+    count_last_results=$(echo $last_results | jq 'length')
+  done
+}
+
+_githubGetStars() {
+  _githubGetStarsRaw | jq '.[]' | jq -c '.node'
+}
+_githubGetStars $*

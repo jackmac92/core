@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# emacsclient --eval '(cbi-work-mode -1)'
+rm -f ~/cbinsights/.active-local-env ~/.goss-transient/cbi.yml
+s cbi stop-vpn
+if ! timeout 5 docker-compose --file=$HOME/.cbi/docker-compose.yml ps consul; then
+    echo "Local dev already turned off"
+    exit 0
+fi
+CBI_NO_AUTOSTART_LOCAL_SERVICE=1 cbi local -s
+docker ps --quiet --filter=name=service --filter=name=job | xargs -P 8 docker rm -f
+# chronic docker node update --availability=active homeframe
+# timeout 3 s adguard enable-blocking

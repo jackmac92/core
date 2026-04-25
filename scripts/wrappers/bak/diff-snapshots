@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtpath="$1"
+
+snapshotlist=$(s bak list-snapshots-for "$tgtpath" --json | jq 'map({ time: .time, id: .id })')
+
+snap_a=$(echo "$snapshotlist" | s fzf select-by-json-key "time" | jq -r '.id')
+snap_b=$(echo "$snapshotlist" | s fzf select-by-json-key "time" | jq -r '.id')
+
+# restic diff just does a --name-status by default, this shows actual diff
+delta <(restic dump --path="$tgtpath" "$snap_a") <(restic dump --path="$tgtpath" "$snap_b")

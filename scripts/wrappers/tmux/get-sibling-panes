@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# s tmux panes-in-this-window | choose -f : 0 | rg -v "$(tmux display -pt "${TMUX_PANE:?}" '#{pane_index}')"
+s tmux panes-in-this-window | rg -v "\(active\)" | choose -f : 0

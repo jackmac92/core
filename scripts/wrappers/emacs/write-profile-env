@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $PWD = $HOME ]]; then
+    echo "Not running in home dir"
+    exit 1
+fi
+
+thisemacsprofile="${1:-${EMACS_PROFILE_NAME:-${PWD##*/}}}"
+
+EMACS_BIN_DIR=${SYSTEMD_NIX_EMACS_BIN_DIR:-"$(chezmoi execute-template '{{ $info := index .emacs.profiles "'"$thisemacsprofile"'" -}}{{- hasKey $info "emacsBinDir" | ternary (get $info "emacsBinDir") (joinPath .chezmoi.homeDir ".nix-profile/bin/") -}}')"}
+
+if [ ! -f ./.env ] || ([ -f ./.env ] && [[ -n "${EMACS_WRITE_ENV_OVERWRITE:-}" ]]); then
+    edir="${TARGET_EMACSD_DIR:-"$(chezmoi execute-template <<<'{{ template "emacs-profile-emacsd-dir" "'"$thisemacsprofile"'" }}')/"}"
+    cat <<EOF >./.env
+EMACSDIR=$edir
+DOOMDIR=$JM_EMACS_ROOT/\$EMACS_SOCKET_NAME/doom
+
+EOF
+else
+    echo "Did not write .env file"
+fi
+
+if [ ! -f ./.envrc ] || { [ -f ./.envrc ] && [[ -n "${EMACS_WRITE_ENV_OVERWRITE:-}" ]]; }; then
+    emacsbindir=$(chezmoi execute-template '{{ $info := index .emacs.profiles "'"$thisemacsprofile"'" -}}{{- hasKey $info "emacsBinDir" | ternary (get $info "emacsBinDir") (joinPath .chezmoi.homeDir ".nix-profile/bin/") -}}')
+    cat <<EOF >./.envrc
+export EMACS_SOCKET_NAME=$thisemacsprofile
+dotenv
+use bitwarden
+PATH_add $EMACS_BIN_DIR
+use lclbin
+
+PATH_add \${EMACSDIR}bin
+
+EOF
+else
+    echo "Did not write .envrc file"
+fi

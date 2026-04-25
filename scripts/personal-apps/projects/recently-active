@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$HOME/Projects"
+
+fd --exclude=clutter --exclude=gitlab-mirror --hidden -t d '^.git$' -x bash -c '
+if [[ -z $(git --git-dir="{}" remote | grep origin) ]]; then
+  echo {//};
+  exit 0;
+fi
+gitmote=$(git --git-dir="{}" remote get-url origin);
+if [[ $gitmote =~ "gitlab.com:jackmac92" ]] || [[ $gitmote =~ "gitlab.com:dropLoop" ]]; then
+  echo {//}
+fi' | xargs lsd --directory-only --sort=time -1 | tac

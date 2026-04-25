@@ -1,0 +1,7 @@
+cd "$1"
+ENTRYPOINT=$(cat package.json | jq .main)
+SENTRY_PROJECT_DSN=""
+STR_CODE_IMPORT="import * as Sentry from '@sentry/browser' // autogen code assuming typescript browser project"
+STR_CODE_INVOKE="Sentry.init({ dsn: '$SENTRY_PROJECT_DSN' })"
+injectToTopOfFile $ENTRYPOINT $STR_CODE_IMPORT
+appendToFile $ENTRYPOINT $STR_CODE_INVOKE

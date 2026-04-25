@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xpanes -t -d -c 'PRIMARY_BOX_NAME=elixium MKDROPLET_SKIP_SWARM=1 s misc remkdroplet {}' ${MINION_LIST[@]}
+
+s misc minions-swarm-setup
+s misc minions-swarm-deploy

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+s gitlab gitlabform-this-repo
+s gitlab add-runner-to-project-dwim "$(s gitlab get-gitlab-project-name-from-remote)"

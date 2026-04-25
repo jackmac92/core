@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export SWARM_HOST_BOX_IP=${SWARM_HOST_BOX_IP:-$(doctl compute droplet list --format PublicIPv4,Name | grep "$PRIMARY_BOX_NAME" | choose 0)}
+ssh "$PRIMARY_BOX_NAME" bash -c "docker swarm init --advertise-addr='\$(tailscale ip -4)'"
+ssh "$PRIMARY_BOX_NAME" docker network create --driver overlay --subnet 172.30.0.0/16 --scope swarm --attachable drop-loop-net
+
+s docker swarm add-self-as-node
+
+s misc minions-swarm-deploy

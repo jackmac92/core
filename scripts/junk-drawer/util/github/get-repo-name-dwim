@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s util github get-repo-name-active-tab || (echo "Need to implement another form of lookup" && exit 1)

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# sudo modprobe v4l2loopback devices=1 exclusive_caps=1 video_nr=2 card_label="fake-cam"
+cd $HOME/.local/apps/Linux-Fake-Background-Webcam
+./fake.py --no-foreground --no-background

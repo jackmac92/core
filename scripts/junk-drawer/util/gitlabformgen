@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+filter="${1:-""}"
+
+base_path="$HOME/.config/gitlabform"
+
+cd "$base_path"
+
+s util yq-merge-all "$PWD/base" $(fd --maxdepth=1 -t f . "$base_path" -x echo {/.} | rg "$filter" | fzf --multi --preview 'cat {}')

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tailscale status --json |
+    jq -r '.Self, (.Peer | to_entries | .[] | .value | select(.TailscaleIPs[0] != "100.101.102.103"))' |
+    jq -s -r 'sort_by(.HostName) | map("\(.DNSName | split(".") | first) = \"\(.TailscaleIPs[0] )\"") | join("\n")'

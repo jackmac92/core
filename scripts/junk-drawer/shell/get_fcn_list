@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+env -i bash --noprofile --norc -c '
+ source "'"$1"'"
+ typeset -f |
+ grep '\''^[^{} ].* () $'\'' |
+ awk "{print \$1}" |
+ while read -r fcn_name; do
+ type "$fcn_name" | head -n 1 | grep -q "is a function$" || continue
+ echo "$fcn_name"
+ done
+'

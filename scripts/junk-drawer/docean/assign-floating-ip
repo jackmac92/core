@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+doctl compute floating-ip-action assign 134.209.129.169 "$(s docean get-droplet-id "$PRIMARY_BOX_NAME")"

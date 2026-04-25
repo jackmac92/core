@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Function to parse a value that might be a time string (e.g., 14s/1803s)
+parse_value() {
+    local value="$1"
+
+    # Check if it's a time format (e.g., 14s/1803s)
+    if [[ $value =~ ^[0-9]+s/[0-9]+s$ ]]; then
+        local current_time=$(echo $value | cut -d'/' -f1 | sed 's/s//')
+        local total_time=$(echo $value | cut -d'/' -f2 | sed 's/s//')
+        echo "{\"current\": $current_time, \"total\": $total_time}"
+        return
+    fi
+
+    # Check if it's a boolean
+    if [[ $value =~ ^(true|false)$ ]]; then
+        echo $value
+        return
+    fi
+
+    # Check if it's a number
+    if [[ $value =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+        echo $value
+        return
+    fi
+
+    # Otherwise, treat as string
+    echo "\"$value\""
+}
+
+# Function to split string on commas while respecting quotes
+split_quoted_string() {
+    local input="$1"
+    local output=""
+    local field=""
+    local in_quotes=false
+
+    # Read input character by character
+    while IFS= read -n1 char; do
+        case "$char" in
+        '"')
+            if [ "$in_quotes" = true ]; then
+                in_quotes=false
+            else
+                in_quotes=true
+            fi
+            field="$field$char"
+            ;;
+        ',')
+            if [ "$in_quotes" = true ]; then
+                field="$field$char"
+            else
+                output="$output$field"$'\n'
+                field=""
+            fi
+            ;;
+        *)
+            field="$field$char"
+            ;;
+        esac
+    done < <(echo -n "$input")
+
+    # Add the last field
+    output="$output$field"
+    echo "$output"
+}
+
+# Main parsing function
+parse_status() {
+    local input="$1"
+
+    # Extract app name and status (everything before first comma)
+    local header=$(echo "$input" | cut -d',' -f1)
+    local app_status=$(echo "$header" | sed -E 's/^([^(]+)\s*\(([^)]+)\).*/\1|\2/')
+    local app_name=$(echo "$app_status" | cut -d'|' -f1 | xargs)
+    local status=$(echo "$app_status" | cut -d'|' -f2)
+
+    # Remove the header from input
+    local remainder=$(echo "$input" | sed 's/^[^,]*,//')
+
+    echo "{"
+    echo "    \"app\": \"$app_name\","
+    echo "    \"status\": \"$status\","
+
+    # Process each key-value pair
+    local first=true
+    while IFS= read -r pair; do
+        # Skip empty pairs
+        [ -z "$pair" ] && continue
+
+        # Extract key and value
+        local key=$(echo "$pair" | sed -E 's/^[[:space:]]*([^=]+)[[:space:]]*=.*/\1/')
+        local value=$(echo "$pair" | sed -E 's/^[^=]+=([[:space:]]*)(.*)$/\2/' | sed 's/^"//;s/"$//')
+
+        # Output key-value pair
+        if [ "$first" = true ]; then
+            first=false
+        else
+            echo ","
+        fi
+
+        # Parse and format the value
+        local parsed_value=$(parse_value "$value")
+        echo -n "    \"$key\": $parsed_value"
+    done < <(split_quoted_string "$remainder")
+
+    echo $'\n}'
+}
+
+# Check if input is provided
+if [ -z "${1:-""}" ]; then
+    # Read from stdin if no argument provided
+    input=$(cat)
+else
+    input="$1"
+fi
+
+# Parse and output JSON
+parse_status "$input" | jq -c '.["time remaining"] as $remaining | del(.["time remaining"]) | .["totalsec"] = $remaining.total | .["currentsec"] = $remaining.current'

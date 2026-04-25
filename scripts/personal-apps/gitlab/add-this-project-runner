@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+s gitlab this-project-request --form POST runners runner_id="$1"

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$DOOMDIR"
+
+rg '\s\(setq.*(org-(?:\w|-)+)\s' --no-filename --no-line-number --multiline --only-matching --replace='$1' | sort | uniq -d

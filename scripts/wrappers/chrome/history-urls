@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cp -f ~/.config/google-chrome/Default/History /tmp/h
+sep='{::}'
+sqlite3 -separator $sep /tmp/h \
+  "select url
+  from urls order by last_visit_time desc"

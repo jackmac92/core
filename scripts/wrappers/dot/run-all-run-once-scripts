@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+for s in $(ls /home/jmccown/.local/share/chezmoi/run_once_*.sh.tmpl); do
+	chezmoi execute-template <$s | bash
+done

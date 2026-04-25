@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s cast get-status | tr ' ' '\n' | rg remaining | sd 'remaining=(\d+)s/(\d+)s,' '$1'
+

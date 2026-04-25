@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+search_query=${1:-$(s web-browser list-urls | rg github | fzf | sd '.*github\.com/([\w-]+)/([\w-]+)/?.*' '$1/$2')}
+
+# s util github download-repo-latest-release "" $(s util github repo-search "$search_query" | fzf)
+s util github download-repo-latest-release "" "$search_query"

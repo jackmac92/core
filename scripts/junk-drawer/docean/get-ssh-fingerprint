@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+raw_ssh_fingerprint_output=$(ssh-keygen -l -E md5 -f ~/.ssh/id_ed25519.pub)
+ssh_fingerprint=$(echo ${raw_ssh_fingerprint_output:8} | cut -d " " -f 1)
+
+if ! doctl compute ssh-key list | grep -q "$ssh_fingerprint"; then
+    s docean ssh-key-add
+fi
+
+echo "$ssh_fingerprint"

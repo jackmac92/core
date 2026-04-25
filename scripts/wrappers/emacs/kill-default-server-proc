@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+kill $(ps -ef | rg emacs | rg daemon=default | choose 1)
+

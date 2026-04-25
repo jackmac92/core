@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sqlite3 remarking_database.sqlite3 '.mode json' '.once out.json' 'SELECT h.extracted_at as hlts,  h.extraction_method as hlmethod, d.id as docid, d.parent as docparent, d.name as docname, h.text as hltext FROM highlight h JOIN document d on d.id = h.document_id'
+

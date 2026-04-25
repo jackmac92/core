@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd run_onc ~/.local/share/chezmoi | rg $* | fzf --header "Select which scripts should NOT run" --invert --multi | xargs --no-run-if-empty -d $'\n' -I_ bash -c "chezmoi execute-template <_ | bash"

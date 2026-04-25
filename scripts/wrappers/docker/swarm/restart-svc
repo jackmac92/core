@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+docker service scale $1=0 ; docker service scale $1=1
+

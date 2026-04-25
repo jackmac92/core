@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt_path=${1:-$(fzf --header "Select a backed up path")}
+export RESTIC_REPOSITORY=$(s bak pick-repo)
+restic restore $(s bak list-snapshots "$tgt_path") $*
+
+

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab gitlabform-this-repo blank
+s gitlab gitlabform-this-repo google
+s gitlab gitlabform-this-repo firefox
+
+s gitlab protect-tags
+

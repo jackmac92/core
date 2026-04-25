@@ -1,0 +1,2 @@
+processor_types=$(benthosPickOneOfType processor)
+benthos --print-yaml --example $(echo $processor_types | tr ' ' ',')

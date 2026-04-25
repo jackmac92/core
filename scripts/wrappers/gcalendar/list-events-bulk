@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtcal=${1:-"$GCAL_DEFAULT_ACCOUNT"}
+
+jq -c ".items[]" <<<"$(calendar3 events list $tgtcal -p max-results=250 -p time-min="$(s gcalendar gen-date "2 weeks ago")")"

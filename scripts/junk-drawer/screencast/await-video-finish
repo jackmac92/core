@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+target_file="$1"
+
+# wait for file to stop growing
+echo "waiting for finished file"
+while [[ $(lsof $target_file 2>/dev/null | wc -l) -gt 0 ]]; do
+    echo "Video still being created.."
+    sleep 0.5
+done
+
+# lastsize=0
+# while true; do
+#     sleep 4s
+#     newsize=$(wc -c "$target_file" | choose 0)
+#     echo "$newsize <- $lastsize"
+#     if [[ "$newsize" -gt 0 ]] && [[ ! "$newsize" -gt "$lastsize" ]]; then break; fi
+#     echo "file still growing $lastsize -> $newsize"
+#     lastsize="$newsize"
+# done
+# echo "video file no longer growing"

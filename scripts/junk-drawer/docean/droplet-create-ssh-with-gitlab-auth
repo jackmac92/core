@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname="$1"
+
+s docean sshcmd-via-doctl "$vpsname" jmccown "$(s cat ssh generate-keypair)"
+SSH_KEY_TO_ADD="$(s docean sshcmd-via-doctl "$vpsname" jmccown "cat ~/.ssh/id_ed25519.pub")" SSH_KEY_TITLE="autogen-$vpsname-droplet-key" s gitlab ssh-key-add

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+yq m $(fd -t f . ~/.config/gitlabform/) | yq r - --tojson  | jq '.projects_and_groups["*"].secret_variables | to_entries | .[].value.key' -r
+

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s dot sync
+paneid=$(s tmux this-pane-id)
+tmux split-pane
+echo "Closing this one out, bye!"
+sleep 0.666
+tmux kill-pane -t "$paneid"

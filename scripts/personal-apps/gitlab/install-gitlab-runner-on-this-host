@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p $HOME/gitlab-runner
+
+sudo gitlab-runner install --user=jmccown --working-directory=$HOME/gitlab-runner || echo "already installed"
+
+GITLAB_RUNNER_TAGS=$(chezmoi execute-template <<<"shell,{{ .chezmoi.hostname }}{{ if .is_cloud_worker }},droplet{{ end }},jmccown-user")
+REGISTRATION_TOKEN=${GITLAB_RUNNER_REGISTRATION_TOKEN:-$(s bitwarden get-field "gitlab.com" "gitlab-runner-registration-token")}
+
+if gum confirm "Install docker executor?"; then
+    # docker executor
+    sudo gitlab-runner register \
+        --non-interactive \
+        --url "https://gitlab.com/" \
+        --registration-token "$REGISTRATION_TOKEN" \
+        --executor "docker" \
+        --docker-image alpine:latest \
+        --description "jackmac92 $(hostname) docker runner created at  $(date)" \
+        --tag-list "$GITLAB_RUNNER_TAGS,docker-exe" \
+        --run-untagged="false" \
+        --locked="false" \
+        --access-level="not_protected"
+fi
+
+if gum confirm "Install shell executor?"; then
+    if docker info | grep -i "Is Manager" | grep -q true; then
+        GITLAB_RUNNER_TAGS="$GITLAB_RUNNER_TAGS,swarm-manager"
+    fi
+
+    # shell executor
+    sudo gitlab-runner register \
+        --non-interactive \
+        --url "https://gitlab.com/" \
+        --registration-token "$REGISTRATION_TOKEN" \
+        --executor "shell" \
+        --description "jackmac92 $(hostname) shell runner created at $(date)" \
+        --tag-list "$GITLAB_RUNNER_TAGS,shell-exe" \
+        --run-untagged="false" \
+        --locked="false" \
+        --access-level="not_protected"
+
+fi
+sudo gitlab-runner start

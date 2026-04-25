@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s docean get-droplet-info $* | jq ".id" -r

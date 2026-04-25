@@ -1,0 +1,1 @@
+unset GIT_LITERAL_PATHSPECS to fix issue with hooks in magit

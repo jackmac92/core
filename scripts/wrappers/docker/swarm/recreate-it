@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s docker swarm destroy-mine
+s docker swarm create-anew

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat ~/.ssr/settings.conf | s util convert-ini-to-json | jq --arg filepath "$1" '.output.file = $filepath' | s util convert-json-to-ini | sponge ~/.ssr/settings.conf

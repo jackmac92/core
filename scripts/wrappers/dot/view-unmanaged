@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+chezmoi unmanaged | fzf --preview 'if test -d {} ; then ls {}; else cat {} ; fi'
+

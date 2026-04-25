@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source_file="$1"
+dest_dir="$2"
+mkdir -p -p -p "$dest_dir"
+source "$source_file"
+for fcn_name in $(s shell get_fcn_list "$source_file"); do
+	tgtfile="$dest_dir/$fcn_name"
+	echo; echo; echo
+	echo "Processing $fcn_name"
+	echo
+	typeset -f "$fcn_name" | s util decapitext 2 | s util truncate-lines | shfmt | tee "$tgtfile"
+	chmod +x "$tgtfile"
+done

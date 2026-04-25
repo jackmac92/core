@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+for sibling in $(s tmux get-sibling-panes); do
+    tmux send-keys -t$sibling up
+    tmux send-keys -t$sibling Enter
+done

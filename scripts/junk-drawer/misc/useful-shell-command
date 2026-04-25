@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmd=""
+script_name=""
+
+while test $# -gt 0; do
+    case "$1" in
+        --)
+            shift
+            cmd="$*"
+            break
+            ;;
+        *)
+            script_name="$script_name$1 "
+            ;;
+    esac
+    shift
+done
+
+script_name=$(echo "$script_name" | sd '\s*$' '')
+script_name="$(echo "$script_name")"
+
+xdg-open "org-protocol://capture?template=b&title=$script_name&body=$cmd"

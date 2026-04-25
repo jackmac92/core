@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+extName=${PWD##*/}
+
+if [ ! -d dist ]; then
+    s npm install-dwim
+    npm run build
+    if [ ! -d dist ]; then
+        echo "Extension must build to the dist folder"
+    fi
+fi
+
+rm -rf ~/.local/unpacked-extensions/$extName
+cp -r dist ~/.local/unpacked-extensions/$extName

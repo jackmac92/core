@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+year=$(date +%Y)
+month=$(date +%m | sd '^0' '')
+day=$(date +%e)
+
+baseurl="https://mnorth.prod.acquia-sites.com/wse/MYmta/Trains/v4/85/1/DepartBy/$year/$month/$day/0000/9ea83a8a361efacd098b6c7f6a6e49c1/Tripstatus24"
+
+http --body "$baseurl" |
+    jq '.GetTripStatusJsonResult | map("\(.OriginTime) - \(.DestinationTime) (\(.Duration) min) \(.TrainStatus)") | .[]' -r |
+    rg -v Departed

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+brotab list |
+	sd --string-mode '"' '' |
+	jq -Rc 'split("\t")|with_entries(.key|=["id","title","url"][.])'

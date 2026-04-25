@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+imdbId="$1"
+
+mkdir -p ~/.local/debug/radarr-add
+
+dunstify --hints=string:x-dunst-stack-tag:radarr-add-movie "Attempting to add to radarr" "imdb: $imdbId"
+
+haserror=0
+
+# RADARR_HOST="https://radarr.priv.$PRIMARY_PERSONAL_DOMAIN"
+RADARR_HOST="127.0.0.1:7878"
+
+http --body GET $RADARR_HOST/api/v3/movie/lookup term=="imdb:$imdbId" apiKey==$RADARR_API_KEY |
+    tee "$HOME/.local/debug/radarr-add/$(date)" |
+    jq --arg imdb_id "$imdbId" '.[] | select(.imdbId != null) | select(.imdbId | contains($imdb_id)) | del(.id) | . * {monitored: true, addOptions: {searchForMovie: true}, rootFolderPath: "/managedMovies", qualityProfileId: 1}' -c |
+    jq 'del(.alternateTitles)' |
+    jq 'del(.images)' |
+    jq -s |
+    s fzf select-by-json-key "title" |
+    http --check-status --body POST $RADARR_HOST/api/v3/movie apiKey==$RADARR_API_KEY

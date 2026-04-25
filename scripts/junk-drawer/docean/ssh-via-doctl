@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+vpsname="${1:-""}"
+shift
+sshuser="${1:-"root"}"
+shift
+
+set -e
+dropletid="$(doctl compute droplet list --format "Name,ID" --output json | jq --arg filtername "$vpsname" 'map(select(.name | contains($filtername)))' | s fzf select-by-json-key "name" | jq '.id' -r)"
+
+doctl compute ssh "$dropletid" --ssh-user "$sshuser" --ssh-port ${DOCTL_SSH_PORT:-2597}

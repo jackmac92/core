@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+logFile=$(mktemp)
+echo 2>&1 "Log file is $logFile"
+
+echo "$CAPTURE_SERVER" >"$logFile"
+
+# NOTE expects arg to be path to the Dictionary.json w/in the target folder
+tgt="$*"
+
+cd "$MY_NOTES_DIR" || exit 1
+chronic deno cache --reload https://gitlab.com/jackmac92/org-capture/-/raw/master/cli.ts
+fd -t d -t f " " "$(dirname "$tgt")" | rename 's/ /_/g'
+capUrl="$(deno run --allow-read --allow-write --allow-env https://gitlab.com/jackmac92/org-capture/-/raw/master/cli.ts toUrl --with-dir --with-files --file "$tgt")"
+echo "$capUrl" >"$logFile"
+emacsclient -s $CAPTURE_SERVER "$capUrl" >>"$logFile" 2>"$logFile.err" || (
+	echo 2>&1 "\n"
+	if cat $logFile.err | grep -q '\*ERROR\*: Capture already exists'; then
+		echo 2>&1 "Error already exists, but will continue and delete input to prevent future dupe"
+	else
+		cat "$logFile"*
+		if [[ -z ${JM_CAPTURE_KEEP_GOING:-""} ]]; then
+			exit 255
+		else
+			exit 1
+		fi
+	fi
+)
+
+if [[ -z "${JM_ORG_IOS_CAPTURE_FORCE_TRASH:-""}" ]]; then
+	mv "$(dirname "$tgt")" "$CAPTURE_WORKDIR/Archived/"
+else
+	rm -rf "$CAPTURE_WORKDIR/Archived/$(dirname "$tgt")"
+fi

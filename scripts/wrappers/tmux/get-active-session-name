@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tmux list-sessions | rg '(attached)' | cut -d: -f1
+

@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+deno eval --no-check '
+import puppeteer from "https://deno.land/x/puppeteer@9.0.1/mod.ts";
+
+async function scrollPage(page) {
+  // Scroll to page end to trigger lazy loading elements
+  await page.evaluate(() => {
+    const scrollInterval = 100;
+    const scrollStep = Math.floor(window.innerHeight / 2);
+    const bottomThreshold = 400;
+
+    function bottomPos() {
+      return window.pageYOffset + window.innerHeight;
+    }
+
+    return new Promise((resolve, reject) => {
+      function scrollDown() {
+        window.scrollBy(0, scrollStep);
+
+        if (document.body.scrollHeight - bottomPos() < bottomThreshold) {
+          window.scrollTo(0, 0);
+          setTimeout(resolve, 500);
+          return;
+        }
+
+        setTimeout(scrollDown, scrollInterval);
+      }
+
+      setTimeout(reject, 30000);
+      scrollDown();
+    });
+  });
+}
+
+const NEW_PROJ_NAME = "'"$*"'";
+
+const targetSite = "https://sentry.io/organizations/jack-mccown/projects/new";
+const browser = await puppeteer.connect({
+    browserURL: "http://127.0.0.1:9222"
+});
+const page = await browser.newPage();
+await page.setViewport({ width: 2536, height: 874 })
+await page.goto(targetSite);
+await scrollPage(page);
+await page.waitFor(2000)
+const nameInputList = await page.$x(`//input[@placeholder="Project name"]`);
+const nameInput = nameInputList[0]
+await nameInput.type("form input[type=text]", NEW_PROJ_NAME, { delay: 100 })
+const createBtn = await page.$(`button[data-test-id="create-project"]`)
+createBtn.click()
+await page.waitForNavigation()
+
+await page.goto("https://sentry.io/settings/jack-mccown/projects/" + NEW_PROJ_NAME)
+const newToken = await page.$eval("#securityToken", (el) => el.value)
+console.log(newToken)
+'

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname="$1"
+
+s docean sshcmd-via-doctl "$vpsname" root reboot 2>/dev/null || true
+sleep 2
+
+export UNTIL_CMD_VERBOSE=1
+s util until-cmd-passes s docean sshcmd-via-doctl $vpsname root 'echo back'

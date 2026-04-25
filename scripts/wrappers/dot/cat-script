@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd --ignore-file <(chezmoi execute-template <~/.local/share/chezmoi/.chezmoiignore) --hidden '^run_' ~/.local/share/chezmoi | rg "${1:-""}" | fzf --multi --preview='cat {} | chezmoi execute-template' | tee | xargs cat | chezmoi execute-template

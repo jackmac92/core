@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+yq r --tojson docker-stack.yml | jq --argjson envrc $(s util envrc-list-exports | jo  -a) '.services.core.environment += $envrc' | jq '.services.core.environment=(.services.core.environment|unique)'
+

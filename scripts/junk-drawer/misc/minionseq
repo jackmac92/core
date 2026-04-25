@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+for m in $MINION_LIST; do
+	assh wrapper ssh -- -o StrictHostKeyChecking=no $m "$1"
+done

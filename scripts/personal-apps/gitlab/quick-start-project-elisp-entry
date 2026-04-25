@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s gitlab quick-start-project "${1:?"Must provide project name as first arg"}" "${2:?"Must provide project template type as second arg"}"

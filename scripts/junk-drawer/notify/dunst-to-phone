@@ -1,0 +1,22 @@
+#!/bin/bash -l
+set -euo pipefail
+
+# DUNST_APP_NAME,
+# DUNST_SUMMARY,
+# DUNST_BODY,
+# DUNST_ICON_PATH,
+# DUNST_URGENCY,
+# DUNST_ID,
+# DUNST_PROGRESS,
+# DUNST_CATEGORY,
+# DUNST_STACK_TAG,
+# DUNST_URLS,
+# DUNST_TIMEOUT,
+# DUNST_TIMESTAMP,
+# DUNST_DESKTOP_ENTRY,
+# DUNST_STACK_TAG.
+
+echo "dunst forward to pushcut running"
+export S_INNER_CALL=1
+# s notify phone "$DUNST_SUMMARY\n $DUNST_BODY"
+/home/jmccown/.local/scripts/junk-drawer/notify/phone "$DUNST_SUMMARY\n $DUNST_BODY"

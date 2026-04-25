@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+dunstify --hints=string:x-dunst-stack-tag:shiptophone $*

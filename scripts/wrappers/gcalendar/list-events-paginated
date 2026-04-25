@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtcal=${1:-"$GCAL_DEFAULT_ACCOUNT"}
+nxtToken=${2:-}
+
+if [[ -n $nxtToken ]]; then
+    nextpage=$(calendar3 events list "$tgtcal" -p time-min="$(s gcalendar gen-date "2 weeks ago")" -p page-token=$nxtToken)
+else
+    nextpage=$(calendar3 events list "$tgtcal" -p time-min="$(s gcalendar gen-date "2 weeks ago")")
+fi
+
+jq -c ".items[]" <<<"$nextpage"
+nxtToken=$(jq ".nextPageToken" <<<"$nextpage")
+if [[ -n $nxtToken ]]; then
+    s gcalendar list-events-paginated "$tgtcal" "$nxtToken"
+fi

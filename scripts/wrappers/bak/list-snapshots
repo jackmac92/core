@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+restic snapshots --host=$(hostname) $*
+# todo test adding new script

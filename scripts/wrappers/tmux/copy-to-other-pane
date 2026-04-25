@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+thisPane=$(s tmux this-pane-id)
+targetWindowPane=$(s tmux panes-in-this-window | choose -f : 0 | rg -v "$thisPane" | head -n 1)
+targetPath=$(tmux display-message -p -F "#{pane_current_path}" -t$targetWindowPane)
+cp $PWD/$1 $targetPath/

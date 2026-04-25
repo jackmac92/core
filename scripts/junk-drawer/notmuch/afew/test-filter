@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtfilter="$(s notmuch afew list-all-filters | fzf --multi | xargs printf "-e %s ")"
+afew -vvv --tag "$tgtfilter" --dry-run "date:3w..now"

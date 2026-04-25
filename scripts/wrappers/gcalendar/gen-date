@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+date --rfc-3339=seconds -d "$1" | sd ' ' 'T'

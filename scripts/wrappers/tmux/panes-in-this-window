@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tmux list-panes -t=$(tmux display-message -p '#I')
+

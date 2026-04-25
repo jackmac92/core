@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repoName=$(s util strip_all $(s util strip_all $(git remote get-url upstream) "git@gitlab.com:") ".git")
+cd "$HOME/my/$repoName"

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+awAnalysisGetEvents() {
+    awdump="$@"
+    eventKeys="$(jq '.buckets | keys | .[]' "$awdump" -r)"
+    for i in $(echo $eventKeys ); do
+        cat "$awdump" | jq '.buckets."'"$i"'" as $parent | .buckets."'"$i"'".events | map(. + { event_type: $parent.type, event_hostname: $parent.hostname, event_client: $parent.client })'
+    done | jq -s 'add'
+}
+
+for i in $(ls "$(fd -t d | fzf --header "Select folder with aw dump files")"); do awAnalysisGetEvents $i; done | jq -s 'add'

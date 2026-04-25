@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+
+import { firefox } from "playwright";
+import path from "path";
+import os from "os";
+
+(async () => {
+  const userDataDir = path.join(os.homedir(), ".mozilla", "profiles", "jackm");
+
+  const context = await firefox.launchPersistentContext(userDataDir, {
+    headless: false,
+    args: ["--disable-popup-blocking"],
+  });
+
+  const page = context.pages()[0];
+
+  context.on("page", async (popupPage) => {
+    console.log(`New pop-up detected: ${popupPage.url()}`);
+    await popupPage.waitForLoadState("load");
+    console.log(`Pop-up loaded: ${popupPage.url()}`);
+  });
+
+  await page.goto("https://track.this", { waitUntil: "load" });
+  console.log(`Main page loaded: ${page.url()}`);
+
+  // Navigate to a specific category
+  await page.click('a[href="/category/example"]'); // Replace with actual selector and category
+  await page.waitForLoadState("load");
+  console.log("Category page loaded");
+
+  // Additional interactions within the category
+  // Example: Click on an item within the category
+  await page.click("a.item-selector"); // Replace with actual item selector
+  await page.waitForLoadState("load");
+  console.log("Item page loaded");
+
+  // Wait before closing
+  await page.waitForTimeout(5000);
+
+  await context.close();
+  console.log("Browser context closed.");
+})();

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xargs -I_ -d $'\n' systemctl --user enable sync-_-mailbox.timer <~/.local/maildir-email-acct-short-names
+xargs -I_ -d $'\n' systemctl --user enable sync-_-mailbox.service <~/.local/maildir-email-acct-short-names

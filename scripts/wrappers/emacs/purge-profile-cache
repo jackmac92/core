@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+cd $JM_EMACS_PROFILES_ROOT/${1:-${EMACS_SOCKET_NAME}}
+rm -rf data/straight/build-*
+rm -rf data/autoloads-*

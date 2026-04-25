@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+moviename="$1"
+imdbId="${2:-""}"
+
+mkdir -p ~/.local/debug/radarr-add
+
+dunstify --hints=string:x-dunst-stack-tag:radarr-add-movie "Attempting to add $moviename to radarr" "imdb: $imdbId"
+
+if [[ -z "${RADARR_API_KEY:-""}" ]]; then
+    export RADARR_API_KEY="$(s bitwarden get-field "Radarr" "api-key")"
+fi
+
+# RADARR_HOST="https://radarr.priv.$PRIMARY_PERSONAL_DOMAIN"
+RADARR_HOST="127.0.0.1:7878"
+
+haserror=0
+
+s misc radarr-movie-search "$moviename" |
+    tee "$HOME/.local/debug/radarr-add/$(date)" |
+    jq --arg imdb_id "$imdbId" '.[] | select(.imdbId != null) | select(.imdbId | contains($imdb_id)) | del(.id) | . * {monitored: true, addOptions: {searchForMovie: true}, rootFolderPath: "/managedMovies", qualityProfileId: 1}' -c |
+    jq 'del(.alternateTitles)' |
+    jq 'del(.images)' |
+    jq -s |
+    JM_FZF_JSON_OPTS=--multi s fzf select-by-json-key "title" |
+    while read; do
+        outfile=$(mktemp)
+        set +e
+        echo $REPLY | http --check-status --body POST $RADARR_HOST/api/v3/movie apiKey==$RADARR_API_KEY piKey==81d698557c734effb1f9c1e42a2461b6 >$outfile
+        if [ $? -ne 0 ]; then
+            dunstify --hints=string:x-dunst-stack-tag:radarr-add-movie "Radarr movie add failed" "$(jq '.[].errorMessage' $outfile)"
+            haserror=1
+        fi
+    done
+
+if [[ $haserror -eq 0 ]]; then
+    dunstify --hints=string:x-dunst-stack-tag:radarr-add-movie "Successfully added $moviename to radarr"
+fi

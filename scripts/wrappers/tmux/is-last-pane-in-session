@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [[ $(tmux list-windows | wc -l) -eq 1 ]]; then
+    if [[ $(tmux list-panes | wc -l) -eq 1 ]]; then
+        tmux detach
+    else
+        exit $*
+    fi
+else
+    exit $*
+fi

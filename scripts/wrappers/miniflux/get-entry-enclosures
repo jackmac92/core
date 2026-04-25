@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s miniflux req-helper "feeds/$1/entries/$2" | jq -r '.enclosures[].url'

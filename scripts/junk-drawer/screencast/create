@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+screencast_name="${1:?"Screencast name is required"}"
+screencast_filepath="$HOME/Videos/$screencast_name"
+
+# COULDDO: set profile by changing settings in .ssr/settings.conf (and maybe restarting ssr)
+s screencast set-filename "$screencast_filepath"
+
+s screencast toggle-recording
+trap 's screencast toggle-recording' SIGINT
+echo "Starting recording, press C-c to stop recording"
+
+s screencast await-and-post-process "$screencast_filepath"

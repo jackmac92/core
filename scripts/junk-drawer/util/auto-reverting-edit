@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+IS_ROOT=0
+if [[ $EUID -eq 0 ]]; then
+	IS_ROOT=1
+fi
+
+debug() {
+    set +u
+    if [[ -n $DEBUG ]]; then
+        echo "$*"
+    fi
+    set -u
+}
+
+target_file=$1
+ttl_mins=$2
+tmp=$(mktemp)
+cp $target_file $tmp
+patchLoc="/tmp/undoable$(realpath "$target_file")-$(date -u +"%s")"
+mkdir -p "$(dirname "$patchLoc")"
+debug "Created tmp $tmp and patch location $patchLoc"
+${EDITOR:-vi} "$tmp"
+debug "Editing done"
+set +e
+diff "$target_file" "$tmp" > "$patchLoc"
+debug "Diff done"
+exitcode=$?
+set -e
+if [[ $exitcode -eq 0 ]]; then
+    echo "No changes made to file"
+    exit 1
+fi
+# if [[ $exitcode -eq 1 ]]; then happy path fi
+if [[ $exitcode -gt 1 ]]; then
+    echo "Error while executing diff"
+    exit 1
+fi
+
+if [[ $IS_ROOT -eq 1 ]]; then
+	cat $tmp | sudo tee $target_file
+	echo "root wrote file"
+else
+	cat $tmp >$target_file
+	echo "normie wrote file"
+fi
+
+debug "Wrote patch"
+
+echo "patch -R $target_file < $patchLoc" | at "now + $ttl_mins minutes"

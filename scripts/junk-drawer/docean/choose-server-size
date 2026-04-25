@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+doctl compute size list --format 'Slug,Price Monthly' | fzf --header-lines=1 | choose 0

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -exuo pipefail
+
+DOCKER_SWARM_TOKEN="$(ssh $PRIMARY_BOX_NAME docker swarm join-token --quiet ${DOCKER_SWARM_NODE_TYPE:-manager})"
+
+docker swarm join --advertise-addr="$(s tailscale this-device-ip)" --token="$DOCKER_SWARM_TOKEN" $(s tailscale get-ip $PRIMARY_BOX_NAME):2377

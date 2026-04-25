@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s util gitlabform-list-all-env-keys | python -c '
+import sys;
+import json;
+print(json.dumps({
+  "projects_and_groups": {
+    "*": {
+      "secret_variables": { idx: { "delete": True, "key": l.strip() } for idx, l in enumerate(sys.stdin.readlines()) }}}}))' | yq r - -P

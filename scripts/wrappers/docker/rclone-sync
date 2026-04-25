@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+docker --config $HOME/.config/docker run --rm -it -v ~/.aws:/root/.aws:ro -v ~/.config/rclone:/config/rclone:ro -v $1:/source_directory
+rclone/rclone sync /source_directory aws3:$2

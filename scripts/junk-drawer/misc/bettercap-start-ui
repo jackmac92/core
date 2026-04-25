@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+(
+    sleep 3
+    xdg-open "http://192.168.1.172"
+) &
+ssh pi@192.168.1.172 'sudo bettercap -eval "http-ui; net.recon on; net.probe on"'

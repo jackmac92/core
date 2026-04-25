@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+dropletid="${1:-"$(s docean pick-droplet-id)"}"
+
+doctl compute droplet delete -f $dropletid

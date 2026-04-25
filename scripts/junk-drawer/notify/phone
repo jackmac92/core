@@ -1,0 +1,5 @@
+#!/bin/bash -l
+
+notitext="$1"
+
+http --ignore-stdin -A creds POST "$PUSHCUT_API_URL/notifications/script" devices:='["jacks iphone"]' text="$notitext"

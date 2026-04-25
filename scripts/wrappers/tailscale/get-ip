@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tailscale status | rg jackmac79@ | choose 1 0 | rg '^'"$1" | choose 1

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s cast playing-devices |
+    xargs -d $'\n' -I_ timeout 3s bash -c "go-chromecast -n _ unpause"

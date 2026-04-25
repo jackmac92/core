@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+doctl compute droplet list --output json | jq '.[].id'
+

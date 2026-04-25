@@ -1,0 +1,3 @@
+targetFile="$1"
+stringToWrite="$2"
+echo -n "$stringToWrite" >>"$targetFile"

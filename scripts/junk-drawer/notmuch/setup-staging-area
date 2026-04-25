@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xargs -I_ -d $'\n' systemctl --user restart sync-_-mailbox.service <~/.local/maildir-email-acct-short-names
+cat "$NOTMUCH_CONFIG" | sd 'path=/home/jmccown/.local/share/mail' 'path=/home/jmccown/.local/share/mail-staging' | tee ~/.notmuch-config
+
+preupdate_snapshot="fast-pool/home/jmccown/.local/share/mail@sandbox$(date +%F)"
+echo "Snapshot name: $preupdate_snapshot"
+
+sudo zfs snapshot $preupdate_snapshot
+sudo zfs clone $preupdate_snapshot fast-pool/home/jmccown/.local/share/mail-staging
+
+echo "Test away, exit with status 0"
+zsh -l
+if [[ $? -ne 0 ]]; then
+    echo "Bailing"
+    exit 0
+fi
+
+sudo zfs promote fast-pool/home/jmccown/.local/share/mail-staging
+sudo zfs rename fast-pool/home/jmccown/.local/share/mail fast-pool/home/jmccown/.local/share/mail-legacy
+sudo zfs rename fast-pool/home/jmccown/.local/share/mail-staging fast-pool/home/jmccown/.local/share/mail
+
+sudo zfs destroy -R $preupdate_snapshot

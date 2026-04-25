@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s screencast toggle-recording
+sleep 0.3
+screencast_filepath="$(realpath ~/Videos/$(lsd --sort=time Videos | head -n 1))"
+
+dtach -n screencast-async-awaiter s screencast await-and-post-process "$screencast_filepath"
+
+echo -n "$screencast_filepath"

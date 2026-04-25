@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo cat /etc/gitlab-runner/config.toml |
+  s util convert-toml-to-json |
+  jq '.runners[].custom_build_dir.enabled = true' |
+  s util convert-json-to-toml |
+  sudo sponge /etc/gitlab-runner/config.toml

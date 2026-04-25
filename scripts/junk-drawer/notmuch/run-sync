@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xargs -I_ -d $'\n' systemctl --user restart sync-_-mailbox.service <~/.local/maildir-email-acct-short-names

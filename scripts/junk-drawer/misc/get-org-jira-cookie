@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s cookies-from-chrome-profile cbi .atlassian.net | jq -r '.[] | select(.name | contains("cloud.session.token")) | .value'

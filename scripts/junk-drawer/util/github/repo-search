@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -z ${1:-""} ]; then
+    echo "You must pass a string query for github repo search"
+    exit 1
+fi
+
+https --body api.github.com/search/repositories q=="$1" | jq -r ".items | .[] | .full_name"

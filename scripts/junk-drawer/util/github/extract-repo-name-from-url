@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rg --color=never --only-matching 'https://github.com/([A-Za-z-_]+?/[A-Za-z-_]+)/?' --replace '$1'

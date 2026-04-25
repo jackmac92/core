@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd . ~/.config/gmailctl --maxdepth=1 -x echo {/.} | fzf

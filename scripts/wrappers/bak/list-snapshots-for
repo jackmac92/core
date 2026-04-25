@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtpath="${1:-"$(s bak pick-repo)"}"
+shift
+
+s bak list-snapshots --path="$tgtpath" $*

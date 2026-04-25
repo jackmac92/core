@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "[$(dconf read /org/gnome/settings-daemon/plugins/media-keys/terminal)]"
+gsettings set org.gnome.settings-daemon.plugins.media-keys www "[$(dconf read /org/gnome/settings-daemon/plugins/media-keys/www)]"

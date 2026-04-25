@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s web-browser active-tab-url | s util github extract-repo-name-from-url

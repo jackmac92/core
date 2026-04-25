@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s web-browser list-tabs |
+    jq -r '"\"\((.title | remove_links)[:60])\" \"\(.url)\""' |
+    fzf --multi |
+    xargs -d $'\n' -I_ -n 1 bash -c "youtube-dl -R infinite -o _"

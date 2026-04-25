@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+NEWPATH=$(echo $PATH | tr ':' $'\n' | rg -v '\.asdf' | tr $'\n' ':')
+export PATH="$NEWPATH"

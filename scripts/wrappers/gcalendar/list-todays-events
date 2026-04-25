@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtcal=${1:-"$GCAL_DEFAULT_ACCOUNT"}
+
+s gcalendar helper events list $tgtcal -p time-min="$(s gcalendar gen-date "1 day ago")" | jq -c "calendar_events"

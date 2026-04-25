@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+channelid=$(s youtube list-my-channels | jq -r '.items[] | select(.snippet.localized.title == "towatch") | .id')
+
+s youtube playlist-items $channelid | jq -c '.items[]'

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat ~/.local/maildir-email-acct-short-names |
+    grep -E "\S" |
+    xargs --no-run-if-empty -n 1 -d $'\n' printf "systemctl --user start sync-%s-mailbox.service\n" |
+    xargs --no-run-if-empty -n 1 -d $'\n' -P 8 bash -c

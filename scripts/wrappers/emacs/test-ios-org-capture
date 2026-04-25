@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+systemctl --user reload rclone-macmini-CaptureTrunk-mount.service
+s org generate-test-capture
+export JM_ORG_IOS_CAPTURE_FORCE_TRASH=1
+s org process-capture-inbox
+systemctl --user reload rclone-macmini-CaptureTrunk-mount.service

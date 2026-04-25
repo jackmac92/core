@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+e --frame-parameters='(quote (name . "capture"))' --eval "(jm/org-capture-frame)"

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sudo efibootmgr -n 0002
+
+timeout 3 ssh makvm -oRemoteCommand="sudo shutdown -h now" || true
+
+sleep 2
+sudo reboot

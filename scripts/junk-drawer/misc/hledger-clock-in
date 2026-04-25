@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [ -z $ACTIVE_TIMELOG ]; then
+	echo "An ACTIVE_TIMELOG env var must be declared"
+	return 1
+fi
+echo i $(date '+%Y-%m-%d %H:%M:%S') \$* >>$ACTIVE_TIMELOG

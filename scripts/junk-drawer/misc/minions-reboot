@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for m in ${MINION_LIST[@]}; do
+	ssh -o StrictHostKeyChecking=no root@$m reboot
+	while [ $? -ne 0 ]; do
+		sleep 2s
+		ssh -o StrictHostKeyChecking=no $m "echo '$m is back!'"
+	done
+done

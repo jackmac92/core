@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+deno eval --no-check '
+import puppeteer from "https://deno.land/x/puppeteer@9.0.1/mod.ts";
+
+const NEW_PROJ_NAME = "";
+
+const targetSite = "https://buildinglink.com/v2/tenant/deliveries/deliveries.aspx";
+const browser = await puppeteer.connect({
+    browserURL: "http://127.0.0.1:9222"
+});
+const page = await browser.newPage();
+await page.setViewport({ width: 2536, height: 874 })
+await page.goto(targetSite);
+
+const waitingPicking = await page.$$("table#ctl00_ContentPlaceHolder1_GridDeliveries_ctl00 td")
+console.log(waitingPicking.length)
+await page.close()
+Deno.exit(0)
+'

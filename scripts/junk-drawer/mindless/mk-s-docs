@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+IFS=$'\n'
+for xx in $(s meta needs-docs | sort | choose -f / 4:); do
+  s cat "$xx"; echo "$xx"; s mkhelp "$xx";
+done
+

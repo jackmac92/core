@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rm -f /tmp/notmuch-count-*
+echo '{{ range $index, $info := .email.accounts_info }}{{ $info.short_name  }} {{ end }}' |
+    chezmoi execute-template |
+    xargs -n 1 bash ~/.local/share/notmuch/new-mail-notifier-single.sh

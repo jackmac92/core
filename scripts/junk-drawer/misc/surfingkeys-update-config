@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VISUAL=$EDITOR gh gist edit b3b55452102b20c319397f8d390ddda3
+

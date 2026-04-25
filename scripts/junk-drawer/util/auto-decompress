@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+fileName="$@"
+
+baseFileName=$(basename -- "$fileName")
+if [[ "$fileName" == *.7z ]]; then
+    7za e "$fileName"
+    exit 0
+elif [[ "$fileName" == *.bz2 ]]; then
+    tar -xjSf "$fileName"
+    exit 0
+elif [[ "$fileName" == *.deb ]]; then
+    s Yn "Install $fileName ?"
+    sudo apt install $(realpath "$fileName")
+    exit 0
+elif [[ "$fileName" == *.rar ]]; then
+    unrar e "$fileName"
+    exit 0
+elif [[ "$fileName" == *.tgz ]] || [[ "$fileName" == *.tar.gz ]]; then
+    tar -xzf "$fileName"
+    exit 0
+elif [[ "$fileName" == *.tar ]] || [[ "$fileName" == *.tar.xz ]]; then
+    tar -xf "$fileName"
+    exit 0
+elif [[ "$fileName" == *.AppImage ]]; then
+    chmod +x "$fileName"
+    mv "$fileName" $HOME/.local/app-images/$(echo "$fileName" | sd '\.\w+$' '')
+    exit 0
+elif [[ "$fileName" == *.zip ]]; then
+    unzip "$fileName" -d "${baseFileName%.*}"
+    exit 0
+fi
+
+echo "Not sure how to open this one..." >/dev/stderr
+mv -i "$fileName" .

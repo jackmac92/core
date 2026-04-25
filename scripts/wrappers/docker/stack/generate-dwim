@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export LE_CERTRESOLVER=""
+
+s ci-scripts generate-docker-stack

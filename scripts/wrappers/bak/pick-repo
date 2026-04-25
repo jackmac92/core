@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -z ${RESTIC_REPOSITORY+x} ]; then
+  s bak list-repos | fzf
+else
+  echo "${RESTIC_REPOSITORY-""}"
+fi
+

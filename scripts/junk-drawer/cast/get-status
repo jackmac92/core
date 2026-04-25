@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+. ~/.config/custom/env.d/chromecast
+
+go-chromecast -n "$JM_DEFAULT_CAST_NAME" status | s cast parse-text-output

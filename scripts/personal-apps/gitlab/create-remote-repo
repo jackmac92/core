@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! git status >/dev/null 2>&1; then
+	echo "No local git repo found, creating a remote one doesn't make sense"
+	exit 1
+fi
+
+repoprivacy=${1:-""}
+
+labinitflags="--private"
+if [[ $repoprivacy = *public* ]]; then
+	labinitflags=""
+fi
+
+lab repo create --remote origin $labinitflags
+
+chronic s gitlab add-runner-to-project-dwim || echo "Failed to add gitlab runners"

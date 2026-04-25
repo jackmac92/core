@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p $(dirname "$1")
+touch "$1"
+
+echo "$1"

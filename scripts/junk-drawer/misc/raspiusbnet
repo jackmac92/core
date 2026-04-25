@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+target_conn=mainline #$(nmcli connection show | rg -v -- '--' | rg -v 'DEVICE' | choose --field-separator='\s{2}' 0 | rg "Wired connection" | fzf)
+
+nmcli con down "$target_conn"
+nmcli con mod "$target_conn" ipv6.method "disabled"
+nmcli con mod "$target_conn" ipv4.addresses 10.0.0.1/24
+nmcli con mod "$target_conn" ipv4.method "manual"
+
+nmcli con up "$target_conn"
+
+echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+
+exit 0
+
+# Below is supposed to share network connection but it doesn't seem to work on its own, and both use the same ip so they collide together
+
+USB_IFACE=enp5s0
+USB_IFACE_IP=10.0.0.1
+USB_IFACE_NET=10.0.0.0/24
+UPSTREAM_IFACE=$(ifconfig | rg enx | cut -d: -f1)
+
+sudo ip addr add "$USB_IFACE_IP/24" dev "$USB_IFACE"
+sudo ip link set "$USB_IFACE" up
+
+sudo iptables -A FORWARD -o "$UPSTREAM_IFACE" -i "$USB_IFACE" -s "$USB_IFACE_NET" -m conntrack --ctstate NEW -j ACCEPT
+sudo iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -t nat -F POSTROUTING
+sudo iptables -t nat -A POSTROUTING -o "$UPSTREAM_IFACE" -j MASQUERADE
+
+echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+
+

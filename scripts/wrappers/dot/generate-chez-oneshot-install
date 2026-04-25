@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat <<EOF
+
+git config --global url."https://jackmac92:$LAB_CORE_TOKEN@gitlab.com/".insteadOf "git@gitlab.com:"
+sh -c "\$(curl -fsLS get.chezmoi.io)" -- init --apply gitlab.com/jackmac92/dotFiles
+
+EOF

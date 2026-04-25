@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+docker service ls | rg -v REPLICAS | while IFS= read val ; do if [[ "$(python -c "print(int($(echo $val | choose 3)))")" -ne 1 ]] ; then echo $val | choose 1 ; fi ; done

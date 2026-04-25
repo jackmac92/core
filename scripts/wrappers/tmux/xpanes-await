@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z $TMUX ]]; then
+    echo "Must be run from w/in tmux"
+    exit 1
+fi
+if [[ -n $(s tmux get-sibling-panes) ]]; then
+    echo "Must be run without other panes in the window"
+    exit 1
+fi
+
+xpanes -x -t -ss -c $*
+s tmux get-sibling-panes
+s tmux get-sibling-panes
+s tmux get-sibling-panes
+sleep 1
+
+while [[ -n $(s tmux get-sibling-panes) ]]; do
+    echo "waiting other jobs to finish"
+    sleep 1
+done
+
+echo "Done"

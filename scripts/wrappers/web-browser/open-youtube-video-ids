@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s web-browser list-urls | rg youtube | rg --only-matching --no-filename --no-line-number 'watch\?v=(.*)' --replace '$1'

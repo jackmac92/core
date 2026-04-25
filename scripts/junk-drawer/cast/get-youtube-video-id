@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s cast get-status | sd ', ' '\n' | rg -i youtube | choose 0 | sd '\W' ''
+

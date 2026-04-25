@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rg --only-matching --no-filename --no-line-number --color=never "$1"'="(\S+)"' --replace '$1'

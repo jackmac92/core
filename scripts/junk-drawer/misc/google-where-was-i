@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ondate=$(zenity --calendar)
+year=$(echo "$ondate" | choose -f "/" 2)
+day=$(echo "$ondate" | choose -f "/" 1)
+month=$(echo "$ondate" | choose -f "/" 0)
+xdg-open "https://www.google.com/maps/timeline?pb=!1m2!1m1!1s$year-$month-$day"

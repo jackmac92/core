@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s web-browser list-tabs |
+  jq -r .url |
+  fzf --multi |
+  xpanes -x -c "yt-dlp ${JM_YTDLP_FLAGS:-""} {} && exit 0"
+
+# jq -r '"\"\((.title | remove_links)[:90])\" \"\(.url)\""' |

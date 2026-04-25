@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+docker-compose -f docker-stack.yml config | yq '.services | to_entries | .[].value.image' -r | xargs -n 1 docker pull
+

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s git with-commit-if-changed $(chezmoi source-path) $(s which dot dhall-meta-write)
+chezmoi apply

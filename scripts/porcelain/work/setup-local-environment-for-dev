@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+echo "Setting up dev local environment"
+
+# timeout 4 s adguard disable-blocking || echo "Failed to disable adguard"
+# chronic docker node update --availability=drain homeframe
+s cbi start-vpn
+
+nextenv="${CBI_LOCAL_ENV:-${CBI_DEFAULT_LOCAL_ENV}}"
+export CBI_LOCAL_ENV=$nextenv
+echo "$CBI_LOCAL_ENV" >~/cbinsights/.active-local-env
+
+slack-helper set-online || echo "Failed to set slack status online"
+
+# emacsclient --eval '(cbi-work-mode +1)'
+rm -f ~/.goss-transient/cbi.yml
+ln -s ~/cbinsights/goss.yaml ~/.goss-transient/cbi.yml
+
+s cbi fudge-etc-hosts

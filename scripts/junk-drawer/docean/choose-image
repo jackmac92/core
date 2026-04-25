@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+doctl compute image list --public --format 'Slug,Name' | fzf --header-lines=1 | choose 0

@@ -1,0 +1,2 @@
+input_types=$(benthosPickOneOfType input)
+benthos --print-yaml --example $(echo $input_types | tr ' ' ',')

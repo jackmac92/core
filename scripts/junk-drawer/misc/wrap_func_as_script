@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+name="$1"
+source=$(s shell print_func_source "$name")
+bat <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+$source
+$name \$*
+EOF

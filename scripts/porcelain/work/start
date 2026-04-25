@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 496584544324.dkr.ecr.us-east-1.amazonaws.com
+
+echo "Updating jira db"
+timeout 8 s jira db-download
+timeout 8 s jira update-current-ticket-state
+
+echo "Starting tmuxinator profile for Work"
+# [[~/.local/share/chezmoi/private_dot_config/exact_tmuxinator/Work.yml][Work tmuxinator config]]
+tmuxinator start Work

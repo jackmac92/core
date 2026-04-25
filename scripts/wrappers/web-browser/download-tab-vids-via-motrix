@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s web-browser list-tabs |
+	jq -s |
+	JM_FZF_JSON_OPTS=--multi s fzf select-by-json-key "title" "url" |
+	jq -r ".url" |
+	xargs -I_ -n 1 s util motrix-download --port 6800 '_'

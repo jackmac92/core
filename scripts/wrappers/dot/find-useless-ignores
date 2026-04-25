@@ -1,0 +1,152 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import shutil
+import tempfile
+from pathlib import Path
+import subprocess
+from typing import Set, List, Dict, Tuple
+
+
+class ChezmoiIgnoreChecker:
+    def __init__(self, root_dir: str):
+        self.root_dir = Path(root_dir)
+
+    def get_managed_files(self, source_dir: Path) -> Set[str]:
+        try:
+            result = subprocess.run(
+                ["chezmoi", "managed", "--source", str(source_dir)],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            return set(result.stdout.splitlines())
+        except subprocess.CalledProcessError as e:
+            print(f"Error running chezmoi managed: {e}", file=sys.stderr)
+            return set()
+
+    def evaluate_ignore_file(self, ignore_file: Path) -> List[Tuple[int, str]]:
+        """Get patterns and their line numbers from .chezmoiignore file"""
+        try:
+            # First read the original file to keep track of line numbers
+            original_lines = ignore_file.read_text().splitlines()
+            print(f"DEBUG: Original file {ignore_file}:", file=sys.stderr)
+            for i, line in enumerate(original_lines, 1):
+                print(f"DEBUG: Line {i}: {line}", file=sys.stderr)
+
+            # Then evaluate the template
+            result = subprocess.run(
+                ["chezmoi", "execute-template", str(ignore_file)],
+                cwd=ignore_file.parent,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            evaluated_content = result.stdout
+            print(f"DEBUG: Evaluated content:", file=sys.stderr)
+            print(evaluated_content, file=sys.stderr)
+
+            # Match evaluated patterns back to original lines
+            patterns = []
+            evaluated_lines = evaluated_content.splitlines()
+
+            # Keep track of which lines in the original file produced which patterns
+            for i, orig_line in enumerate(original_lines, 1):
+                orig_line = orig_line.strip()
+                # Skip empty lines, comments, and template control structures
+                if (
+                    not orig_line
+                    or orig_line.startswith("#")
+                    or orig_line.startswith("{{-")
+                    or orig_line.startswith("{{")
+                    or orig_line == "{{-"
+                    or orig_line == "}}"
+                    or orig_line == "-}}"
+                    or orig_line == "end }}"
+                    or orig_line == "end -}}"
+                ):
+                    continue
+
+                # If this is a template line, look for its evaluated result
+                if "{{" in orig_line:
+                    for eval_line in evaluated_lines:
+                        eval_line = eval_line.strip()
+                        if eval_line and not eval_line.startswith("#"):
+                            patterns.append((i, eval_line))
+                else:
+                    # Non-template line, use as-is
+                    patterns.append((i, orig_line))
+
+            print(f"DEBUG: Found patterns with line numbers:", file=sys.stderr)
+            for line_num, pattern in patterns:
+                print(f"DEBUG:   Line {line_num}: {pattern}", file=sys.stderr)
+
+            return patterns
+
+        except subprocess.CalledProcessError as e:
+            print(f"Error evaluating template {ignore_file}: {e}", file=sys.stderr)
+            return []
+
+    def check_all(self) -> List[Tuple[str, int]]:
+        """Check all .chezmoiignore files for unused patterns"""
+        unused_patterns = []
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_source = Path(temp_dir)
+            shutil.copytree(self.root_dir, temp_source, dirs_exist_ok=True)
+
+            # Get all ignore files and their patterns with line numbers
+            ignore_files = {}
+            for ignore_file in self.root_dir.rglob(".chezmoiignore"):
+                patterns = self.evaluate_ignore_file(ignore_file)
+                if patterns:
+                    ignore_files[ignore_file] = patterns
+
+            # Remove all ignore files to get baseline
+            for f in temp_source.rglob(".chezmoiignore"):
+                f.unlink()
+
+            baseline_managed = self.get_managed_files(temp_source)
+
+            # Test each pattern
+            for orig_ignore_file, patterns in ignore_files.items():
+                for line_num, pattern in patterns:
+                    # Create temporary ignore file with just this pattern
+                    temp_ignore = temp_source / ".chezmoiignore"
+                    temp_ignore.write_text(pattern + "\n")
+
+                    test_managed = self.get_managed_files(temp_source)
+
+                    if test_managed == baseline_managed:
+                        rel_path = orig_ignore_file.relative_to(self.root_dir)
+                        unused_patterns.append((str(rel_path), line_num))
+
+                    temp_ignore.unlink()
+
+        return unused_patterns
+
+
+def main():
+    cwd = Path.cwd()
+    if not any(cwd.rglob(".chezmoiignore")):
+        print("Error: No .chezmoiignore files found", file=sys.stderr)
+        return 1
+
+    checker = ChezmoiIgnoreChecker(cwd)
+    results = checker.check_all()
+
+    if not results:
+        print("No unused patterns found")
+        return 0
+
+    # Print results in format: file_path:line_number
+    for file_path, line_num in sorted(results):
+        print(f"{file_path}:{line_num}")
+
+    return 0
+
+
+if __name__ == "__main__":
+    exit(main())

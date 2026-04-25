@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+export CBI_NO_AUTOSTART_LOCAL_SERVICE=1
+tmuxinator stop Work
+s jira db-upload
+href-router -p chrome/jackmac79@gmail.com "https://en.wikipedia.org/wiki/Special:Random"
+tmux -L cbi kill-server

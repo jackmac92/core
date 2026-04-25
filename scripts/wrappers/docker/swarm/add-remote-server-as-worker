@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -exuo pipefail
+
+target_box_ip="$1"
+ssh_target="${2:-"jmccown@$target_box_ip"}"
+SWARM_HOST_BOX_IP=${SWARM_HOST_BOX_IP:-$(doctl compute droplet list --format PublicIPv4,Name | grep "$PRIMARY_BOX_NAME" | choose 0)}
+DOCKER_SWARM_TOKEN="$(ssh jmccown@$SWARM_HOST_BOX_IP docker swarm join-token --quiet ${DOCKER_SWARM_NODE_TYPE:-worker})"
+
+ssh "$ssh_target" bash -c "docker swarm join --advertise-addr='\$(tailscale ip -4)' --token='$DOCKER_SWARM_TOKEN' $SWARM_HOST_BOX_IP:2377"

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+confbak=$(mktemp)
+
+chezmoi cat-config >$confbak
+
+set +euo pipefail
+
+JM_NO_CHEZ_OVERRIDE=1 chezmoi init
+
+if delta $confbak <(chezmoi cat-config); then
+    exit 0
+fi
+
+echo "Original chezmoi.toml at $confbak"
+
+if ! gum confirm "Proceed with replacing config? ([n] will restore previous config)"; then
+    echo "Restoring previous config"
+    mv -f $confbak ~/.config/chezmoi/chezmoi.toml
+fi

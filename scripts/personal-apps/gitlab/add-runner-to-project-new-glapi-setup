@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+s gitlab this-project-request --form POST runners token="$(s bitwarden get-field "gitlab.com" "runner-token-darwin-docker")"
+s gitlab this-project-request --form POST runners token="$(s bitwarden get-field "gitlab.com" "runner-token-darwin-shell")"
+s gitlab this-project-request --form POST runners token="$(s bitwarden get-field "gitlab.com" "runner-token-linux-docker")"
+s gitlab this-project-request --form POST runners token="$(s bitwarden get-field "gitlab.com" "runner-token-linux-shell")"

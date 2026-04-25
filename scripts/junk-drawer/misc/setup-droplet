@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname="$1"
+
+export UNTIL_CMD_VERBOSE=1
+export FOR_REMOTE_SETUP=1
+
+# DO difference is it assumes root ssh already setup
+public_ip=$(doctl compute droplet list --format PublicIPv4,Name | grep "$vpsname" | choose 0)
+
+s docean setup-jmccown-user-on-new-droplet "$vpsname"
+
+echo "User creation/tabula rasa done"
+# CUTOFF POINT FOR DIGITAL OCEAN SPECIFIC STUFF
+# BEYOND HERE ASSUME BW/TAILSCALE/CHEZ are initialized
+# and that git access to gitlab is available
+
+
+S_FORCE_INPROC=1 s misc setup-chez-remote "$vpsname" "$public_ip"
+
+echo "Starting post setup at $SECONDS"
+
+# if [[ -z "${MKDROPLET_SKIP_SWARM:-""}" ]]; then
+#   s docker swarm add-remote-server-as-worker "$(doctl compute droplet list --format PublicIPv4,Name | grep "$vpsname" | choose 0)" "root@$vpsname"
+# fi
+
+if [[ $vpsname = "$PRIMARY_BOX_NAME" ]]; then
+  s docean assign-floating-ip
+  s docean assign-private-network-dns
+  ssh -t "root@$vpsname" 'mkdir /cloud-torrent-out'
+  ssh -t "root@$vpsname" 'curl -sSL https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh'
+  scp ~/Projects/my-junk/backups/AdGuardHome.yaml/AdGuardHome.yaml root@$vpsname:/opt/AdGuardHome/AdGuardHome.yaml
+fi
+
+set +e
+ssh -t $vpsname "zsh -i -c '. /etc/profile; s goss autofix'"
+ssh root@$vpsname sudo reboot
+set -e
+
+#### s misc minions-do-async 'chezmoi git pull && chezmoi apply .config/goss && chezmoi apply .ssh'

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $(http --follow --body :5600/api/0/buckets/aw-watcher-afk_homeframe/events | jq '.[0].data.status' -r) = "afk" ]]; then
+    echo 1
+else
+    echo 0
+fi

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+notititle=$1
+notibody=$2
+
+mkdir -p ~/.local/afk-notifs
+
+if s is-afk; then
+    echo "Got notification while away: $notitile $notibody" >~/.local/afk-notifs/$(date)
+
+fi

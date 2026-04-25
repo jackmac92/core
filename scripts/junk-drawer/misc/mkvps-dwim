@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VPSNAME=$1
+DROPLET_IMAGE=${DROPLET_IMAGE:-"ubuntu-22-04-x64"}
+if [[ $VPSNAME = ${PRIMARY_BOX_NAME:-elixium} ]]; then
+    DROPLET_SIZE=${DROPLET_SIZE:-"s-2vcpu-2gb-intel"}
+else
+    DROPLET_SIZE=${DROPLET_SIZE:-"s-1vcpu-2gb-intel"}
+fi
+
+s docean mkvps $VPSNAME $DROPLET_IMAGE $DROPLET_SIZE

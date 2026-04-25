@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt="${1:-$PWD}"
+
+source_tgt="$(chezmoi source-path "$tgt")"
+
+delta \
+    <(fd -t f . "$source_tgt" | xargs chezmoi target-path | sort) \
+    <(fd -t f . "$tgt" | sort)

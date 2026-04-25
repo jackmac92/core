@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+org-protocol-capture-html.sh -r -u "$(s web-browser active-tab-url)"

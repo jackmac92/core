@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Send a PDF to remailable@getneutrality.org from that email address,
+# and it will magically* appear on your ReMarkable Tablet.
+# (You will receive an email with a confirmation, or an indication of why your message failed.)
+
+fileToUpload="$1"
+
+# Create a temporary file for the email
+EMAIL_FILE=$(mktemp)
+
+# Get the current date in RFC 2822 format
+DATE=$(date -R)
+
+# Generate a random boundary string
+BOUNDARY="==Multipart_Boundary_$(date +%s)"
+
+# Create the email with headers and multipart structure
+cat >>$EMAIL_FILE <<EOF
+From: jackmcc@fastmail.com
+To: remailable@getneutrality.org
+Subject: Remarkable upload
+Date: $DATE
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="$BOUNDARY"
+
+--$BOUNDARY
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+Please find the attached PDF file.
+
+--$BOUNDARY
+Content-Type: application/pdf; name="attachment.pdf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.pdf"
+
+$(base64 $fileToUpload)
+
+--$BOUNDARY--
+EOF
+
+# Send the email using sendmail
+sendmail -t <$EMAIL_FILE
+
+# Clean up the temporary file
+rm $EMAIL_FILE

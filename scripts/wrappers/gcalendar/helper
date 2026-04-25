@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+calendar3 --config-dir $GCAL_CONFIG_DIR $*

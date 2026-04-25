@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tdg | jq '.project as $project | .root as $projectpath | .comments | map("** \(.type) [[\($projectpath)/\(.file)::\(.line)][\(.title)]]\n\(.body)") | .[]' -r
+

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s docean get-droplet-info | jq '.networks.v4 | map(select(.type | contains("public"))) | first | .ip_address' -r
+

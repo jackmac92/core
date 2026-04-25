@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd $(chezmoi source-path)
+
+cd meta.d
+
+dhall-to-json <base.dhall | s util convert-json-to-toml | sponge ../.chezmoidata.toml
+
+if [[ -z ${CHEZ_DHALL_AUTO_COMMIT:-""} ]]; then
+    exit 0
+fi
+
+cd $(git root-directory)
+
+git add meta.d
+git add ./.chezmoidata.toml
+git commit -m "chezmoidata from dhall update" --allow-empty

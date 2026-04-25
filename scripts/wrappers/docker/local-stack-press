@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+(
+    cat ~/Projects/infra/ci-templates/docker-stack/auto-config.yml | yq '.variables | to_entries | map("export \(.key)=\(.value)")[]' -r
+    cat ~/Projects/infra/ci-templates/docker-stack/generator.yml | yq '.[".generate_docker_stack_components_base"].script[]' -r
+) | bash
+
+s util yq-merge-all specfiles/* >stackpressed.yml

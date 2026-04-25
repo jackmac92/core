@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TAILAUTH=$(bw get item tailscale | jq '.fields[] | select(.name == "api-key").value' -r)
+https --auth "$TAILAUTH:" "api.tailscale.com/api/v2/tailnet/jackmac79@gmail.com/dns/preferences" | jq -e '.magicDNS == true'
+
+# COULDDO: use this to dictate whether some dns goss tests get removed

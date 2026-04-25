@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Set defaults for MAIN_SERVICE and TAILSCALE_HOST.
+# MAIN_SERVICE defaults to jackdmc.com, can be overridden via envvar.
+MAIN_SERVICE="${MAIN_SERVICE:-jackdmc.com}"
+
+# TAILSCALE_HOST defaults to a URL composed of the local hostname.
+DEFAULT_TAILSCALE_HOST="https://$(hostname).tail93d63.ts.net/"
+TAILSCALE_HOST="${TAILSCALE_HOST:-$DEFAULT_TAILSCALE_HOST}"
+
+# Check for exactly one positional argument: the subdomain prefix.
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <subdomain_prefix>"
+    exit 1
+fi
+
+SUBDOMAIN_PREFIX="$1"
+
+echo >&2 "Using MAIN_SERVICE=${MAIN_SERVICE}"
+echo >&2 "Using TAILSCALE_HOST=${TAILSCALE_HOST}"
+echo >&2 "Creating subdomain: ${SUBDOMAIN_PREFIX}.${MAIN_SERVICE} -> ${TAILSCALE_HOST}"
+
+# Create the CNAME record using doctl.
+doctl compute domain records create "${MAIN_SERVICE}" \
+    --record-type CNAME \
+    --record-name "${SUBDOMAIN_PREFIX}" \
+    --record-data "${TAILSCALE_HOST}" \
+    --record-ttl 1800
+
+echo >&2 "Created DNS record for ${SUBDOMAIN_PREFIX}.${MAIN_SERVICE} successfully."

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_name="${1:-"$(s gitlab get-gitlab-project-name-from-remote)"}"
+git pull
+
+if [ -f package.json ]; then
+	jq --arg pkgname "$project_name" '.name = $pkgname' package.json | sponge package.json
+	git add package.json
+	yarn install
+	git add yarn.lock
+	git commit -m "chore: $1 initial commit"
+fi
+if [ -x project_init.sh ]; then
+	./project_init.sh "$project_name"
+	rm -f project_init.sh || true
+	git rm project_init.sh || true
+	git commit --allow-empty -m "post init commit"
+	git push -u origin "$(git current-branch)"
+fi
+if [ -s go.mod ]; then
+	go mod download
+fi

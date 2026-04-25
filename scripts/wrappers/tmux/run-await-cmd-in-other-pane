@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+tmux_run_command() {
+    local command="$1"
+    local tmp_file=$(mktemp)
+    local window_id=$(tmux display-message -p "#{window_id}")
+    local original_layout=$(tmux display-message -p "#{window_layout}")
+
+    tmux split-window -d bash -c "($command); echo \$? > $tmp_file"
+
+    while [ ! -f "$tmp_file" ] || [ ! -s "$tmp_file" ]; do
+        sleep 0.01
+    done
+
+    local exit_status=$(cat "$tmp_file")
+    rm -f "$tmp_file"
+
+    # Restore original layout
+    tmux select-window -t "$window_id"
+    tmux select-layout "$original_layout" >/dev/null 2>&1
+
+    return $exit_status
+}
+
+tmux_run_command "$*"

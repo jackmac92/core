@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+asset_filter=${1:-""}
+repo_name="${2:-"$(s util github get-repo-name-dwim)"}"
+
+dlUrl=$(
+	s util github find-repo-latest-releases "$repo_name" |
+		jq -r -s '.[].browser_download_url' |
+		rg "$asset_filter" |
+		fzf
+)
+
+s util download-and-extract "$dlUrl"

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+doctl compute ssh-key create "s script sshkey $(date)" --public-key="$(cat ~/.ssh/id_ed25519.pub)"

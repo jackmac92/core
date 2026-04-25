@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s web-browser list-urls | rg github | fzf | sd '.*github\.com/([\w-]+)/([\w-]+)/?.*' 'https://github.com/$1/$2'

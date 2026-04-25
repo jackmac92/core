@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s dot find-useless-ignores |
+    sort -t: -k1,1 -k2,2nr |
+    xargs -n 1 -d $'\n' s shell delete-one-line-by-lineno
+
+fd --hidden .chezmoiignore -x s util gotemplate-find-dead-blocks |
+    sort -t: -k1,1 -k2,2nr |
+    xargs -n 1 -d $'\n' s shell delete-one-line-by-lineno

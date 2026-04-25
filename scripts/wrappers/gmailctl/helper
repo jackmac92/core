@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt=$1
+shift
+
+gmailctl --config ~/.config/gmailctl/$tgt $*

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s new "$*" -- 'echo "Not implemented!!^!"; exit 1'

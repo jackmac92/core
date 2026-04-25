@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+domain=$1
+
+doctl compute domain create "$domain" --ip-address 134.209.129.169
+doctl compute domain records create "$domain" --record-type CNAME --record-name '*' --record-data "$domain." --record-ttl 43200
+doctl compute domain records create "$domain" --record-type A --record-name "priv" --record-data "$(s tailscale pick-ip elixium)" --record-ttl 43200
+doctl compute domain records create "$domain" --record-type CNAME --record-name '*.priv' --record-data "priv.$domain." --record-ttl 43200

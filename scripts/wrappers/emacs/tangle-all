@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+JM_ORG_TANGLE_EXCLUDE="README.org config.org" s emacs tangle-all-in-target-dir ~/.doom.d

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname="$1"
+
+public_ip=$(doctl compute droplet list --format PublicIPv4,Name | grep "$vpsname" | choose 0)
+
+chronic ssh-keygen -R $public_ip
+
+gum spin --spinner dot --title "Initial connection" -- s util until-cmd-passes --quiet ssh -o StrictHostKeyChecking=accept-new "root@$public_ip" "echo hi"
+
+export DOCTL_SSH_PORT=22
+gum spin --spinner hamburger --title "Apt update" --show-output -- s util until-cmd-passes --max-times=3 s docean sshcmd-via-doctl "$vpsname" root "apt-get -o DPkg::Lock::Timeout=60 update -y"
+
+gum spin --spinner hamburger --title "Apt full-upgrade" -- s util until-cmd-passes s docean sshcmd-via-doctl "$vpsname" root "DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 -o Dpkg::Options::='--force-confold' full-upgrade -y"
+
+echo "Apt updates done"
+
+gum spin --spinner jump --title "Create user" -- s docean sshcmd-via-doctl "$vpsname" root "
+# allow no password sudo access
+echo 'ALL            ALL = (ALL) NOPASSWD: ALL' | sudo EDITOR='tee -a' visudo
+# allow no password su access
+groupadd allowedpeople
+echo 'auth sufficient pam_succeed_if.so use_uid user ingroup allowedpeople' | sudo tee -a /etc/pam.d/su
+echo 'auth       sufficient   pam_shells.so' | sudo tee -a /etc/pam.d/chsh
+
+sudo useradd --shell /bin/bash --create-home --groups sudo,allowedpeople jmccown
+
+sudo passwd -d jmccown
+
+sudo -u jmccown ssh-keygen -q -t ed25519 -b 4096 -N '' -f /home/jmccown/.ssh/id_ed25519 -C jackmac79@gmail.com
+"
+
+SSH_KEY_TO_ADD="$(s docean sshcmd-via-doctl "$vpsname" jmccown "cat ~/.ssh/id_ed25519.pub")" SSH_KEY_TITLE="autogen-$vpsname-droplet-key" s gitlab ssh-key-add
+
+s docean copy-root-ssh-authorized-keys-to-jmccown "$public_ip"

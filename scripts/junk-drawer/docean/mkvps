@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VPSNAME=$1
+DROPLET_IMAGE=${2:-"$(s docean choose-image)"}
+DROPLET_SIZE=${3:-"$(s docean choose-server-size)"}
+
+doctl compute droplet create "$VPSNAME" \
+    --wait \
+    --enable-monitoring \
+    --enable-private-networking \
+    --region nyc1 \
+    --size "$DROPLET_SIZE" \
+    --image "$DROPLET_IMAGE" \
+    --ssh-keys="$(s docean get-ssh-fingerprint)"

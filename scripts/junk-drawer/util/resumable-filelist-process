@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -lt 2 ]; then
+    echo "Usage: $0 input_file processor_script" >&2
+    echo "Example: $0 files_to_process.txt ./process_single_file.sh" >&2
+    exit 1
+fi
+
+input_file="$1"
+processor_script="$2"
+batch_size=100 # Number of files to process before updating input file
+
+# Input validation
+if [ ! -f "$input_file" ]; then
+    echo "Error: Input file '$input_file' not found" >&2
+    exit 1
+fi
+if [ ! -f "$processor_script" ]; then
+    echo "Error: Processor script '$processor_script' not found" >&2
+    exit 1
+fi
+if [ ! -x "$processor_script" ]; then
+    echo "Error: Processor script '$processor_script' is not executable" >&2
+    exit 1
+fi
+
+# Derive processed file name from input file
+processed_file="${input_file%.*}.done.txt"
+lock_file="/tmp/processing_$$"
+initial_count=$(wc -l <"$input_file")
+touch "$processed_file"
+
+# Cleanup function
+cleanup() {
+    rm -f "$lock_file"
+    jobs -p | xargs -r kill
+}
+trap cleanup EXIT
+
+# Print initial status
+echo "Starting processing of $initial_count files..."
+
+# Process files using null bytes as separators, with inlined function
+cat "$input_file" | tr '\n' '\0' |
+    xargs -0 bash -c '
+        processor="$1"; shift
+        input_file="$1"; shift
+        lock_file="$1"; shift
+        batch_size="$1"; shift
+        processed_file="${input_file%.*}.done.txt"
+
+        process_single_file() {
+            local file="$1"
+            
+            # Skip if already processed
+            if [ -f "$processed_file" ] && grep -Fxq "$file" "$processed_file"; then
+                return 0
+            fi
+            
+            if ! "$processor" "$file"; then
+                echo "Error: Processing failed for file: $file" >&2
+                return 1
+            fi
+            
+            # Atomic update with file locking
+            (
+                flock -x 200
+                printf "%s\n" "$file" >> "$processed_file"
+                
+                # Update input file periodically and show progress
+                if [ -f "$processed_file" ]; then
+                    processed_count=$(wc -l < "$processed_file")
+                    if ((processed_count % batch_size == 0)); then
+                        if [ -f "$input_file" ]; then
+                            grep -Fxv -f "$processed_file" "$input_file" > "${input_file}.tmp.$$" && 
+                            mv "${input_file}.tmp.$$" "$input_file"
+                            remaining_count=$(wc -l < "$input_file")
+                            echo "Progress: $processed_count processed, $remaining_count remaining"
+                        fi
+                    fi
+                fi
+            ) 200>"$lock_file"
+            
+            return 0
+        }
+
+        # Process each file
+        for file in "$@"; do
+            if ! process_single_file "$file"; then
+                exit 1
+            fi
+        done
+    ' _ "$processor_script" "$input_file" "$lock_file" "$batch_size"
+
+# Final cleanup of input file and status
+if [ -f "$input_file" ] && [ -f "$processed_file" ]; then
+    grep -Fxv -f "$processed_file" "$input_file" >"${input_file}.tmp.$$" &&
+        mv "${input_file}.tmp.$$" "$input_file"
+
+    processed_count=$(wc -l <"$processed_file")
+    remaining_count=$(wc -l <"$input_file")
+    echo "Final status: $processed_count processed, $remaining_count remaining"
+fi

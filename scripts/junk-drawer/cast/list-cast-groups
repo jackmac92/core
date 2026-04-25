@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# groups listen on a different port
+go-chromecast ls |
+    rg 'address="\S+:32228"' |
+    s cast device-extract-field uuid

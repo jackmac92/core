@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+notmuch dump "is:unread AND is:inbox AND not is:archive AND not is:trash AND not is:spam AND tag:$1" | rg -v "#notmuch-dump" | choose -1 | s gui emacs-view-emails $1

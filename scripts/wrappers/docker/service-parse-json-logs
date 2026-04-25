@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+docker service logs --no-task-ids $1 | sd "^$1\.1@\w+" '' | sd '^\s+\|\s' '' | jq -R 'fromjson?'
+

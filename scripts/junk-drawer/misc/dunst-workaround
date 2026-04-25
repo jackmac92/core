@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+currnetnotifier=$(DISPLAY=${DISPLAY:-":0"} dunst |& rg PID)
+
+if [[ dunst != $(echo "$currnetnotifier" | rg --only-matching --no-filename --no-line-number "Name is acquired by '(\S+)' with" --replace '$1') ]]; then
+    nonDunstPid=$(echo "$currnetnotifier" | choose -1 | sd "'(\d+)'\." '$1')
+    if [[ -n "$nonDunstPid" ]]; then
+        kill $nonDunstPid && systemctl --user restart dunst.service
+    fi
+else
+    echo "dunst already active"
+fi

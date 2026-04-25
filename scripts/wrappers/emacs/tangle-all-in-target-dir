@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fd -e ${JM_ORG_TANGLE_EXT:-org} $(xargs printf "--exclude=%s " <<<"$JM_ORG_TANGLE_EXCLUDE") . $1 -x emacsclient --eval '(org-babel-tangle-file "{}")'

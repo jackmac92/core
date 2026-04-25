@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+youtube3 playlists list 'snippet,status' -p mine=true
+

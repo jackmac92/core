@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname="$1"
+
+export FOR_REMOTE_SETUP=1
+cat ~/.local/share/chezmoi/.chezmoiscripts/run_once_install-tailscale.sh.tmpl | chezmoi execute-template | ssh "root@$vpsname" bash -
+cat ~/.local/share/chezmoi/.chezmoiscripts/run_once_after_tailscale-auth.sh.tmpl | chezmoi execute-template | ssh "root@$vpsname" bash -
+
+s misc chezmoi-update-one-tailscale-ip "$vpsname"

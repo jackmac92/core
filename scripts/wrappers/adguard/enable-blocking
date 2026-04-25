@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Enabling adblock server"
+chronic http --ignore-stdin --auth=jmccown:$(bw get password adguard) --print=B POST http://priv.$PRIMARY_PERSONAL_DOMAIN:3471/control/dns_config protection_enabled:=true

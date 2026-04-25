@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xpanes -s -t -c 'docker service logs -f {}' $(docker stack ps --filter=desired-state=running ${1:?missing required stack name parameter} | s util decapitext | choose 1 | cut -d. -f1)

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+env | rg '^GO' | choose -f = 0 | tr '\n' ' ' | sd -- 'GO' '-e GO'
+

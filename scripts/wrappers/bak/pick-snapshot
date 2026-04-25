@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# currently assuming you pass a --path, that's why time is the key we care about
+
+s bak list-snapshots --json $* | s fzf select-by-json-key "time" | jq -r '.short_id'

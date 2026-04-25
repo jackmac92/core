@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -exuo pipefail
+
+joinarg=${1:-${DOCKER_SWARM_NODE_TYPE:-worker}}
+
+if docker node ls >/dev/null 2>&1; then
+    docker swarm join-token --quiet $joinarg
+else
+    ssh $PRIMARY_BOX_NAME docker swarm join-token --quiet $joinarg
+fi

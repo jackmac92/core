@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+
+echo "Syncing jira with local ticket store"
+
+activeTicketOnJira=$(jira active-ticket | jq -r '.issues[]?.key' | head -n 1)
+if [[ $activeTicketOnJira != $(s jira get-active-ticket) ]]; then
+    s jira set-current-ticket "$activeTicketOnJira"
+fi

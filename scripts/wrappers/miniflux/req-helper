@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+req_path=$1
+shift
+
+http --auth="${MINIFLUX_USER:?Missing miniflux user}:${MINIFLUX_PASS:?Missing miniflux pass}" --ignore-stdin --body https://feeds.jackdmc.com/v1/$req_path $*

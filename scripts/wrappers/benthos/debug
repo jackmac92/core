@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+benthos -c <(yq "$1" d output | yq - w output.stdout.delimiter '')

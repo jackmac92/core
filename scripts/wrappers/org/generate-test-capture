@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgtDate="$(date --rfc-3339=s | sd ' ' 'T')"
+tgtDir="$HOME/.local/ios-capture-inbox/$tgtDate"
+mkdir "$tgtDir"
+jq --null-input --arg capDate "$tgtDate" --arg id "$(uuidgen)" '{body:"Generated capture test case at \($capDate)\ncapture body\n", "from-ios-shortcut": true, tags: ["test"], uuid: $id}' | tee "$tgtDir/Dictionary.json"

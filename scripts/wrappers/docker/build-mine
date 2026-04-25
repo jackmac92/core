@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+dirName=${PWD##*/}
+docker build $PWD -t jackzzz92/$dirName
+

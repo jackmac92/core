@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+doctl compute droplet list --format "Name,ID" --output json | s fzf select-by-json-key "name" | jq -r '.id'

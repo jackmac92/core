@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+s cast available-device-ids | xargs -d $'\n' -I_ timeout 7s bash -c "go-chromecast -u _ status | rg --quiet -i '(playing)' && echo _"

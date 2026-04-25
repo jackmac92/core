@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_name="$1"
+
+s util github find-repo-latest-releases "$repo_name" |
+	jq -r -s '.[].browser_download_url' |
+	head -n 1

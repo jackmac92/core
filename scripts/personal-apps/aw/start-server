@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+dtach -n activitywatch ~/.local/apps/activitywatch/aw-server/aw-server

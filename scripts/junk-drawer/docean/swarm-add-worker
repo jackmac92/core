@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname="$1"
+
+s docker swarm add-remote-server-as-worker "$(doctl compute droplet list --format PublicIPv4,Name | grep "$vpsname" | choose 0)"

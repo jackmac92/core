@@ -1,0 +1,1 @@
+benthos -list-$1 | rg "^## \`" | cut -d\` -f2 | fzf --multi --print-query --preview "benthos -print-json -example {} | jq .$1.{} | yq - r"

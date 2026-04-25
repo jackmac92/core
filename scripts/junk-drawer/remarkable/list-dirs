@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+IFS=$'\n'; for fle in $(rmapi -ni ls "${1:-""}" | rg '^\[d\]' | sd '^\[d\]\s+' ''); do echo "$fle"; done
+

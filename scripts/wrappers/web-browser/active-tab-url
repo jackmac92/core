@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Not implemented after tabfs -> brotab"
+exit 1
+
+#? brotab active --json | jq .url

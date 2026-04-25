@@ -1,0 +1,1 @@
+parse logs from specified docker service as json (ignoring non json)

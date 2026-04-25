@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+docker swarm leave --force
+
+for i in elixium; do
+    ssh $i docker swarm leave --force || true
+    ssh $i docker system prune -af
+    ssh $i docker volume prune -f
+    # COULDDO: should also remove gitlab-runners, to ensure swarm-manager tags stay up to date
+done

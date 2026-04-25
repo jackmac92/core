@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+http -A creds --body POST $HASS_SERVER/api/services/rest_command/kgoogle cmd="$1"

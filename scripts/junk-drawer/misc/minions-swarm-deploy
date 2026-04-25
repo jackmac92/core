@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for i in droxy-ssl docker-registry; do
+    cd $(zoxide query $i)
+    echo "Await starting $i from $PWD"
+    lab ci create
+    gitlab-ci-tracker --wait for-sha
+    echo "$i deploy pipeline done"
+done
+
+for i in user-comments jaeger-tracing media filestash bettercap-receiver; do
+    cd $(zoxide query $i)
+    echo "Starting $i from $PWD"
+    lab ci create
+done

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+moviename="$1"
+
+# RADARR_HOST="https://radarr.priv.$PRIMARY_PERSONAL_DOMAIN"
+RADARR_HOST="127.0.0.1:7878"
+
+http --body GET $RADARR_HOST/api/v3/movie/lookup term=="$moviename" apiKey==$RADARR_API_KEY

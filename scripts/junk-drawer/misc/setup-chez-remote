@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname="$1"
+public_ip="$2"
+
+debugmsg() {
+    if [[ -n "${DEBUG:-""}" ]]; then
+        printf "%s\t%s" $(date +%T) "$@"
+    fi
+}
+
+_reboot() {
+    ssh "root@$vpsname" reboot || true
+    until [[ "$(ssh $vpsname whoami 2>/dev/null)" == "jmccown" ]]; do
+        sleep 2
+        debugmsg "Retesting post reboot awake"
+    done
+    sleep 3
+    ssh-keygen -R "$public_ip"
+    debugmsg "Reboot done"
+}
+
+cat ~/.ssh/conf.d/tailscale_hosts.inc | sed "/Host ${vpsname}/,/^\s*$/d" | sponge ~/.ssh/conf.d/tailscale_hosts.inc
+
+cat <<EOF | tee ~/.ssh/temp-conf.d/$vpsname >/dev/null
+Host $vpsname
+     HostName $public_ip
+     User jmccown
+     StrictHostKeyChecking no
+     ServerAliveCountMax 300
+     ServerAliveInterval 60
+     ConnectTimeout 10
+     ConnectionAttempts 15
+
+EOF
+
+chmod 600 ~/.ssh/temp-conf.d/$vpsname
+
+# ssh "$vpsname" "
+# git config --global url.\"https://jackmac92:$LAB_CORE_TOKEN@gitlab.com/\".insteadOf \"git@gitlab.com:\"
+# "
+
+# NOTE skipping global url rewrite assuming that the ssh key add works
+gum spin --spinner line --title "chez initial init" -- ssh "$vpsname" '
+mkdir -p bin
+sh -c "$(curl -fsLS https://chezmoi.io/get)" -- init gitlab.com/jackmac92/dotFiles --ssh
+'
+
+chronic ssh "root@$vpsname" 'mv /home/jmccown/bin/chezmoi /usr/bin/chezmoi'
+
+gum spin --spinner dot --title "Install nix" --show-output -- ssh "root@$vpsname" "curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm"
+
+gum spin --spinner minidot --title "Install nix base packages" -- ssh "$vpsname" "
+. /etc/profile
+nix-channel --add https://channels.nixos.org/nixos-unstable nixpkgs
+nix-channel --update
+nix-env -iA nixpkgs.bitwarden-cli nixpkgs.fd
+nix-env --set-flag priority 4 bitwarden-cli
+nix-env --set-flag priority 9 fd
+"
+
+_reboot
+
+debugmsg "first reboot done"
+
+until BW_TEMP_FILE_PATH=/home/jmccown/.bw-auth BW_SKIP_SET_SKATE=1 chronic s bitwarden remote-auth-skate "$vpsname"; do
+    debugmsg "Bw login failed!!"
+    sleep 2
+done
+
+chronic ssh "$vpsname" "
+echo 'source /etc/profile' >> ~/.tmpenv
+echo 'export CHEZ_FULL=1' >> ~/.tmpenv
+echo 'export CHEZ_WITH_SUDO=1' >> ~/.tmpenv
+echo 'export IN_REMOTE_SETUP=1' >> ~/.tmpenv
+echo 'export JM_NO_CHEZ_OVERRIDE=1' >> ~/.tmpenv
+echo \"[ -f /home/jmccown/.bw-auth ] && source /home/jmccown/.bw-auth\" >> ~/.tmpenv
+"
+
+for i in $(seq 2); do
+    set +e
+    gum spin --spinner hamburger --title "Running initial chez apply $i" --show-output -- chronic ssh "$vpsname" '. ~/.tmpenv; JM_NIX_INITIAL_SETUP=1 chezmoi apply --force --keep-going'
+    debugmsg "Chez slim apply $i done with exit $?"
+    set -e
+    _reboot
+done
+
+chronic ssh "$vpsname" "
+echo 'export FORCE_DEP_INSTALLS=1' >> ~/.tmpenv
+"
+
+debugmsg "Starting full chez apply"
+chronic ssh "$vpsname" '. ~/.tmpenv; chezmoi apply --force --keep-going' || true
+gum spin --spinner pulse --title "Running full chez apply 2" -- ssh "$vpsname" '. ~/.tmpenv; chezmoi apply --force'
+debugmsg "Finished full chez apply"
+chronic ssh "$vpsname" '. ~/.tmpenv; chezmoi apply .envrc'
+
+debugmsg "Updating ssh ip/port"
+ssh "$vpsname" 'JM_SETUP_CUSTOM_SSH_PORT=1 CHEZ_WITH_SUDO=1 chezmoi apply .chezmoiscripts/linux--sshd-config.sh'
+gum spin --spinner monkey --title "Updating ssh port/ip" -- bash -c "
+s misc chezmoi-update-one-tailscale-ip '$vpsname'
+chezmoi apply --force ~/.ssh/conf.d/tailscale_hosts.inc
+rm -f ~/.ssh/temp-conf.d/$vpsname"
+debugmsg "Update ssh ip/port done"
+
+_reboot
+
+debugmsg "last chez reboot done"
+
+s bitwarden remote-auth-skate "$vpsname"

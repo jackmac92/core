@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tgt=$(s gmailctl pick-account)
+cmd=${*:-"$(
+echo 'apply
+debug
+download
+edit
+export
+help
+init
+diff' | fzf --header "Select gmailctl command" --preview "gmailctl help {}")"}
+
+
+s gmailctl helper "$tgt" $cmd
+

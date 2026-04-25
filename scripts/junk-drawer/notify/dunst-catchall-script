@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# DUNST_APP_NAME,
+# DUNST_SUMMARY,
+# DUNST_BODY,
+# DUNST_ICON_PATH,
+# DUNST_URGENCY,
+# DUNST_ID,
+# DUNST_PROGRESS,
+# DUNST_CATEGORY,
+# DUNST_STACK_TAG,
+# DUNST_URLS,
+# DUNST_TIMEOUT,
+# DUNST_TIMESTAMP,
+# DUNST_DESKTOP_ENTRY,
+# DUNST_STACK_TAG.
+
+mkdir -p "$HOME/.local/dunst-catchall-log"
+env | rg DUNST_ >"$HOME/.local/dunst-catchall-log/$(date +%s)"
+if who | rg -q 100.125.117.115; then
+    echo "Forwarding to macbook"
+    ssh 100.125.117.115 .local/bin/osx-notify "'$DUNST_SUMMARY'" "'$DUNST_APP_NAME'" "'$DUNST_BODY'"
+fi
+
+export S_INNER_CALL=1
+# s notify dwim "$DUNST_SUMMARY" "$DUNST_BODY"

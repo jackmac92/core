@@ -1,0 +1,2 @@
+output_types=$(benthosPickOneOfType output)
+benthos --print-yaml --example $(echo $output_types | tr ' ' ',')

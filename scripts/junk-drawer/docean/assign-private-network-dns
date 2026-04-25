@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for d in "$PRIMARY_PERSONAL_DOMAIN" hopefullythis.works; do
+    TARGET_DROPLET_ID="$(doctl compute domain records list "$d" | rg '\spriv\s' | grep A | choose 0)"
+    doctl compute domain records update "$d" --record-id "$TARGET_DROPLET_ID" --record-data "$(s tailscale get-ip "$PRIMARY_BOX_NAME")"
+done

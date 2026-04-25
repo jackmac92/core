@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+vpsname="$1"
+newip="$(s tailscale get-ip "$vpsname")"
+if [[ -z "$newip" ]]; then
+    echo "Could not find new ip!!"
+    exit 1
+fi
+cat ~/.local/share/chezmoi/meta.d/vpnips.dhall | dhall-to-json | jq --arg newip "$newip" '.elixium = $newip' | json-to-dhall | sponge ~/.local/share/chezmoi/meta.d/vpnips.dhall
+chezmoi git add meta.d/vpnips.dhall
+s dot dhall-meta-write
+chezmoi git add .chezmoidata.toml
+chezmoi git commit -- -m "auto update $vpsname droplet ip"
+chezmoi git pull -- --no-edit
+chezmoi git push

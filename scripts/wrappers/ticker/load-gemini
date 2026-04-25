@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+open "https://exchange.gemini.com/balances"
+echo "Download trade history..."
+read nully
+echo "Ok hopefully no fuckups cuz I didn't check"
+
+s util xlsx-to-csv $(ls ~/Downloads/transaction_history*.xlsx | fzf) | convertCsvToJson | jq 'map(select(.Type | contains("Buy")))' | python -c '
+import sys
+import json
+
+all = json.load(sys.stdin)
+for a in all:
+ basesymbol = a["Symbol"][:-3]
+ tickersymbol = basesymbol + "-" + a["Symbol"][-3:]
+ quantity = float(a[f"{basesymbol} Amount {basesymbol}"])
+ cost = float(a["USD Amount USD"])
+ unit_cost = cost / quantity
+ print(json.dumps({"symbol": tickersymbol, "unit_cost": unit_cost, "quantity": quantity }))
+' | jq -s | yq - r -P | sed -e 's/^/  /'
+

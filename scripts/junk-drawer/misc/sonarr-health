@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+https --check-status --body GET sonarr.priv.$PRIMARY_PERSONAL_DOMAIN/api/v3/health apiKey==$SONARR_API_KEY | jq '.[]'

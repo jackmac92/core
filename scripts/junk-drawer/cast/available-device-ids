@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for i in $(seq 3); do
+    go-chromecast ls | s cast device-extract-field uuid
+done | sort -u
