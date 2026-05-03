@@ -5,12 +5,12 @@ reponame=$(s gitlab get-gitlab-project-name-from-remote)
 cd $(mktemp -d)
 
 if [[ $# > 1 ]]; then
-    s util gitlabformgen-noninteractive $* >./config.yml
+	s util gitlabformgen-noninteractive $* >./config.yml
 else
-    s util gitlabformgen $* >./config.yml
+	s util gitlabformgen $* >./config.yml
 fi
 
 cat config.yml
 echo "Updating for $reponame"
 
-GITLAB_TOKEN=${GITLAB_API_TOKEN:-$(s gitlab get-api-token-for-url)} pipx run gitlabform "$reponame"
+GITLAB_TOKEN=${GITLAB_API_TOKEN:-$(s gitlab get-api-token-for-url)} uvx gitlabform "$reponame"
