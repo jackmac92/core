@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd ~/.config/nix/home-manager
+cd ~/.config/nix
 nix flake update
 chezmoi add --create flake.lock
-trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/nix/home-manager/create_flake.lock; rm -f ~/.config/nix/home-manager/flake.lock; chezmoi apply --force ~/.config/nix/home-manager/flake.lock; exit 1" ERR
+trap "git -C ~/.local/share/chezmoi/ checkout -- private_dot_config/nix/create_flake.lock; rm -f ~/.config/nix/flake.lock; chezmoi apply --force ~/.config/nix/flake.lock; exit 1" ERR
 
 cd
 
@@ -15,7 +15,7 @@ if [[ ${CHEZ_JM_EMACS_ENABLED:-""} == 1 ]]; then
 	s emacs test integration
 fi
 
-cd ~/.local/share/chezmoi/private_dot_config/nix/home-manager
+cd ~/.local/share/chezmoi/private_dot_config/nix/
 git add *flake*
 git commit -m "flake update" && {
 	git pull --no-edit
