@@ -1,0 +1,1 @@
+Check all s-script references across SCRIPTS_PATH for broken calls. Useful before/after renaming scripts.

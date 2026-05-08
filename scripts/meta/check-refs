@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Verify all 's <cmd>' references in scripts resolve to known scripts.
+# Useful before/after renaming scripts to catch broken references.
+
+set -euo pipefail
+
+declare -A known
+errors=0
+
+# Build known script set (slash-joined relative paths, e.g. "meta/needs-docs")
+for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    [[ -d "$scriptdir" ]] || continue
+    while IFS= read -r path; do
+        rel="${path#$scriptdir/}"
+        known["$rel"]=1
+    done < <(fd . "$scriptdir" -t x)
+done
+
+echo "Loaded ${#known[@]} known scripts" >&2
+
+# Check if space-separated words resolve to a known script.
+# Tries longest prefix first (mirrors how 's' traverses subdirs).
+resolve_call() {
+    local args=("$@")
+    local n=${#args[@]}
+    local candidate
+    for ((i=n; i>=1; i--)); do
+        candidate=$(printf '%s/' "${args[@]:0:$i}")
+        candidate="${candidate%/}"
+        [[ -n "${known[$candidate]:-}" ]] && return 0
+    done
+    return 1
+}
+
+check_file() {
+    local file="$1"
+    local lineno=0 line match call
+    local -a words
+
+    while IFS= read -r line; do
+        lineno=$((lineno + 1))
+
+        # Skip blank lines, comment lines, and echo/printf lines (avoid string content false positives)
+        [[ -z "${line// }" ]] && continue
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ "$line" =~ ^[[:space:]]*(echo|printf)[[:space:]] ]] && continue
+
+        while IFS= read -r match; do
+            [[ -z "$match" ]] && continue
+            call="${match#s }"
+            read -ra words <<< "$call"
+            [[ ${#words[@]} -eq 0 ]] && continue
+
+            # Skip s dispatcher's built-in passthru commands (not scripts on disk)
+            case "${words[0]}" in
+                which|whicha|new|edit|cat|mkhelp|delete|debug|rename|duplicate|help) continue ;;
+            esac
+
+            # Skip dynamic calls where the last word ends with '-' (variable suffix stripped by regex)
+            [[ "${words[-1]}" == *- ]] && continue
+
+            if ! resolve_call "${words[@]}"; then
+                echo "${file}:${lineno}: unresolved: s ${words[*]}"
+                errors=$((errors + 1))
+            fi
+        done < <(
+            echo "$line" | rg -o --pcre2 \
+                '(?:^|(?<=[ \t;|&`(]))s [a-z][a-z0-9_-]+(?:[ \t]+[a-z][a-z0-9_-]+)*' \
+                2>/dev/null || true
+        )
+    done < "$file"
+}
+
+for scriptdir in $(echo "$SCRIPTS_PATH" | tr ':' '\n'); do
+    [[ -d "$scriptdir" ]] || continue
+    while IFS= read -r file; do
+        check_file "$file"
+    done < <(fd . "$scriptdir" -t x)
+done
+
+echo ""
+if [[ $errors -gt 0 ]]; then
+    echo "$errors unresolved s script reference(s)" >&2
+    exit 1
+else
+    echo "All s script references resolve OK"
+fi
