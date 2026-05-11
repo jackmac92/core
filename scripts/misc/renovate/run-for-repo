@@ -2,5 +2,5 @@
 set -euo pipefail
 
 cd ~/repos/gitlab.com/jackmac92/renovate-runner
-. ~/.config/custom/secrets.d/renovate
+. ~/.local/share/secrets.d/dev
 renovate --autodiscover=false $1

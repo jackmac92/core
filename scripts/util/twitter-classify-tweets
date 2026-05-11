@@ -74,11 +74,11 @@ def load_env_from_file(file_path: str) -> Dict[str, str]:
 def load_custom_env_vars():
     """
     Load environment variables from custom locations.
-    Loads from ~/.config/custom/secrets.d/openai if it exists.
+    Loads from ~/.local/share/secrets.d/llms if it exists.
     """
     # Try to load from custom secrets directory
     home = Path.home()
-    secrets_file = home / '.config' / 'custom' / 'secrets.d' / 'openai'
+    secrets_file = home / '.local' / 'share' / 'secrets.d' / 'llms'
 
     if secrets_file.exists():
         print(f"Loading environment variables from {secrets_file}")
@@ -484,7 +484,7 @@ def main():
         print("Error: OPENAI_API_KEY environment variable not set")
         print("Please either:")
         print("  1. Set it with: export OPENAI_API_KEY=your-api-key")
-        print("  2. Add it to ~/.config/custom/secrets.d/openai file:")
+        print("  2. Add it to ~/.local/share/secrets.d/llms file:")
         print("     OPENAI_API_KEY=your-api-key")
         return
 
